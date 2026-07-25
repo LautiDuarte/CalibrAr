@@ -15,7 +15,6 @@ namespace Data
         public Task AddAsync(Area area)
         {
             area.SetId(nextId++);
-            nextId++;
 
             var locationRepo = new LocationRepository();
             var location = locationRepo.GetAllAsync().Result.FirstOrDefault(l => l.Id == area.LocationId);

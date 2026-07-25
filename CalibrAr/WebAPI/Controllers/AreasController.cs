@@ -34,18 +34,32 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<AreaDTO>> Add(AreaDTO dto)
         {
-            var created = await areaService.AddAsync(dto);
-            return CreatedAtAction(nameof(Get), new { id = created.Id }, created);
+            try
+            {
+                var created = await areaService.AddAsync(dto);
+                return CreatedAtAction(nameof(Get), new { id = created.Id }, created);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, AreaDTO dto)
         {
             dto.Id = id;
-            var updated = await areaService.UpdateAsync(dto);
-            if (!updated)
-                return NotFound();
-            return NoContent();
+            try
+            {
+                var updated = await areaService.UpdateAsync(dto);
+                if (!updated)
+                    return NotFound();
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpDelete("{id}")]

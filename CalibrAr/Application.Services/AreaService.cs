@@ -12,14 +12,18 @@ namespace Application.Services
     public class AreaService : IAreaService
     {
         private readonly IAreaRepository areaRepository;
+        private readonly ILocationRepository locationRepository;
 
-        public AreaService(IAreaRepository areaRepository)
+        public AreaService(IAreaRepository areaRepository, ILocationRepository locationRepository)
         {
             this.areaRepository = areaRepository;
+            this.locationRepository = locationRepository;
         }
 
         public async Task<AreaDTO> AddAsync(AreaDTO dto)
         {
+            await EnsureLocationExistsAsync(dto.LocationId);
+
             var createdAt = DateTime.Now;
             var area = new Area(0, dto.Name, dto.Responsible, dto.IsActive, createdAt, dto.LocationId);
             await areaRepository.AddAsync(area);
@@ -74,8 +78,18 @@ namespace Application.Services
             var existing = await areaRepository.GetAsync(dto.Id);
             if (existing == null)
                 return false;
+
+            await EnsureLocationExistsAsync(dto.LocationId);
+
             Area area = new Area(dto.Id, dto.Name, dto.Responsible, dto.IsActive, existing.CreatedAt, dto.LocationId);
             return await areaRepository.UpdateAsync(area);
+        }
+
+        private async Task EnsureLocationExistsAsync(int locationId)
+        {
+            var location = await locationRepository.GetAsync(locationId);
+            if (location == null)
+                throw new KeyNotFoundException($"No existe una Location con Id {locationId}.");
         }
     }
 }

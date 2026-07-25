@@ -7,10 +7,12 @@ namespace Application.Services
     public class LocationService : ILocationService
     {
         private readonly ILocationRepository locationRepository;
+        private readonly IAreaRepository areaRepository;
 
-        public LocationService(ILocationRepository locationRepository)
+        public LocationService(ILocationRepository locationRepository, IAreaRepository areaRepository)
         {
             this.locationRepository = locationRepository;
+            this.areaRepository = areaRepository;
         }
 
         public async Task<LocationDTO> AddAsync(LocationDTO dto)
@@ -28,6 +30,10 @@ namespace Application.Services
 
         public async Task<bool> DeleteAsync(int id)
         {
+            var areas = await areaRepository.GetAllAsync();
+            if (areas.Any(a => a.LocationId == id))
+                throw new InvalidOperationException($"No se puede eliminar la Location {id} porque está en uso por una o más Areas.");
+
             return await locationRepository.DeleteAsync(id);
         }
 
