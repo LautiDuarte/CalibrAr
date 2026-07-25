@@ -9,7 +9,7 @@ using Domain.Model;
 
 namespace Application.Services
 {
-    public class AreaService
+    public class AreaService : IAreaService
     {
         private readonly IAreaRepository areaRepository;
 
