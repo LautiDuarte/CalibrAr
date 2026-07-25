@@ -1,0 +1,224 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{21416A18-5A05-4B5E-83BE-1D6F6F473FE7}|Application.Services\\Application.Services.csproj|c:\\users\\lautaro\\documents\\utn - frro\\net\\tpi\\calibrar\\calibrar\\application.services\\areaservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{21416A18-5A05-4B5E-83BE-1D6F6F473FE7}|Application.Services\\Application.Services.csproj|solutionrelative:application.services\\areaservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{21416A18-5A05-4B5E-83BE-1D6F6F473FE7}|Application.Services\\Application.Services.csproj|c:\\users\\lautaro\\documents\\utn - frro\\net\\tpi\\calibrar\\calibrar\\application.services\\locationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{21416A18-5A05-4B5E-83BE-1D6F6F473FE7}|Application.Services\\Application.Services.csproj|solutionrelative:application.services\\locationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6997D63A-6380-4928-A4BB-392D85868C7E}|Data\\Data.csproj|c:\\users\\lautaro\\documents\\utn - frro\\net\\tpi\\calibrar\\calibrar\\data\\arearepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6997D63A-6380-4928-A4BB-392D85868C7E}|Data\\Data.csproj|solutionrelative:data\\arearepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{21416A18-5A05-4B5E-83BE-1D6F6F473FE7}|Application.Services\\Application.Services.csproj|c:\\users\\lautaro\\documents\\utn - frro\\net\\tpi\\calibrar\\calibrar\\application.services\\iareaservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{21416A18-5A05-4B5E-83BE-1D6F6F473FE7}|Application.Services\\Application.Services.csproj|solutionrelative:application.services\\iareaservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C23AE9A6-9FC8-4F2D-9251-F2977245F3C5}|DTOs\\DTOs.csproj|c:\\users\\lautaro\\documents\\utn - frro\\net\\tpi\\calibrar\\calibrar\\dtos\\areadto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C23AE9A6-9FC8-4F2D-9251-F2977245F3C5}|DTOs\\DTOs.csproj|solutionrelative:dtos\\areadto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6997D63A-6380-4928-A4BB-392D85868C7E}|Data\\Data.csproj|c:\\users\\lautaro\\documents\\utn - frro\\net\\tpi\\calibrar\\calibrar\\data\\locationrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6997D63A-6380-4928-A4BB-392D85868C7E}|Data\\Data.csproj|solutionrelative:data\\locationrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C23AE9A6-9FC8-4F2D-9251-F2977245F3C5}|DTOs\\DTOs.csproj|c:\\users\\lautaro\\documents\\utn - frro\\net\\tpi\\calibrar\\calibrar\\dtos\\locationdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C23AE9A6-9FC8-4F2D-9251-F2977245F3C5}|DTOs\\DTOs.csproj|solutionrelative:dtos\\locationdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{21416A18-5A05-4B5E-83BE-1D6F6F473FE7}|Application.Services\\Application.Services.csproj|c:\\users\\lautaro\\documents\\utn - frro\\net\\tpi\\calibrar\\calibrar\\application.services\\ilocationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{21416A18-5A05-4B5E-83BE-1D6F6F473FE7}|Application.Services\\Application.Services.csproj|solutionrelative:application.services\\ilocationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D2EBC142-9113-4981-AD8D-A014B293047B}|Domain.Model\\Domain.Model.csproj|c:\\users\\lautaro\\documents\\utn - frro\\net\\tpi\\calibrar\\calibrar\\domain.model\\location.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D2EBC142-9113-4981-AD8D-A014B293047B}|Domain.Model\\Domain.Model.csproj|solutionrelative:domain.model\\location.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6997D63A-6380-4928-A4BB-392D85868C7E}|Data\\Data.csproj|c:\\users\\lautaro\\documents\\utn - frro\\net\\tpi\\calibrar\\calibrar\\data\\ilocationrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6997D63A-6380-4928-A4BB-392D85868C7E}|Data\\Data.csproj|solutionrelative:data\\ilocationrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6997D63A-6380-4928-A4BB-392D85868C7E}|Data\\Data.csproj|c:\\users\\lautaro\\documents\\utn - frro\\net\\tpi\\calibrar\\calibrar\\data\\iarearepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6997D63A-6380-4928-A4BB-392D85868C7E}|Data\\Data.csproj|solutionrelative:data\\iarearepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D2EBC142-9113-4981-AD8D-A014B293047B}|Domain.Model\\Domain.Model.csproj|c:\\users\\lautaro\\documents\\utn - frro\\net\\tpi\\calibrar\\calibrar\\domain.model\\area.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D2EBC142-9113-4981-AD8D-A014B293047B}|Domain.Model\\Domain.Model.csproj|solutionrelative:domain.model\\area.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AreaService.cs",
+              "DocumentMoniker": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\Application.Services\\AreaService.cs",
+              "RelativeDocumentMoniker": "Application.Services\\AreaService.cs",
+              "ToolTip": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\Application.Services\\AreaService.cs",
+              "RelativeToolTip": "Application.Services\\AreaService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAE0AAAA6AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-25T04:11:10.487Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "LocationService.cs",
+              "DocumentMoniker": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\Application.Services\\LocationService.cs",
+              "RelativeDocumentMoniker": "Application.Services\\LocationService.cs",
+              "ToolTip": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\Application.Services\\LocationService.cs",
+              "RelativeToolTip": "Application.Services\\LocationService.cs",
+              "ViewState": "AgIAABsAAAAAAAAAAAAowBIAAABeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-25T03:52:49.523Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "IAreaService.cs",
+              "DocumentMoniker": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\Application.Services\\IAreaService.cs",
+              "RelativeDocumentMoniker": "Application.Services\\IAreaService.cs",
+              "ToolTip": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\Application.Services\\IAreaService.cs",
+              "RelativeToolTip": "Application.Services\\IAreaService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-25T04:10:12.848Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ILocationService.cs",
+              "DocumentMoniker": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\Application.Services\\ILocationService.cs",
+              "RelativeDocumentMoniker": "Application.Services\\ILocationService.cs",
+              "ToolTip": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\Application.Services\\ILocationService.cs",
+              "RelativeToolTip": "Application.Services\\ILocationService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAALAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-25T03:53:46.236Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "AreaDTO.cs",
+              "DocumentMoniker": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\DTOs\\AreaDTO.cs",
+              "RelativeDocumentMoniker": "DTOs\\AreaDTO.cs",
+              "ToolTip": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\DTOs\\AreaDTO.cs",
+              "RelativeToolTip": "DTOs\\AreaDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-25T03:47:57.576Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "LocationDTO.cs",
+              "DocumentMoniker": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\DTOs\\LocationDTO.cs",
+              "RelativeDocumentMoniker": "DTOs\\LocationDTO.cs",
+              "ToolTip": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\DTOs\\LocationDTO.cs",
+              "RelativeToolTip": "DTOs\\LocationDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-25T03:44:47.044Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "AreaRepository.cs",
+              "DocumentMoniker": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\Data\\AreaRepository.cs",
+              "RelativeDocumentMoniker": "Data\\AreaRepository.cs",
+              "ToolTip": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\Data\\AreaRepository.cs",
+              "RelativeToolTip": "Data\\AreaRepository.cs",
+              "ViewState": "AgIAACkAAAAAAAAAAAAwwEIAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-25T03:28:40.975Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "IAreaRepository.cs",
+              "DocumentMoniker": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\Data\\IAreaRepository.cs",
+              "RelativeDocumentMoniker": "Data\\IAreaRepository.cs",
+              "ToolTip": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\Data\\IAreaRepository.cs",
+              "RelativeToolTip": "Data\\IAreaRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-25T03:27:42.149Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "ILocationRepository.cs",
+              "DocumentMoniker": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\Data\\ILocationRepository.cs",
+              "RelativeDocumentMoniker": "Data\\ILocationRepository.cs",
+              "ToolTip": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\Data\\ILocationRepository.cs",
+              "RelativeToolTip": "Data\\ILocationRepository.cs",
+              "ViewState": "AgIAAAEAAAAAAAAAAAAAAAsAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-25T02:36:54.549Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "LocationRepository.cs",
+              "DocumentMoniker": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\Data\\LocationRepository.cs",
+              "RelativeDocumentMoniker": "Data\\LocationRepository.cs",
+              "ToolTip": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\Data\\LocationRepository.cs",
+              "RelativeToolTip": "Data\\LocationRepository.cs",
+              "ViewState": "AgIAABgAAAAAAAAAAAAowDEAAAA6AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-25T02:31:08.187Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Area.cs",
+              "DocumentMoniker": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\Domain.Model\\Area.cs",
+              "RelativeDocumentMoniker": "Domain.Model\\Area.cs",
+              "ToolTip": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\Domain.Model\\Area.cs",
+              "RelativeToolTip": "Domain.Model\\Area.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAA5wD4AAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-25T01:49:22.689Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Location.cs",
+              "DocumentMoniker": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\Domain.Model\\Location.cs",
+              "RelativeDocumentMoniker": "Domain.Model\\Location.cs",
+              "ToolTip": "C:\\Users\\Lautaro\\Documents\\UTN - Frro\\Net\\TPI\\CalibrAr\\CalibrAr\\Domain.Model\\Location.cs",
+              "RelativeToolTip": "Domain.Model\\Location.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-25T01:23:37.737Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
