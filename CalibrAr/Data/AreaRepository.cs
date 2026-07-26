@@ -11,18 +11,23 @@ namespace Data
     {
         private static readonly List<Area> areas = new List<Area>();
         private static int nextId = 1;
+        private readonly ILocationRepository locationRepository;
 
-        public Task AddAsync(Area area)
+        public AreaRepository(ILocationRepository locationRepository)
+        {
+            this.locationRepository = locationRepository;
+        }
+
+        public async Task AddAsync(Area area)
         {
             area.SetId(nextId++);
 
-            var locationRepo = new LocationRepository();
-            var location = locationRepo.GetAllAsync().Result.FirstOrDefault(l => l.Id == area.LocationId);
+            var locations = await locationRepository.GetAllAsync();
+            var location = locations.FirstOrDefault(l => l.Id == area.LocationId);
             if (location != null)
                 area.SetLocation(location);
 
             areas.Add(area);
-            return Task.CompletedTask;
         }
 
         public Task<bool> DeleteAsync(int id)
@@ -46,7 +51,7 @@ namespace Data
             return Task.FromResult<IEnumerable<Area>>(areas.OrderBy(a => a.Name).ToList());
         }
 
-        public Task<bool> UpdateAsync(Area area)
+        public async Task<bool> UpdateAsync(Area area)
         {
             var existing = areas.FirstOrDefault(a => a.Id == area.Id);
             if (existing != null)
@@ -56,13 +61,13 @@ namespace Data
                 existing.SetIsActive(area.IsActive);
                 existing.SetCreatedAt(area.CreatedAt);
                 existing.SetLocationId(area.LocationId);
-                var locationRepo = new LocationRepository();
-                var location = locationRepo.GetAllAsync().Result.FirstOrDefault(l => l.Id == area.LocationId);
+                var locations = await locationRepository.GetAllAsync();
+                var location = locations.FirstOrDefault(l => l.Id == area.LocationId);
                 if (location != null)
                     existing.SetLocation(location);
-                return Task.FromResult(true);
+                return true;
             }
-            return Task.FromResult(false);
+            return false;
         }
 
     }
