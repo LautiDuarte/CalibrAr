@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -17,7 +18,8 @@ namespace Domain.Model
         public DateTime? LastLoginAt { get; private set; }
         public bool IsActive { get; private set; }
         public DateTime CreatedAt { get; private set; }
-        
+        public string Salt { get; private set; }
+
 
         public User(int id, string fullName, string email, string passwordHash, UserRole role, bool isActive, DateTime createdAt)
         {
@@ -57,7 +59,8 @@ namespace Domain.Model
         {
             if (string.IsNullOrWhiteSpace(passwordHash))
                 throw new ArgumentException("El hash de contraseña no puede ser nulo o vacío.", nameof(passwordHash));
-            PasswordHash = passwordHash;
+            Salt = GenerateSalt();
+            PasswordHash = HashPassword(passwordHash, Salt);
         }
 
         public void SetRole(UserRole role)
@@ -82,6 +85,20 @@ namespace Domain.Model
         public void SetLastLoginAt(DateTime? lastLoginAt)
         {
             LastLoginAt = lastLoginAt;
+        }
+
+        private static string GenerateSalt()
+        {
+            byte[] saltBytes = new byte[32];
+            RandomNumberGenerator.Fill(saltBytes);
+            return Convert.ToBase64String(saltBytes);
+        }
+
+        private static string HashPassword(string password, string salt)
+        {
+            using var pbkdf2 = new Rfc2898DeriveBytes(password, Convert.FromBase64String(salt), 10000, HashAlgorithmName.SHA256);
+            byte[] hashBytes = pbkdf2.GetBytes(32);
+            return Convert.ToBase64String(hashBytes);
         }
     }
 }

@@ -18,6 +18,7 @@ namespace Domain.Model
         public bool IsActive { get; private set; }
         public DateTime CreatedAt { get; private set; }
 
+        public virtual ICollection<Calibration> Calibrations { get; private set; } = new List<Calibration>();
         public ReferenceStandard(int id, string description, string certifyingBody, string certificateNumber,
             DateTime certificateIssuedAt, DateTime certificateExpiresAt, bool isActive, DateTime createdAt)
         {
