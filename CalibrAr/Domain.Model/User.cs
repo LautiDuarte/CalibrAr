@@ -20,6 +20,9 @@ namespace Domain.Model
         public DateTime CreatedAt { get; private set; }
         public string Salt { get; private set; }
 
+        public int? PermissionGroupId { get; private set; }
+        public virtual PermissionGroup? Group { get; private set; }
+
 
         public User(int id, string fullName, string email, string passwordHash, UserRole role, bool isActive, DateTime createdAt)
         {
@@ -32,6 +35,8 @@ namespace Domain.Model
             SetIsActive(isActive);
             SetCreatedAt(createdAt);
         }
+
+        private User() { }
 
         public void SetId(int id)
         {
@@ -99,6 +104,32 @@ namespace Domain.Model
             using var pbkdf2 = new Rfc2898DeriveBytes(password, Convert.FromBase64String(salt), 10000, HashAlgorithmName.SHA256);
             byte[] hashBytes = pbkdf2.GetBytes(32);
             return Convert.ToBase64String(hashBytes);
+        }
+
+        // Metodos para el manejo de permisos y grupos de permisos
+        public void SetGroup(PermissionGroup? group)
+        {
+            Group = group;
+            PermissionGroupId = group?.Id;
+        }
+
+        public bool HasPermission(string permissionName)
+        {
+            if (!IsActive || Group == null || !Group.IsActive)
+                return false;
+            return Group.HasPermission(permissionName);
+        }
+
+        public IEnumerable<string> GetPermissions()
+        {
+            if (Group == null || !Group.IsActive)
+                return new List<string>();
+            return Group.GetPermissionNames();
+        }
+
+        public string? GetGroupName()
+        {
+            return Group?.Name;
         }
     }
 }
