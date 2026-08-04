@@ -10,7 +10,7 @@ namespace DTOs
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Responsible { get; set; }
+        public string? Responsible { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
         public int LocationId { get; set; }

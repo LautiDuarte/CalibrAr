@@ -5,7 +5,7 @@ namespace Domain.Model
     {
         public int Id { get; private set; }
         public string Name { get; private set; }
-        public string Responsible { get; private set; }
+        public string? Responsible { get; private set; }
         public bool IsActive { get; private set; }
         public DateTime CreatedAt { get; private set; }
 
@@ -28,7 +28,7 @@ namespace Domain.Model
             }
         }
 
-        public Area(int id, string name, string responsible, bool isActive, DateTime createdAt, int locationId)
+        public Area(int id, string name, string? responsible, bool isActive, DateTime createdAt, int locationId)
         {
             SetId(id);
             SetName(name);
@@ -52,14 +52,13 @@ namespace Domain.Model
             Name = name;
         }
 
-        public void SetResponsible(string responsible)
+        public void SetResponsible(string? responsible)
         {
             Responsible = responsible;
         }
 
         public void SetIsActive(bool isActive)
         {
-            ArgumentNullException.ThrowIfNull(isActive);
             IsActive = isActive;
         }
 

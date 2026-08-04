@@ -47,12 +47,13 @@ namespace WebAPI
                 }
                 catch (KeyNotFoundException ex)
                 {
-                    return Results.BadRequest(new { error = ex.Message });
+                    return Results.NotFound(new { error = ex.Message });
                 }
             })
             .WithName("AddArea")
             .Produces<AreaDTO>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
             .WithOpenApi();
 
             app.MapPut("/areas/{id}", async (int id, AreaDTO dto, IAreaService areaService) =>
@@ -75,7 +76,7 @@ namespace WebAPI
                 }
                 catch (KeyNotFoundException ex)
                 {
-                    return Results.BadRequest(new { error = ex.Message });
+                    return Results.NotFound(new { error = ex.Message });
                 }
             })
             .WithName("UpdateArea")

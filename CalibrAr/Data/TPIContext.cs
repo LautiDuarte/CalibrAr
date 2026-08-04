@@ -174,10 +174,10 @@ namespace Data
                 entity.Property(e => e.IsActive).IsRequired();
                 entity.Property(e => e.CreatedAt).IsRequired();
 
-                var adminUser = new User(1, "Admin", "adminuser@calibrar.com", "admin123", UserRole.Administrador, true, DateTime.Now);
-                var responsableUser = new User(2, "Responsable", "responsableuser@calibrar.com", "responsable123", UserRole.Responsable, true, DateTime.Now);
-                var operadorUser = new User(3, "Operador", "operadoruser@calibrar.com", "operador123", UserRole.Operador, true, DateTime.Now);
-                var auditorUser = new User(4, "Auditor", "auditoruser@calibrar.com", "auditor123", UserRole.Auditor, true, DateTime.Now);
+                var adminUser = new User(1, "Admin", "admin@calibrar.com", "admin123", UserRole.Administrador, true, DateTime.Now);
+                var responsableUser = new User(2, "Responsable", "responsable@calibrar.com", "responsable123", UserRole.Responsable, true, DateTime.Now);
+                var operadorUser = new User(3, "Operador", "operador@calibrar.com", "operador123", UserRole.Operador, true, DateTime.Now);
+                var auditorUser = new User(4, "Auditor", "auditor@calibrar.com", "auditor123", UserRole.Auditor, true, DateTime.Now);
 
                 entity.HasData
                 (

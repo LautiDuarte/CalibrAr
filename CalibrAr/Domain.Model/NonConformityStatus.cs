@@ -8,9 +8,9 @@ namespace Domain.Model
 {
     public enum NonConformityStatus
     {
-        Abierto,
-        Bajo_analisis,
-        Con_acciones_correctivas,
-        Cerrado
+        Open,
+        UnderAnalysis,
+        WithCorrectiveActions,
+        Closed
     }
 }

@@ -8,8 +8,8 @@ namespace Domain.Model
 {
     public enum Result
     {
-        Conforme,
-        No_conforme,
-        Con_restricciones
+        Conformant,
+        NonConformant,
+        WithRestrictions
     }
 }

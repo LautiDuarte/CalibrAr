@@ -8,11 +8,11 @@ namespace Domain.Model
 {
     public enum InstrumentStatus
     {
-        Activo,
-        Fuera_de_servicio_temporalmente,
-        Calibracion_vencida,
-        En_reparacion,
-        Dado_de_baja,
-        Prestado
+        Active,
+        TemporarilyOutOfService,
+        CalibrationExpired,
+        UnderRepair,
+        Decommissioned,
+        OnLoan
     }
 }

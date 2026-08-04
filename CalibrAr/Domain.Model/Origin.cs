@@ -8,10 +8,10 @@ namespace Domain.Model
 {
     public enum Origin
     {
-        Calibracion_vencida,
-        Resultado_no_conforme,
-        Daño_fisico,
-        Uso_incorrecto,
-        Otro
+        CalibrationExpired,
+        NonConformantResult,
+        PhysicalDamage,
+        IncorrectUse,
+        Other
     }
 }

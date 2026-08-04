@@ -1,7 +1,4 @@
-﻿using System.Xml.Linq;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace Domain.Model
+﻿namespace Domain.Model
 {
     public class Location
     {
@@ -12,7 +9,7 @@ namespace Domain.Model
         public DateTime CreatedAt { get; private set; }
 
 
-        public Location(int id, string name, string address, bool isActive, DateTime createdAt)
+        public Location(int id, string name, string? address, bool isActive, DateTime createdAt)
         {
             SetId(id);
             SetName(name);
@@ -43,7 +40,6 @@ namespace Domain.Model
 
         public void SetIsActive(bool isActive)
         {
-            ArgumentNullException.ThrowIfNull(isActive);
             IsActive = isActive;
         }
 

@@ -8,9 +8,9 @@ namespace Domain.Model
 {
     public enum InterventionType
     {
-        Calibracion,
-        Verificacion,
-        Mantenimiento,
-        Ajuste_y_calibracion
+        Calibration,
+        Verification,
+        Maintenance,
+        AdjustmentAndCalibration
     }
 }
