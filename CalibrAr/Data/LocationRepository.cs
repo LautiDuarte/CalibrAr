@@ -1,57 +1,58 @@
 ﻿using Domain.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace Data
 {
     public class LocationRepository : ILocationRepository
     {
-        private static readonly List<Location> locations = new List<Location>
-        {
-            new Location(1, "Rosario Sur", "Laprida 3568", true, DateTime.Now),
-            new Location(2, "Rosario Norte", "Bv. Rondeau 894", true, DateTime.Now)
-        };
+        private readonly CalibrArContext context;
 
-        public Task AddAsync(Location location)
+        public LocationRepository(CalibrArContext context)
         {
-            location.SetId(locations.Count + 1);
-
-            locations.Add(location);
-            return Task.CompletedTask;
+            this.context = context;
         }
 
-        public Task<bool> DeleteAsync(int id)
+        public async Task AddAsync(Location location)
         {
-            var location = locations.FirstOrDefault(l => l.Id == id);
+            context.Locations.Add(location);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var location = await context.Locations.FirstOrDefaultAsync(l => l.Id == id);
             if (location != null)
             {
-                locations.Remove(location);
-                return Task.FromResult(true);
+                context.Locations.Remove(location);
+                await context.SaveChangesAsync();
+                return true;
             }
-            return Task.FromResult(false);
+            return false;
         }
 
-        public Task<Location?> GetAsync(int id)
+        public async Task<Location?> GetAsync(int id)
         {
-            return Task.FromResult(locations.FirstOrDefault(l => l.Id == id));
+            return await context.Locations.FirstOrDefaultAsync(l => l.Id == id);
         }
 
-        public Task<IEnumerable<Location>> GetAllAsync()
+        public async Task<IEnumerable<Location>> GetAllAsync()
         {
-            return Task.FromResult<IEnumerable<Location>>(locations.OrderBy(p => p.Name).ToList());
+            return await context.Locations.OrderBy(l => l.Name).ToListAsync();
         }
 
-        public Task<bool> UpdateAsync(Location location)
+        public async Task<bool> UpdateAsync(Location location)
         {
-            var existing = locations.FirstOrDefault(l => l.Id == location.Id);
-            if (existing != null)
+            var existingLocation = await context.Locations.FindAsync(location.Id);
+            if (existingLocation != null)
             {
-                existing.SetName(location.Name);
-                existing.SetAddress(location.Address);
-                existing.SetIsActive(location.IsActive);
-                existing.SetCreatedAt(location.CreatedAt);
-
-                return Task.FromResult(true);
+                existingLocation.SetName(location.Name);
+                existingLocation.SetAddress(location.Address);
+                existingLocation.SetIsActive(location.IsActive);
+                existingLocation.SetCreatedAt(location.CreatedAt);
+                await context.SaveChangesAsync();
+                return true;
             }
-            return Task.FromResult(false);
+            return false;
         }
     }
 }

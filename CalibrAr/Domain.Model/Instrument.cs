@@ -143,7 +143,6 @@ namespace Domain.Model
 
         public void SetIsActive(bool isActive)
         {
-            ArgumentNullException.ThrowIfNull(isActive);
             IsActive = isActive;
         }
 
@@ -161,8 +160,8 @@ namespace Domain.Model
 
         public void SetInstrumentTypeId( int instrumentTypeId)
         {
-            if (InstrumentTypeId <= 0)
-                throw new ArgumentException("El Id del tipo de instrumento debe ser mayor que 0.", nameof(InstrumentTypeId));
+            if (instrumentTypeId <= 0)
+                throw new ArgumentException("El Id del tipo de instrumento debe ser mayor que 0.", nameof(instrumentTypeId));
             if (_instrumentType != null && _instrumentType.Id != instrumentTypeId)
                 InstrumentType = null;
             InstrumentTypeId = instrumentTypeId;
@@ -170,8 +169,8 @@ namespace Domain.Model
 
         public void SetAreaId(int areaId)
         {
-            if (AreaId <= 0)
-                throw new ArgumentException("El Id del área debe ser mayor que 0.", nameof(AreaId));
+            if (areaId <= 0)
+                throw new ArgumentException("El Id del área debe ser mayor que 0.", nameof(areaId));
             if (_area != null && _area.Id != areaId)
                 Area = null;
             AreaId = areaId;

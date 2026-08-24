@@ -4,67 +4,57 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Domain.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace Data
 {
     public class AreaRepository : IAreaRepository
     {
-        private static readonly List<Area> areas = new List<Area>();
-        private static int nextId = 1;
-        private readonly ILocationRepository locationRepository;
-
-        public AreaRepository(ILocationRepository locationRepository)
+        private readonly CalibrArContext context;
+        public AreaRepository(CalibrArContext context)
         {
-            this.locationRepository = locationRepository;
+            this.context = context;
         }
-
         public async Task AddAsync(Area area)
         {
-            area.SetId(nextId++);
-
-            var locations = await locationRepository.GetAllAsync();
-            var location = locations.FirstOrDefault(l => l.Id == area.LocationId);
-            if (location != null)
-                area.SetLocation(location);
-
-            areas.Add(area);
+            context.Areas.Add(area);
+            await context.SaveChangesAsync();
+            await context.Entry(area).Reference(a => a.Location).LoadAsync();
         }
 
-        public Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            var area = areas.FirstOrDefault(a => a.Id == id);
+            var area = await context.Areas.FirstOrDefaultAsync(a => a.Id == id);
             if (area != null)
             {
-                areas.Remove(area);
-                return Task.FromResult(true);
+                context.Areas.Remove(area);
+                await context.SaveChangesAsync();
+                return true;
             }
-            return Task.FromResult(false);
+            return false;
         }
 
-        public Task<Area?> GetAsync(int id)
+        public async Task<Area?> GetAsync(int id)
         {
-            return Task.FromResult(areas.FirstOrDefault(a => a.Id == id));
+            return await context.Areas.Include(a => a.Location).FirstOrDefaultAsync(a => a.Id == id);
         }
 
-        public Task<IEnumerable<Area>> GetAllAsync()
+        public async Task<IEnumerable<Area>> GetAllAsync()
         {
-            return Task.FromResult<IEnumerable<Area>>(areas.OrderBy(a => a.Name).ToList());
+            return await context.Areas.Include(a => a.Location).OrderBy(a => a.Name).ToListAsync();
         }
 
         public async Task<bool> UpdateAsync(Area area)
         {
-            var existing = areas.FirstOrDefault(a => a.Id == area.Id);
-            if (existing != null)
+            var existingArea = await context.Areas.FindAsync(area.Id);
+            if (existingArea != null)
             {
-                existing.SetName(area.Name);
-                existing.SetResponsible(area.Responsible);
-                existing.SetIsActive(area.IsActive);
-                existing.SetCreatedAt(area.CreatedAt);
-                existing.SetLocationId(area.LocationId);
-                var locations = await locationRepository.GetAllAsync();
-                var location = locations.FirstOrDefault(l => l.Id == area.LocationId);
-                if (location != null)
-                    existing.SetLocation(location);
+                existingArea.SetName(area.Name);
+                existingArea.SetResponsible(area.Responsible);
+                existingArea.SetIsActive(area.IsActive);
+                existingArea.SetCreatedAt(area.CreatedAt);
+                existingArea.SetLocationId(area.LocationId);
+                await context.SaveChangesAsync();
                 return true;
             }
             return false;

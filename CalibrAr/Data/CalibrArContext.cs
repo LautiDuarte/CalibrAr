@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Data
 {
-    public class TPIContext : DbContext
+    public class CalibrArContext : DbContext
     {
         public DbSet<Location> Locations { get; set; }
         public DbSet<Area> Areas { get; set; }
@@ -27,13 +27,13 @@ namespace Data
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<PermissionGroup> PermissionGroups { get; set; }
 
-        public TPIContext(DbContextOptions<TPIContext> options) : base(options)
+        public CalibrArContext(DbContextOptions<CalibrArContext> options) : base(options)
         {
             this.Database.EnsureCreated();
             SeedInitialData();
         }
 
-        internal TPIContext()
+        internal CalibrArContext()
         {
             this.Database.EnsureCreated();
             SeedInitialData();
@@ -100,9 +100,9 @@ namespace Data
                 entity.Property(e => e.CreatedAt).IsRequired();
                 entity.HasData
                 (
-                    new { Id = 1, Name = "Calibrador de presión", Description = "Instrumento para calibrar presión", MeasurementUnit = "psi", MaxAllowedError = 0.5, CalibrationFrequencyMonths = 12, IsActive = true, CreatedAt = DateTime.Now },
-                    new { Id = 2, Name = "Calibrador de temperatura", Description = "Instrumento para calibrar temperatura", MeasurementUnit = "°C", MaxAllowedError = 1.0, CalibrationFrequencyMonths = 6, IsActive = true, CreatedAt = DateTime.Now },
-                    new { Id = 3, Name = "Calibrador de flujo", Description = "Instrumento para calibrar flujo", MeasurementUnit = "L/min", MaxAllowedError = 0.2, CalibrationFrequencyMonths = 12, IsActive = true, CreatedAt = DateTime.Now }
+                    new { Id = 1, Name = "Calibrador de presión", Description = "Instrumento para calibrar presión", MeasurementUnit = "psi", MaxAllowedError = 0.5m, CalibrationFrequencyMonths = 12, IsActive = true, CreatedAt = DateTime.Now },
+                    new { Id = 2, Name = "Calibrador de temperatura", Description = "Instrumento para calibrar temperatura", MeasurementUnit = "°C", MaxAllowedError = 1.0m, CalibrationFrequencyMonths = 6, IsActive = true, CreatedAt = DateTime.Now },
+                    new { Id = 3, Name = "Calibrador de flujo", Description = "Instrumento para calibrar flujo", MeasurementUnit = "L/min", MaxAllowedError = 0.2m, CalibrationFrequencyMonths = 12, IsActive = true, CreatedAt = DateTime.Now }
                 );
             });
 
@@ -263,7 +263,7 @@ namespace Data
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
-                entity.Property(e => e.CertificateNumber).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.CertificateNumber).HasMaxLength(100);
                 entity.Property(e => e.Result).IsRequired();
                 entity.Property(e => e.RestrictionDetail).HasMaxLength(200);
                 entity.Property(e => e.NextCalibrationDate).IsRequired();
