@@ -45,21 +45,21 @@ namespace Domain.Model
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("El Id debe ser mayor que 0.", nameof(id));
+                throw new ArgumentException("Id must be greater than 0.", nameof(id));
             Id = id;
         }
 
         public void SetNominalValue(decimal nominalValue)
         {
             if (nominalValue <= 0)
-                throw new ArgumentException("El valor nominal debe ser mayor que 0.", nameof(nominalValue));
+                throw new ArgumentException("The nominal Value must be grater than 0.", nameof(nominalValue));
             NominalValue = nominalValue;
         }
 
         public void SetMeasuredValue(decimal measuredValue)
         {
             if (measuredValue <= 0)
-                throw new ArgumentException("El valor medido debe ser mayor que 0.", nameof(measuredValue));
+                throw new ArgumentException("The measured value msut be greater than 0.", nameof(measuredValue));
             MeasuredValue = measuredValue;
         }
 
@@ -81,7 +81,7 @@ namespace Domain.Model
         public void SetCalibrationId(int calibrationId)
         {
             if (calibrationId < 0)
-                throw new ArgumentException("El Id de calibración debe ser mayor que 0.", nameof(calibrationId));
+                throw new ArgumentException($"Calibration Id must be greater than 0.", nameof(calibrationId));
             if (_calibration != null && _calibration.Id != calibrationId)
                 Calibration = null;
             CalibrationId = calibrationId;

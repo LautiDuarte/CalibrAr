@@ -12,27 +12,35 @@ namespace Application.Services
     public class InstrumentTypeService : IInstrumentTypeService
     {
         private readonly IInstrumentTypeRepository instrumentTypeRepository;
+        private readonly IInstrumentRepository instrumentRepository;
 
-        public InstrumentTypeService(IInstrumentTypeRepository instrumentTypeRepository)
+        public InstrumentTypeService(IInstrumentTypeRepository instrumentTypeRepository, IInstrumentRepository instrumentRepository)
         {
             this.instrumentTypeRepository = instrumentTypeRepository;
+            this.instrumentRepository = instrumentRepository;
         }
 
         public async Task<InstrumentTypeDTO> AddAsync(InstrumentTypeDTO dto)
         {
             var createdAt = DateTime.Now;
-            InstrumentType instrumentType = new InstrumentType(0, dto.Name, dto.Description, dto.MeasurementUnit, dto.MaxAllowedError, dto.CalibrationFrequencyMonths, dto.IsActive, createdAt);
+            var isActive = true;
+            InstrumentType instrumentType = new InstrumentType(0, dto.Name, dto.Description, dto.MeasurementUnit, dto.MaxAllowedError, dto.CalibrationFrequencyMonths, isActive, createdAt);
 
             await instrumentTypeRepository.AddAsync(instrumentType);
 
             dto.Id = instrumentType.Id;
             dto.CreatedAt = instrumentType.CreatedAt;
+            dto.IsActive = instrumentType.IsActive;
 
             return dto;
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
+            var instruments = await instrumentRepository.GetAllAsync();
+            if (instruments.Any(i => i.InstrumentTypeId == id))
+                throw new InvalidOperationException($"Cannot delete instrument type with id {id} because it is being used");
+
             return await instrumentTypeRepository.DeleteAsync(id);
         }
 

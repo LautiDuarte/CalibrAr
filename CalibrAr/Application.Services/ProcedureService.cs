@@ -25,12 +25,14 @@ namespace Application.Services
             await EnsureInstrumentTypeExistsAsync(dto.InstrumentTypeId);
 
             var createdAt = DateTime.Now;
-            Procedure procedure = new Procedure(0, dto.Code, dto.Name, dto.VersionNumber, dto.ApprovedAt, dto.IsActive, createdAt, dto.InstrumentTypeId);
+            var isActive = true;
+            Procedure procedure = new Procedure(0, dto.Code, dto.Name, dto.VersionNumber, dto.ApprovedAt, isActive, createdAt, dto.InstrumentTypeId);
 
             await procedureRepository.AddAsync(procedure);
 
             dto.Id = procedure.Id;
             dto.CreatedAt = procedure.CreatedAt;
+            dto.IsActive = isActive;
             dto.InstrumentTypeName = procedure.InstrumentType?.Name;
 
             return dto;
@@ -95,7 +97,7 @@ namespace Application.Services
         {
             var instrumentType = await instrumentTypeRepository.GetAsync(instrumentTypeId);
             if (instrumentType == null)
-                throw new KeyNotFoundException($"No existe un InstrumentType con Id {instrumentTypeId}.");
+                throw new KeyNotFoundException($"There is no instrument type with id {instrumentTypeId}.");
         }
     }
 }

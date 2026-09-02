@@ -28,8 +28,9 @@ namespace Application.Services
             await EnsureAreaExistsAsync(dto.AreaId);
 
             var createdAt = DateTime.Now;
-            var status = ParseStatus(dto.Status);
-            Instrument instrument = new Instrument(0, dto.Code, dto.Name, dto.SerialNumber, dto.Brand, dto.Model, status, dto.MaxAllowedError, dto.CalibrationFrequencyMonths, dto.LastCalibrationDate, dto.NextCalibrationDate, dto.IsActive, createdAt, null, dto.InstrumentTypeId, dto.AreaId);
+            var status = InstrumentStatus.Active; 
+            var isActive = true;
+            Instrument instrument = new Instrument(0, dto.Code, dto.Name, dto.SerialNumber, dto.Brand, dto.Model, status, dto.MaxAllowedError, dto.CalibrationFrequencyMonths, dto.LastCalibrationDate, dto.NextCalibrationDate, isActive, createdAt, null, dto.InstrumentTypeId, dto.AreaId);
 
             await instrumentRepository.AddAsync(instrument);
 
@@ -38,6 +39,7 @@ namespace Application.Services
             dto.UpdatedAt = instrument.UpdatedAt;
             dto.InstrumentTypeName = instrument.InstrumentType?.Name;
             dto.AreaName = instrument.Area?.Name;
+            dto.IsActive = isActive;
 
             return dto;
         }
@@ -60,7 +62,10 @@ namespace Application.Services
         public async Task<IEnumerable<InstrumentDTO>> GetAllAsync()
         {
             var instruments = await instrumentRepository.GetAllAsync();
-            return instruments.Select(MapToDto);
+            if (instruments == null || !instruments.Any())
+                return Enumerable.Empty<InstrumentDTO>();
+            var instrumentsUpToDate = await CheckCalibrationExpiredAsync(instruments);
+            return instrumentsUpToDate.Select(MapToDto);
         }
 
         public async Task<bool> UpdateAsync(InstrumentDTO dto)
@@ -69,32 +74,61 @@ namespace Application.Services
             if (existing == null)
                 return false;
 
+
             await EnsureInstrumentTypeExistsAsync(dto.InstrumentTypeId);
             await EnsureAreaExistsAsync(dto.AreaId);
 
             var status = ParseStatus(dto.Status);
             Instrument instrument = new Instrument(dto.Id, dto.Code, dto.Name, dto.SerialNumber, dto.Brand, dto.Model, status, dto.MaxAllowedError, dto.CalibrationFrequencyMonths, dto.LastCalibrationDate, dto.NextCalibrationDate, dto.IsActive, existing.CreatedAt, DateTime.Now, dto.InstrumentTypeId, dto.AreaId);
-            return await instrumentRepository.UpdateAsync(instrument);
+            Instrument instrumentUpToDate  = await IsActiveCheck(instrument);
+            return await instrumentRepository.UpdateAsync(instrumentUpToDate);
+        }
+
+        public async Task<Instrument> IsActiveCheck(Instrument instrument) // chequear funcionamiento de esta funcion
+        {
+            if (instrument.Status == InstrumentStatus.Decommissioned)
+            {
+                instrument.SetIsActive(false);
+            }
+            else
+            {
+                instrument.SetIsActive(true);
+            }
+            return instrument;
+        }
+
+        public async Task<IEnumerable<Instrument>> CheckCalibrationExpiredAsync(IEnumerable<Instrument> instruments) //chequear funcionamiento de esta funcion
+        {
+            foreach (var instrument in instruments)
+            {
+                if (instrument.Status == InstrumentStatus.Active && instrument.NextCalibrationDate.HasValue && instrument.NextCalibrationDate.Value < DateTime.Now)
+                {
+                    instrument.SetStatus(InstrumentStatus.CalibrationExpired);
+                    InstrumentDTO instrumentDto = MapToDto(instrument);
+                    await this.UpdateAsync(instrumentDto);
+                }
+            }
+            return instruments;
         }
 
         private async Task EnsureInstrumentTypeExistsAsync(int instrumentTypeId)
         {
             var instrumentType = await instrumentTypeRepository.GetAsync(instrumentTypeId);
             if (instrumentType == null)
-                throw new KeyNotFoundException($"No existe un InstrumentType con Id {instrumentTypeId}.");
+                throw new KeyNotFoundException($"There is no instrument type with id {instrumentTypeId}.");
         }
 
         private async Task EnsureAreaExistsAsync(int areaId)
         {
             var area = await areaRepository.GetAsync(areaId);
             if (area == null)
-                throw new KeyNotFoundException($"No existe una Area con Id {areaId}.");
+                throw new KeyNotFoundException($"There is no area with id {areaId}.");
         }
 
         private static InstrumentStatus ParseStatus(string status)
         {
             if (!Enum.TryParse<InstrumentStatus>(status, out var parsed))
-                throw new ArgumentException($"El estado '{status}' no es válido.", nameof(status));
+                throw new ArgumentException($"The status '{status}' is not valid.", nameof(status));
             return parsed;
         }
 

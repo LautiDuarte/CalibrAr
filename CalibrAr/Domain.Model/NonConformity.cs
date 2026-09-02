@@ -103,21 +103,21 @@ namespace Domain.Model
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("El Id debe ser mayor que 0.", nameof(id));
+                throw new ArgumentException("Id must be greater than 0.", nameof(id));
             Id = id;
         }
 
         public void SetCode(string code)
         {
             if (string.IsNullOrWhiteSpace(code))
-                throw new ArgumentException("El código no puede estar vacío.", nameof(code));
+                throw new ArgumentException("The code cannot be null or empty.", nameof(code));
             Code = code;
         }
 
         public void SetDescription(string description)
         {
             if (string.IsNullOrWhiteSpace(description))
-                throw new ArgumentException("La descripción no puede estar vacía.", nameof(description));
+                throw new ArgumentException("The description cannot be null or empty.", nameof(description));
             Description = description;
         }
 
@@ -139,7 +139,7 @@ namespace Domain.Model
         public void SetOpenedAt(DateTime openedAt)
         {
             if (openedAt == default)
-                throw new ArgumentException("La fecha de apertura no puede ser nula.", nameof(openedAt));
+                throw new ArgumentException("The opening date cannot be null.", nameof(openedAt));
             OpenedAt = openedAt;
         }
 
@@ -151,14 +151,14 @@ namespace Domain.Model
         public void SetCreatedAt(DateTime createdAt)
         {
             if (createdAt == default)
-                throw new ArgumentException("La fecha de creación no puede ser nula.", nameof(createdAt));
+                throw new ArgumentException("The creation date cannot be null.", nameof(createdAt));
             CreatedAt = createdAt;
         }
 
         public void SetInstrumentId(int instrumentId)
         {
             if (instrumentId <= 0)
-                throw new ArgumentException("El Id del instrumento debe ser mayor que 0.", nameof(instrumentId));
+                throw new ArgumentException("Instrument Id must be greater than 0.", nameof(instrumentId));
             if (_instrument != null && _instrument.Id != instrumentId)
                 Instrument = null;
             InstrumentId = instrumentId;
@@ -167,7 +167,7 @@ namespace Domain.Model
         public void SetCalibrationId(int calibrationId)
         {
             if (calibrationId <= 0)
-                throw new ArgumentException("El Id de la calibración debe ser mayor que 0.", nameof(calibrationId));
+                throw new ArgumentException("Calibration Id must be greater than 0.", nameof(calibrationId));
             if (_calibration != null && _calibration.Id != calibrationId)
                 Calibration = null;
             CalibrationId = calibrationId;
@@ -176,7 +176,7 @@ namespace Domain.Model
         public void SetDetectedByUserId(int detectedByUserId)
         {
             if (detectedByUserId <= 0)
-                throw new ArgumentException("El Id del usuario que detectó la no conformidad debe ser mayor que 0.", nameof(detectedByUserId));
+                throw new ArgumentException("The Id from the user who detected de non conformity must be greater than 0.", nameof(detectedByUserId));
             if (_detectedByUser != null && _detectedByUser.Id != detectedByUserId)
                 DetectedByUser = null;
             DetectedByUserId = detectedByUserId;
@@ -185,7 +185,7 @@ namespace Domain.Model
         public void SetClosedByUserId(int closedByUserId)
         {
             if (closedByUserId <= 0)
-                throw new ArgumentException("El Id del usuario que cerró la no conformidad debe ser mayor que 0.", nameof(closedByUserId));
+                throw new ArgumentException("The id from the user who closed the non conformity must be greater than 0.", nameof(closedByUserId));
             if (_closedByUser != null && _closedByUser.Id != closedByUserId)
                 ClosedByUser = null;
             ClosedByUserId = closedByUserId;

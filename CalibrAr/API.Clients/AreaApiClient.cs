@@ -1,0 +1,132 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using DTOs;
+using System.Net.Http.Json;
+
+namespace API.Clients
+{
+    public class AreaApiClient : BaseApiClient
+    {
+        public static async Task<AreaDTO> GetAsync(int id)
+        {
+            try
+            {
+                using var client = await CreateHttpClientAsync();
+                HttpResponseMessage response = await client.GetAsync($"areas/{id}");
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadFromJsonAsync<AreaDTO>();
+                }
+                else
+                {
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Failed to get area with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new Exception($"An error occurred while getting area with ID {id}: {ex.Message}.", ex);
+            }
+            catch (TaskCanceledException ex)
+            {
+                throw new Exception($"Request timed out while getting area with ID {id}: {ex.Message}.", ex);
+            }
+        }
+
+        public static async Task<List<AreaDTO>> GetAllAsync()
+        {
+            try
+            {
+                using var client = await CreateHttpClientAsync();
+                HttpResponseMessage response = await client.GetAsync("areas");
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadFromJsonAsync<List<AreaDTO>>();
+                }
+                else
+                {
+                    await HandleUnauthorizedResponseAsync(response);
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Failed to get areas. Status code: {response.StatusCode}, Error: {errorContent}");
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new Exception($"An error occurred while getting areas: {ex.Message}.", ex);
+            }
+            catch (TaskCanceledException ex)
+            {
+                throw new Exception($"Request timed out while getting areas: {ex.Message}.", ex);
+            }
+        }
+
+        public static async Task AddAsync(AreaDTO area)
+        {
+            try
+            {
+                using var client = await CreateHttpClientAsync();
+                HttpResponseMessage response = await client.PostAsJsonAsync("areas", area);
+                if (!response.IsSuccessStatusCode)
+                {
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Failed to add area. Status code: {response.StatusCode}, Error: {errorContent}");
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new Exception($"An error occurred while adding area: {ex.Message}.", ex);
+            }
+            catch (TaskCanceledException ex)
+            {
+                throw new Exception($"Request timed out while adding area: {ex.Message}.", ex);
+            }
+        }
+
+        public static async Task DeleteAsync(int id)
+        {
+            try
+            {
+                using var client = await CreateHttpClientAsync();
+                HttpResponseMessage response = await client.DeleteAsync($"areas/{id}");
+                if (!response.IsSuccessStatusCode)
+                {
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Failed to delete area with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new Exception($"An error occurred while deleting area with ID {id}: {ex.Message}.", ex);
+            }
+            catch (TaskCanceledException ex)
+            {
+                throw new Exception($"Request timed out while deleting area with ID {id}: {ex.Message}.", ex);
+            }
+        }
+
+        public static async Task UpdateAsync(AreaDTO area)
+        {
+            try
+            {
+                using var client = await CreateHttpClientAsync();
+                HttpResponseMessage response = await client.PutAsJsonAsync("areas", area);
+                if (!response.IsSuccessStatusCode)
+                {
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Failed to update area with ID {area.Id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new Exception($"An error occurred while updating area with ID {area.Id}: {ex.Message}.", ex);
+            }
+            catch (TaskCanceledException ex)
+            {
+                throw new Exception($"Request timed out while updating area with ID {area.Id}: {ex.Message}.", ex);
+            }
+        }
+    }
+}

@@ -70,7 +70,7 @@ namespace Application.Services
         {
             var calibration = await calibrationRepository.GetAsync(calibrationId);
             if (calibration == null)
-                throw new KeyNotFoundException($"No existe una Calibration con Id {calibrationId}.");
+                throw new KeyNotFoundException($"There is no calibration with id {calibrationId}.");
         }
 
         private static CalibrationMeasurementDTO MapToDto(CalibrationMeasurement calibrationMeasurement)

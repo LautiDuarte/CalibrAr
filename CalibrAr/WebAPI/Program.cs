@@ -35,6 +35,7 @@ builder.Services.AddScoped<ICalibrationMeasurementService, CalibrationMeasuremen
 builder.Services.AddScoped<INonConformityService, NonConformityService>();
 builder.Services.AddScoped<IInstrumentStatusHistoryService, InstrumentStatusHistoryService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<AuthService>();
 
 var app = builder.Build();
 
@@ -62,5 +63,6 @@ app.MapCalibrationMeasurementEndpoints();
 app.MapNonConformityEndpoints();
 app.MapInstrumentStatusHistoryEndpoints();
 app.MapUserEndpoints();
+app.MapAuthEndpoints();
 
 app.Run();

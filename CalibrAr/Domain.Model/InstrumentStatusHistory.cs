@@ -60,7 +60,7 @@ namespace Domain.Model
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("El Id debe ser mayor que 0.", nameof(id));
+                throw new ArgumentException("Id must be greater than 0.", nameof(id));
             Id = id;
         }
 
@@ -82,14 +82,14 @@ namespace Domain.Model
         public void SetChangedAt(DateTime changedAt)
         {
             if (changedAt == default)
-                throw new ArgumentException("La fecha de cambio no puede ser nula.", nameof(changedAt));
+                throw new ArgumentException("The change date cannot be null.", nameof(changedAt));
             ChangedAt = changedAt;
         }
 
         public void SetChangedByUserId(int changedByUserId)
         {
             if (changedByUserId < 0)
-                throw new ArgumentException("El Id del usuario que realizó el cambio debe ser mayor que 0.", nameof(changedByUserId));
+                throw new ArgumentException("The Id from the user who made the change must be greater than 0.", nameof(changedByUserId));
             if (_changedByUser != null && _changedByUser.Id != changedByUserId)
                 ChangedByUser = null; 
             ChangedByUserId = changedByUserId;
@@ -98,7 +98,7 @@ namespace Domain.Model
         public void SetInstrumentId(int instrumentId)
         {
             if (instrumentId < 0)
-                throw new ArgumentException("El Id del instrumento debe ser mayor que 0.", nameof(instrumentId));
+                throw new ArgumentException("Instrument Id must be greater than 0.", nameof(instrumentId));
             if (_instrument != null && _instrument.Id != instrumentId)
                 Instrument = null; 
             InstrumentId = instrumentId;

@@ -18,12 +18,14 @@ namespace Application.Services
         public async Task<LocationDTO> AddAsync(LocationDTO dto)
         {
             var createdAt = DateTime.Now;
-            Location location = new Location(0, dto.Name, dto.Address, dto.IsActive, createdAt);
+            var isActive = true;
+            Location location = new Location(0, dto.Name, dto.Address, isActive, createdAt);
 
             await locationRepository.AddAsync(location);
 
             dto.Id = location.Id;
             dto.CreatedAt = location.CreatedAt;
+            dto.IsActive = isActive;
 
             return dto;
         }
@@ -32,7 +34,7 @@ namespace Application.Services
         {
             var areas = await areaRepository.GetAllAsync();
             if (areas.Any(a => a.LocationId == id))
-                throw new InvalidOperationException($"No se puede eliminar la Location {id} porque está en uso por una o más Areas.");
+                throw new InvalidOperationException($"Cannot delete location with id {id} because it is being used");
 
             return await locationRepository.DeleteAsync(id);
         }

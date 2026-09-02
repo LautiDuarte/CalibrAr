@@ -109,16 +109,16 @@ namespace Domain.Model
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("El Id debe ser mayor que 0.", nameof(id));
+                throw new ArgumentException("Id must be greater than 0.", nameof(id));
             Id = id;
         }
 
         public void SetCalibrationDate(DateTime calibrationDate)
         {
             if (calibrationDate > DateTime.Now)
-                throw new ArgumentException("La fecha de calibración no puede ser mayor a la fecha actual.", nameof(calibrationDate));
+                throw new ArgumentException("Calibration date cannot be in the future.", nameof(calibrationDate));
             if (calibrationDate == default)
-                throw new ArgumentException("La fecha de calibración no puede ser nula.", nameof(calibrationDate));
+                throw new ArgumentException("Calibration date cannot be null.", nameof(calibrationDate));
             CalibrationDate = calibrationDate;
         }
 
@@ -155,7 +155,7 @@ namespace Domain.Model
         public void SetNextCalibrationDate(DateTime nextCalibrationDate)
         {
             if (nextCalibrationDate == default)
-                throw new ArgumentException("La fecha de próxima calibración no puede ser nula.", nameof(nextCalibrationDate));
+                throw new ArgumentException("Next calibration date cannot be null.", nameof(nextCalibrationDate));
             NextCalibrationDate = nextCalibrationDate;
         }
 
@@ -167,14 +167,14 @@ namespace Domain.Model
         public void SetCreatedAt(DateTime createdAt)
         {
             if (createdAt == default)
-                throw new ArgumentException("La fecha de creación no puede ser nula.", nameof(createdAt));
+                throw new ArgumentException("Creation date cannot be null.", nameof(createdAt));
             CreatedAt = createdAt;
         }
 
         public void SetInstrumentId(int instrumentId)
         {
             if (instrumentId <= 0)
-                throw new ArgumentException("El Id del instrumento debe ser mayor que 0.", nameof(instrumentId));
+                throw new ArgumentException("Instrument Id must be greater than 0.", nameof(instrumentId));
             if (_instrument != null && _instrument.Id != instrumentId)
                 Instrument = null;
             InstrumentId = instrumentId;
@@ -183,7 +183,7 @@ namespace Domain.Model
         public void SetProcedureId(int? procedureId)
         {
             if (procedureId.HasValue && procedureId <= 0)
-                throw new ArgumentException("El Id del procedimiento debe ser mayor que 0.", nameof(procedureId));
+                throw new ArgumentException("Procedure Id must be greater than 0.", nameof(procedureId));
             if (_procedure != null && _procedure.Id != procedureId)
                 Procedure = null;
             ProcedureId = procedureId;
@@ -192,7 +192,7 @@ namespace Domain.Model
         public void SetPerformedByUserId(int? performedByUserId)
         {
             if (performedByUserId.HasValue && performedByUserId <= 0)
-                throw new ArgumentException("El Id del usuario que realizó la calibración debe ser mayor que 0.", nameof(performedByUserId));
+                throw new ArgumentException("The Id of the user who performed the calibration must be greater than 0.", nameof(performedByUserId));
             if (_performedByUser != null && _performedByUser.Id != performedByUserId)
                 PerformedByUser = null;
             PerformedByUserId = performedByUserId;
@@ -201,7 +201,7 @@ namespace Domain.Model
         public void SetApprovedByUserId(int? approvedByUserId)
         {
             if (approvedByUserId.HasValue && approvedByUserId <= 0)
-                throw new ArgumentException("El Id del usuario que aprobó la calibración debe ser mayor que 0.", nameof(approvedByUserId));
+                throw new ArgumentException("The Id of the user who approved the calibration must be greater than 0.", nameof(approvedByUserId));
             if (_approvedByUser != null && _approvedByUser.Id != approvedByUserId)
                 ApprovedByUser = null;
             ApprovedByUserId = approvedByUserId;

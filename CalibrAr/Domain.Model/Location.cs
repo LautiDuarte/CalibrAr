@@ -4,7 +4,7 @@
     {
         public int Id { get; private set; }
         public string Name { get; private set; }
-        public string? Address { get; private set; }
+        public string Address { get; private set; }
         public bool IsActive { get; private set; }
         public DateTime CreatedAt { get; private set; }
 
@@ -22,18 +22,18 @@
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("El Id debe ser mayor que 0.", nameof(id));
+                throw new ArgumentException("Id must be greater than 0.", nameof(id));
             Id = id;
         }
 
         public void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("El nombre no puede ser nulo o vacío.", nameof(name));
+                throw new ArgumentException("The name cannot be null or empty.", nameof(name));
             Name = name;
         }
 
-        public void SetAddress(string? address)
+        public void SetAddress(string address)
         {
             Address = address;
         }
@@ -46,7 +46,7 @@
         public void SetCreatedAt(DateTime createdAt)
         {
             if (createdAt == default)
-                throw new ArgumentException("La fecha de alta no puede ser nula.", nameof(createdAt));
+                throw new ArgumentException("The creation date cannot be null.", nameof(createdAt));
             CreatedAt = createdAt;
         }
     }

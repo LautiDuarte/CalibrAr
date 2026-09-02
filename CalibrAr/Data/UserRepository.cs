@@ -17,6 +17,10 @@ namespace Data
             this.context = context;
         }
 
+        //public UserRepository()
+        //{
+        //}
+
         public async Task AddAsync(User user)
         {
             context.Users.Add(user);

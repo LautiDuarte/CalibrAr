@@ -33,39 +33,39 @@ namespace Domain.Model
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("El Id debe ser mayor que 0.", nameof(id));
+                throw new ArgumentException("Id must be greater than 0.", nameof(id));
             Id = id;
         }
         public void SetDescription(string description)
         {
             if (string.IsNullOrWhiteSpace(description))
-                throw new ArgumentException("La descripción no puede ser nula o vacía.", nameof(description));
+                throw new ArgumentException("The description cannot be null or empty.", nameof(description));
             Description = description;
         }
         public void SetCertifyingBody(string certifyingBody)
         {
             if (string.IsNullOrWhiteSpace(certifyingBody))
-                throw new ArgumentException("El organismo certificador no puede ser nulo o vacío.", nameof(certifyingBody));
+                throw new ArgumentException("The certifying body cannot be null or empty.", nameof(certifyingBody));
             CertifyingBody = certifyingBody;
         }
         public void SetCertificateNumber(string certificateNumber)
         {
             if (string.IsNullOrWhiteSpace(certificateNumber))
-                throw new ArgumentException("El número de certificado no puede ser nulo o vacío.", nameof(certificateNumber));
+                throw new ArgumentException("The certificate number cannot be null or empty.", nameof(certificateNumber));
             CertificateNumber = certificateNumber;
         }
         public void SetCertificateIssuedAt(DateTime certificateIssuedAt)
         {
             if (certificateIssuedAt == default)
-                throw new ArgumentException("La fecha de emisión no puede ser nula.", nameof(certificateIssuedAt));
+                throw new ArgumentException("The certificate issue date cannot be null.", nameof(certificateIssuedAt));
             CertificateIssuedAt = certificateIssuedAt;
         }
         public void SetCertificateExpiresAt(DateTime certificateExpiresAt)
         {
             if (certificateExpiresAt == default)
-                throw new ArgumentException("La fecha de vencimiento no puede ser nula.", nameof(certificateExpiresAt));
+                throw new ArgumentException("The certificate expiration date cannot be null.", nameof(certificateExpiresAt));
             if (certificateExpiresAt <= CertificateIssuedAt)
-                throw new ArgumentException("La fecha de vencimiento debe ser posterior a la fecha de emisión.", nameof(certificateExpiresAt));
+                throw new ArgumentException("The certificate expiration date must be greater than the certificate issue date.", nameof(certificateExpiresAt));
             CertificateExpiresAt = certificateExpiresAt;
         }
         public void SetIsActive(bool isActive)
@@ -75,7 +75,7 @@ namespace Domain.Model
         public void SetCreatedAt(DateTime createdAt)
         {
             if (createdAt == default)
-                throw new ArgumentException("La fecha de alta no puede ser nula.", nameof(createdAt));
+                throw new ArgumentException("The creation date cannot be null.", nameof(createdAt));
             CreatedAt = createdAt;
         }
 

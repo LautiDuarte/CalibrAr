@@ -32,17 +32,17 @@ namespace Domain.Model
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("El Id debe ser mayor o igual a 0.", nameof(id));
+                throw new ArgumentException("Id must be greater than 0.", nameof(id));
             Id = id;
         }
 
         public void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("El nombre no puede ser nulo o vacío.", nameof(name));
+                throw new ArgumentException("The name cannot be null or empty.", nameof(name));
 
             if (name.Length > 50)
-                throw new ArgumentException("El nombre no puede exceder 50 caracteres.", nameof(name));
+                throw new ArgumentException("The name cannot exceed 50 characters.", nameof(name));
 
             Name = name;
         }
@@ -50,10 +50,10 @@ namespace Domain.Model
         public void SetDescription(string description)
         {
             if (string.IsNullOrWhiteSpace(description))
-                throw new ArgumentException("La descripción no puede ser nula o vacía.", nameof(description));
+                throw new ArgumentException("The description cannot be null or empty.", nameof(description));
 
             if (description.Length > 200)
-                throw new ArgumentException("La descripción no puede exceder 200 caracteres.", nameof(description));
+                throw new ArgumentException("The description cannot exceed 200 characters.", nameof(description));
 
             Description = description;
         }
@@ -61,7 +61,7 @@ namespace Domain.Model
         public void SetCreatedAt(DateTime createdAt)
         {
             if (createdAt == default)
-                throw new ArgumentException("La fecha de creación no puede ser nula.", nameof(createdAt));
+                throw new ArgumentException("The creation date cannot be null.", nameof(createdAt));
             CreatedAt = createdAt;
         }
 

@@ -48,35 +48,35 @@ namespace Domain.Model
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("El Id debe ser mayor que 0.", nameof(id));
+                throw new ArgumentException("Id must be greater than 0.", nameof(id));
             Id = id;
         }
 
         public void SetCode(string code)
         {
             if (string.IsNullOrWhiteSpace(code))
-                throw new ArgumentException("El código no puede ser nulo o vacío.", nameof(code));
+                throw new ArgumentException("The code cannot be null or empty.", nameof(code));
             Code = code;
         }
 
         public void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("El nombre no puede ser nulo o vacío.", nameof(name));
+                throw new ArgumentException("The name cannot be null or empty.", nameof(name));
             Name = name;
         }
 
         public void SetVersionNumber(string versionNumber)
         {
             if (string.IsNullOrWhiteSpace(versionNumber))
-                throw new ArgumentException("El número de versión no puede ser nulo o vacío.", nameof(versionNumber));
+                throw new ArgumentException("The version number cannot be null or empty.", nameof(versionNumber));
             VersionNumber = versionNumber;
         }
 
         public void SetApprovedAt(DateTime approvedAt)
         {
             if (approvedAt == default)
-                throw new ArgumentException("La fecha de aprobación no puede ser nula.", nameof(approvedAt));
+                throw new ArgumentException("The approval date cannot be null.", nameof(approvedAt));
             ApprovedAt = approvedAt;
         }
 
@@ -88,14 +88,14 @@ namespace Domain.Model
         public void SetCreatedAt(DateTime createdAt)
         {
             if (createdAt == default)
-                throw new ArgumentException("La fecha de alta no puede ser nula.", nameof(createdAt));
+                throw new ArgumentException("The creation date cannot be null.", nameof(createdAt));
             CreatedAt = createdAt;
         }
 
         public void SetInstrumentTypeId(int instrumentTypeId)
         {
             if (instrumentTypeId <= 0)
-                throw new ArgumentException("El Id del tipo de instrumento debe ser mayor que 0.", nameof(instrumentTypeId));
+                throw new ArgumentException("Instrmument type Id must be greater than 0.", nameof(instrumentTypeId));
             if (_instrumentType != null && _instrumentType.Id != instrumentTypeId)
                 InstrumentType = null;
             InstrumentTypeId = instrumentTypeId;
