@@ -51,9 +51,8 @@ namespace WebAPI
             .Produces(StatusCodes.Status400BadRequest)
             .WithOpenApi();
 
-            app.MapPut("/instrumenttypes/{id}", async (int id, InstrumentTypeDTO dto, IInstrumentTypeService instrumentTypeService) =>
+            app.MapPut("/instrumenttypes", async (InstrumentTypeDTO dto, IInstrumentTypeService instrumentTypeService) =>
             {
-                dto.Id = id;
                 try
                 {
                     var updated = await instrumentTypeService.UpdateAsync(dto);
@@ -78,14 +77,21 @@ namespace WebAPI
 
             app.MapDelete("/instrumenttypes/{id}", async (int id, IInstrumentTypeService instrumentTypeService) =>
             {
-                var deleted = await instrumentTypeService.DeleteAsync(id);
-
-                if (!deleted)
+                try
                 {
-                    return Results.NotFound();
-                }
+                    var deleted = await instrumentTypeService.DeleteAsync(id);
 
-                return Results.NoContent();
+                    if (!deleted)
+                    {
+                        return Results.NotFound();
+                    }
+
+                    return Results.NoContent();
+                }
+                catch (InvalidOperationException ex)
+                {
+                    return Results.Conflict(new { error = ex.Message });
+                }
             })
             .WithName("DeleteInstrumentType")
             .Produces(StatusCodes.Status204NoContent)

@@ -56,9 +56,8 @@ namespace WebAPI
             .Produces(StatusCodes.Status404NotFound)
             .WithOpenApi();
 
-            app.MapPut("/areas/{id}", async (int id, AreaDTO dto, IAreaService areaService) =>
+            app.MapPut("/areas", async (AreaDTO dto, IAreaService areaService) =>
             {
-                dto.Id = id;
                 try
                 {
                     var updated = await areaService.UpdateAsync(dto);
@@ -87,18 +86,26 @@ namespace WebAPI
 
             app.MapDelete("/areas/{id}", async (int id, IAreaService areaService) =>
             {
-                var deleted = await areaService.DeleteAsync(id);
-
-                if (!deleted)
+                try
                 {
-                    return Results.NotFound();
-                }
+                    var deleted = await areaService.DeleteAsync(id);
 
-                return Results.NoContent();
+                    if (!deleted)
+                    {
+                        return Results.NotFound();
+                    }
+
+                    return Results.NoContent();
+                }
+                catch (InvalidOperationException ex)
+                {
+                    return Results.Conflict(new { error = ex.Message });
+                }
             })
             .WithName("DeleteArea")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status409Conflict)
             .WithOpenApi();
         }
     }

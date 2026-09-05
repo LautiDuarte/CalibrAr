@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.37111.16 d17.14
+VisualStudioVersion = 17.14.37111.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI", "WebAPI\WebAPI.csproj", "{C3C0B037-777B-4A2B-B77D-66411D5863D9}"
 EndProject
@@ -12,6 +12,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DTOs", "DTOs\DTOs.csproj", "{C23AE9A6-9FC8-4F2D-9251-F2977245F3C5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Services", "Application.Services\Application.Services.csproj", "{21416A18-5A05-4B5E-83BE-1D6F6F473FE7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsForms", "WindowsForms\WindowsForms.csproj", "{DA23B1BD-570C-4778-BD47-47544A3FDC31}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API.Auth.WindowsForms", "API.Auth.WindowsForms\API.Auth.WindowsForms.csproj", "{8073EF0E-155B-4CE5-9B6A-1D093590F69E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API.Clients", "API.Clients\API.Clients.csproj", "{E8091E38-E4E4-42F6-9E18-54207880E5A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +45,18 @@ Global
 		{21416A18-5A05-4B5E-83BE-1D6F6F473FE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21416A18-5A05-4B5E-83BE-1D6F6F473FE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{21416A18-5A05-4B5E-83BE-1D6F6F473FE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA23B1BD-570C-4778-BD47-47544A3FDC31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA23B1BD-570C-4778-BD47-47544A3FDC31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA23B1BD-570C-4778-BD47-47544A3FDC31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA23B1BD-570C-4778-BD47-47544A3FDC31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8073EF0E-155B-4CE5-9B6A-1D093590F69E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8073EF0E-155B-4CE5-9B6A-1D093590F69E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8073EF0E-155B-4CE5-9B6A-1D093590F69E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8073EF0E-155B-4CE5-9B6A-1D093590F69E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8091E38-E4E4-42F6-9E18-54207880E5A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8091E38-E4E4-42F6-9E18-54207880E5A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8091E38-E4E4-42F6-9E18-54207880E5A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8091E38-E4E4-42F6-9E18-54207880E5A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

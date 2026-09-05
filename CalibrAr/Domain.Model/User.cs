@@ -40,29 +40,29 @@ namespace Domain.Model
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("El Id debe ser mayor que 0.", nameof(id));
+                throw new ArgumentException("Id must be greater than 0.", nameof(id));
             Id = id;
         }
         public void SetFullName(string fullname)
         {
             if (string.IsNullOrWhiteSpace(fullname))
-                throw new ArgumentException("El nombre no puede ser nulo o vacío.", nameof(fullname));
+                throw new ArgumentException("The name cannot be null or empty.", nameof(fullname));
             FullName = fullname;
         }
 
         public void SetEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
-                throw new ArgumentException("El email no puede ser nulo o vacío.", nameof(email));
+                throw new ArgumentException("The email cannot be null or empty.", nameof(email));
             if (!email.Contains('@'))
-                throw new ArgumentException("El email no tiene un formato válido.", nameof(email));
+                throw new ArgumentException("The email format is not valid.", nameof(email));
             Email = email;
         }
 
         public void SetPasswordHash(string passwordHash)
         {
             if (string.IsNullOrWhiteSpace(passwordHash))
-                throw new ArgumentException("El hash de contraseña no puede ser nulo o vacío.", nameof(passwordHash));
+                throw new ArgumentException("The password hash cannot be null or empty.", nameof(passwordHash));
             Salt = GenerateSalt();
             PasswordHash = HashPassword(passwordHash, Salt);
         }
@@ -70,7 +70,7 @@ namespace Domain.Model
         public void SetRole(UserRole role)
         {
             if (!Enum.IsDefined(typeof(UserRole), role))
-                throw new ArgumentException("El rol especificado no es válido.", nameof(role));
+                throw new ArgumentException("The role is not valid.", nameof(role));
             Role = role;
         }
 
@@ -79,10 +79,19 @@ namespace Domain.Model
             IsActive = isActive;
         }
 
+        public bool ValidatePassword(string password)
+        {
+            if (string.IsNullOrWhiteSpace(password))
+                return false;
+
+            string hashedInput = HashPassword(password, Salt);
+            return PasswordHash == hashedInput;
+        }
+
         public void SetCreatedAt(DateTime createdAt)
         {
             if (createdAt == default)
-                throw new ArgumentException("La fecha de alta no puede ser nula.", nameof(createdAt));
+                throw new ArgumentException("The creation date cannot be null.", nameof(createdAt));
             CreatedAt = createdAt;
         }
 

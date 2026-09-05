@@ -55,9 +55,8 @@ namespace WebAPI
             .Produces(StatusCodes.Status400BadRequest)
             .WithOpenApi();
 
-            app.MapPut("/instruments/{id}", async (int id, InstrumentDTO dto, IInstrumentService instrumentService) =>
+            app.MapPut("/instruments", async (InstrumentDTO dto, IInstrumentService instrumentService) =>
             {
-                dto.Id = id;
                 try
                 {
                     var updated = await instrumentService.UpdateAsync(dto);

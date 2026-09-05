@@ -51,9 +51,8 @@ namespace WebAPI
             .Produces(StatusCodes.Status400BadRequest)
             .WithOpenApi();
 
-            app.MapPut("/locations/{id}", async (int id, LocationDTO dto, ILocationService locationService) =>
+            app.MapPut("/locations", async (LocationDTO dto, ILocationService locationService) =>
             {
-                dto.Id = id;
                 try
                 {
                     var updated = await locationService.UpdateAsync(dto);

@@ -21,11 +21,12 @@ namespace Application.Services
         public async Task<UserDTO> AddAsync(UserDTO dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Password))
-                throw new ArgumentException("La contraseña es requerida para crear un usuario.", nameof(dto.Password));
+                throw new ArgumentException("Password is required to create a user.", nameof(dto.Password));
 
             var createdAt = DateTime.Now;
+            var isActive = true;
             var role = ParseRole(dto.Role);
-            User user = new User(0, dto.FullName, dto.Email, dto.Password, role, dto.IsActive, createdAt);
+            User user = new User(0, dto.FullName, dto.Email, dto.Password, role, isActive, createdAt);
 
             await userRepository.AddAsync(user);
 
@@ -33,6 +34,7 @@ namespace Application.Services
             dto.CreatedAt = user.CreatedAt;
             dto.LastLoginAt = user.LastLoginAt;
             dto.Password = null;
+            dto.IsActive = isActive;
             dto.GroupName = user.GetGroupName();
 
             return dto;
@@ -76,7 +78,7 @@ namespace Application.Services
         private static UserRole ParseRole(string role)
         {
             if (!Enum.TryParse<UserRole>(role, out var parsed))
-                throw new ArgumentException($"El rol '{role}' no es válido.", nameof(role));
+                throw new ArgumentException($"The role '{role}' is not valid.", nameof(role));
             return parsed;
         }
 

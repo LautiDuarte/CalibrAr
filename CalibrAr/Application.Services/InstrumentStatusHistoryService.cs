@@ -81,20 +81,20 @@ namespace Application.Services
         {
             var instrument = await instrumentRepository.GetAsync(instrumentId);
             if (instrument == null)
-                throw new KeyNotFoundException($"No existe un Instrument con Id {instrumentId}.");
+                throw new KeyNotFoundException($"There is no instrument with id {instrumentId}.");
         }
 
         private async Task EnsureUserExistsAsync(int userId)
         {
             var user = await userRepository.GetAsync(userId);
             if (user == null)
-                throw new KeyNotFoundException($"No existe un User con Id {userId}.");
+                throw new KeyNotFoundException($"There is no user with id {userId}.");
         }
 
         private static TEnum ParseEnum<TEnum>(string value, string paramName) where TEnum : struct
         {
             if (!Enum.TryParse<TEnum>(value, out var parsed))
-                throw new ArgumentException($"El valor '{value}' no es válido.", paramName);
+                throw new ArgumentException($"The value '{value}' is not valid.", paramName);
             return parsed;
         }
 

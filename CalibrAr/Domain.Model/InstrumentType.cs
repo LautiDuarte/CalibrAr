@@ -32,13 +32,13 @@ namespace Domain.Model
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("El Id debe ser mayor que 0.", nameof(id));
+                throw new ArgumentException("Id must be greater than 0.", nameof(id));
             Id = id;
         }
         public void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("El nombre no puede ser nulo o vacío.", nameof(name));
+                throw new ArgumentException("The name cannot be null or empty.", nameof(name));
             Name = name;
         }
 
@@ -50,7 +50,7 @@ namespace Domain.Model
         public void SetMeasurementUnit(string measurementUnit)
         {
             if (string.IsNullOrWhiteSpace(measurementUnit))
-                throw new ArgumentException("La unidad de medida no puede ser nula o vacía.", nameof(measurementUnit));
+                throw new ArgumentException("The measurement unit cannot be null or empty.", nameof(measurementUnit));
             MeasurementUnit = measurementUnit;
         }
 
@@ -58,7 +58,7 @@ namespace Domain.Model
         {
             if (maxAllowedError <= 0)
             {
-                throw new ArgumentException("El error máximo admisible debe ser mayor que 0.", nameof(maxAllowedError));
+                throw new ArgumentException("Max allowed error must be greater than 0.", nameof(maxAllowedError));
             }
             MaxAllowedError = maxAllowedError;
         }
@@ -67,7 +67,7 @@ namespace Domain.Model
         {
             if (calibrationFrequencyMonths <= 0)
             {
-                throw new ArgumentException("La frecuencia de calibración debe ser mayor que 0.", nameof(calibrationFrequencyMonths));
+                throw new ArgumentException("The calibration frequency must be greater than 0.", nameof(calibrationFrequencyMonths));
             }
             CalibrationFrequencyMonths = calibrationFrequencyMonths;
         }
@@ -78,7 +78,7 @@ namespace Domain.Model
         public void SetCreatedAt(DateTime createdAt)
         {
             if (createdAt == default)
-                throw new ArgumentException("La fecha de alta no puede ser nula.", nameof(createdAt));
+                throw new ArgumentException("The creation date cannot be null.", nameof(createdAt));
             CreatedAt = createdAt;
         }
 
