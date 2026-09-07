@@ -68,5 +68,11 @@ namespace WindowsForms
         {
 
         }
+
+        private async void logoutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            await AuthServiceProvider.Instance.LogoutAsync();
+            this.Close();
+        }
     }
 }

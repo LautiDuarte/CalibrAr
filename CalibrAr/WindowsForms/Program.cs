@@ -47,7 +47,11 @@ namespace WindowsForms
                 try
                 {
                     Application.Run(new Home());
-                    break; // La aplicación se cerró normalmente
+                    if (await authService.IsAuthenticatedAsync())
+                    {
+                        break; // Cerró la ventana estando logueado -> salir de la app
+                    }
+                    // Si no: hizo logout -> el while sigue y vuelve a mostrar el LoginForm
                 }
                 catch (UnauthorizedAccessException ex)
                 {
