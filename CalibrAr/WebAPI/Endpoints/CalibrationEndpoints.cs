@@ -21,7 +21,8 @@ namespace WebAPI
             .WithName("GetCalibration")
             .Produces<CalibrationDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("CalibrationsRead");
 
             app.MapGet("/calibrations", async (ICalibrationService calibrationService) =>
             {
@@ -31,7 +32,8 @@ namespace WebAPI
             })
             .WithName("GetAllCalibrations")
             .Produces<IEnumerable<CalibrationDTO>>(StatusCodes.Status200OK)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("CalibrationsRead");
 
             app.MapPost("/calibrations", async (CalibrationDTO dto, ICalibrationService calibrationService) =>
             {
@@ -53,7 +55,8 @@ namespace WebAPI
             .WithName("AddCalibration")
             .Produces<CalibrationDTO>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("CalibrationsCreate");
 
             app.MapPut("/calibrations/{id}", async (int id, CalibrationDTO dto, ICalibrationService calibrationService) =>
             {
@@ -82,7 +85,8 @@ namespace WebAPI
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("CalibrationsUpdate");
 
             app.MapDelete("/calibrations/{id}", async (int id, ICalibrationService calibrationService) =>
             {
@@ -98,7 +102,8 @@ namespace WebAPI
             .WithName("DeleteCalibration")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("CalibrationsDelete");
         }
     }
 }

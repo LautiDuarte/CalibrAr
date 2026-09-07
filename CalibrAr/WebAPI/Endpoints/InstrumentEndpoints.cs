@@ -21,7 +21,8 @@ namespace WebAPI
             .WithName("GetInstrument")
             .Produces<InstrumentDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentsRead");
 
             app.MapGet("/instruments", async (IInstrumentService instrumentService) =>
             {
@@ -31,7 +32,8 @@ namespace WebAPI
             })
             .WithName("GetAllInstruments")
             .Produces<IEnumerable<InstrumentDTO>>(StatusCodes.Status200OK)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentsRead");
 
             app.MapPost("/instruments", async (InstrumentDTO dto, IInstrumentService instrumentService) =>
             {
@@ -53,7 +55,8 @@ namespace WebAPI
             .WithName("AddInstrument")
             .Produces<InstrumentDTO>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentsCreate");
 
             app.MapPut("/instruments", async (InstrumentDTO dto, IInstrumentService instrumentService) =>
             {
@@ -81,7 +84,8 @@ namespace WebAPI
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentsUpdate");
 
             app.MapDelete("/instruments/{id}", async (int id, IInstrumentService instrumentService) =>
             {
@@ -97,7 +101,8 @@ namespace WebAPI
             .WithName("DeleteInstrument")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentsDelete");
         }
     }
 }

@@ -21,7 +21,8 @@ namespace WebAPI
             .WithName("GetInstrumentType")
             .Produces<InstrumentTypeDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentTypesRead");
 
             app.MapGet("/instrumenttypes", async (IInstrumentTypeService instrumentTypeService) =>
             {
@@ -31,7 +32,8 @@ namespace WebAPI
             })
             .WithName("GetAllInstrumentTypes")
             .Produces<IEnumerable<InstrumentTypeDTO>>(StatusCodes.Status200OK)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentTypesRead");
 
             app.MapPost("/instrumenttypes", async (InstrumentTypeDTO dto, IInstrumentTypeService instrumentTypeService) =>
             {
@@ -49,7 +51,8 @@ namespace WebAPI
             .WithName("AddInstrumentType")
             .Produces<InstrumentTypeDTO>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentTypesCreate");
 
             app.MapPut("/instrumenttypes", async (InstrumentTypeDTO dto, IInstrumentTypeService instrumentTypeService) =>
             {
@@ -73,7 +76,8 @@ namespace WebAPI
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentTypesUpdate");
 
             app.MapDelete("/instrumenttypes/{id}", async (int id, IInstrumentTypeService instrumentTypeService) =>
             {
@@ -96,7 +100,8 @@ namespace WebAPI
             .WithName("DeleteInstrumentType")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentTypesDelete");
         }
     }
 }

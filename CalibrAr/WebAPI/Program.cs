@@ -1,6 +1,9 @@
+using System.Text;
 using Application.Services;
 using Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using WebAPI;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,6 +40,52 @@ builder.Services.AddScoped<IInstrumentStatusHistoryService, InstrumentStatusHist
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<AuthService>();
 
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var jwtSecretKey = jwtSettings["SecretKey"]
+    ?? throw new InvalidOperationException("Falta configurar JwtSettings:SecretKey en appsettings.json.");
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtSettings["Issuer"],
+            ValidateAudience = true,
+            ValidAudience = jwtSettings["Audience"],
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey)),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    // Una política por cada permiso sembrado en CalibrArContext, formato "Categoria.accion".
+    string[] categories =
+    [
+        "Locations", "Areas", "Instruments", "Calibrations", "Users", "InstrumentTypes",
+        "Procedures", "NonConformities", "ReferenceStandards", "InstrumentStatusHistory",
+        "CalibrationMeasurements"
+    ];
+    (string Suffix, string Action)[] actions =
+    [
+        ("Read", "read"), ("Create", "create"), ("Update", "update"), ("Delete", "delete")
+    ];
+
+    foreach (var category in categories)
+    {
+        foreach (var (suffix, action) in actions)
+        {
+            options.AddPolicy($"{category}{suffix}", policy => policy.RequireClaim("permission", $"{category}.{action}"));
+        }
+    }
+
+    // Cualquier endpoint sin política explícita ni [AllowAnonymous] igual exige estar autenticado.
+    options.FallbackPolicy = options.DefaultPolicy;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -51,6 +100,9 @@ else
     app.UseHsts();
     app.UseHttpsRedirection();
 }
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapAreaEndpoints();
 app.MapLocationEndpoints();

@@ -21,7 +21,8 @@ namespace WebAPI
             .WithName("GetLocation")
             .Produces<LocationDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("LocationsRead");
 
             app.MapGet("/locations", async (ILocationService locationService) =>
             {
@@ -31,7 +32,8 @@ namespace WebAPI
             })
             .WithName("GetAllLocations")
             .Produces<IEnumerable<LocationDTO>>(StatusCodes.Status200OK)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("LocationsRead");
 
             app.MapPost("/locations", async (LocationDTO dto, ILocationService locationService) =>
             {
@@ -49,7 +51,8 @@ namespace WebAPI
             .WithName("AddLocation")
             .Produces<LocationDTO>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("LocationsCreate");
 
             app.MapPut("/locations", async (LocationDTO dto, ILocationService locationService) =>
             {
@@ -73,7 +76,8 @@ namespace WebAPI
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("LocationsUpdate");
 
             app.MapDelete("/locations/{id}", async (int id, ILocationService locationService) =>
             {
@@ -97,7 +101,8 @@ namespace WebAPI
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status409Conflict)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("LocationsDelete");
         }
     }
 }

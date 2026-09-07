@@ -21,7 +21,8 @@ namespace WebAPI
             .WithName("GetArea")
             .Produces<AreaDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("AreasRead");
 
             app.MapGet("/areas", async (IAreaService areaService) =>
             {
@@ -31,7 +32,8 @@ namespace WebAPI
             })
             .WithName("GetAllAreas")
             .Produces<IEnumerable<AreaDTO>>(StatusCodes.Status200OK)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("AreasRead");
 
             app.MapPost("/areas", async (AreaDTO dto, IAreaService areaService) =>
             {
@@ -54,7 +56,8 @@ namespace WebAPI
             .Produces<AreaDTO>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("AreasCreate");
 
             app.MapPut("/areas", async (AreaDTO dto, IAreaService areaService) =>
             {
@@ -82,7 +85,8 @@ namespace WebAPI
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("AreasUpdate");
 
             app.MapDelete("/areas/{id}", async (int id, IAreaService areaService) =>
             {
@@ -106,7 +110,8 @@ namespace WebAPI
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status409Conflict)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("AreasDelete");
         }
     }
 }
