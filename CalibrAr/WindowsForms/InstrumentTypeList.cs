@@ -131,9 +131,14 @@ namespace WindowsForms
             try
             {
                 DisableControls();
+                var selected = this.SelectedItem();
+                if (selected == null)
+                {
+                    MessageBox.Show("Seleccioná una fila primero.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
-                int id = this.SelectedItem().Id;
-                InstrumentTypeDTO instrumentType = await InstrumentTypeApiClient.GetAsync(id);
+                InstrumentTypeDTO instrumentType = await InstrumentTypeApiClient.GetAsync(selected.Id);
 
                 InstrumentTypeDetail instrumentTypeDetail = new InstrumentTypeDetail(FormMode.Update, instrumentType);
                 instrumentTypeDetail.ShowDialog();
@@ -152,8 +157,12 @@ namespace WindowsForms
 
         private async void deleteButton_Click(object sender, EventArgs e)
         {
-            InstrumentTypeDTO instrumentType = this.SelectedItem();
-
+            var instrumentType = this.SelectedItem();
+            if (instrumentType == null)
+            {
+                MessageBox.Show("Seleccioná una fila primero.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             var result = MessageBox.Show($"¿Are you sure you want to delete this item: {instrumentType.Name}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
@@ -216,12 +225,12 @@ namespace WindowsForms
             }
         }
 
-        private InstrumentTypeDTO SelectedItem()
+        private InstrumentTypeDTO? SelectedItem()
         {
-            InstrumentTypeDTO instrumentType;
+            if (instrumentTypesDataGridView.SelectedRows.Count == 0)
+                return null;
 
-            instrumentType = (InstrumentTypeDTO)instrumentTypesDataGridView.SelectedRows[0].DataBoundItem;
-            return instrumentType;
+            return (InstrumentTypeDTO)instrumentTypesDataGridView.SelectedRows[0].DataBoundItem;
         }
 
         private void DisableControls()

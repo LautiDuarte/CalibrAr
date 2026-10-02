@@ -198,8 +198,13 @@ namespace WindowsForms
             {
                 DisableControls();
 
-                int id = this.SelectedItem().Id;
-                InstrumentDTO instrument = await InstrumentApiClient.GetAsync(id);
+                var selected = this.SelectedItem();
+                if (selected == null)
+                {
+                    MessageBox.Show("Seleccioná una fila primero.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                InstrumentDTO instrument = await InstrumentApiClient.GetAsync(selected.Id);
 
                 InstrumentDetail instrumentDetail = new InstrumentDetail(FormMode.Update, instrument);
                 instrumentDetail.ShowDialog();
@@ -218,7 +223,12 @@ namespace WindowsForms
 
         private async void deleteButton_Click(object sender, EventArgs e)
         {
-            InstrumentDTO instrument = this.SelectedItem();
+            var instrument = this.SelectedItem();
+            if (instrument == null)
+            {
+                MessageBox.Show("Seleccioná una fila primero.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             var result = MessageBox.Show($"¿Are you sure you want to delete this item: {instrument.Code}{instrument.Name}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
@@ -281,12 +291,12 @@ namespace WindowsForms
             }
         }
 
-        private InstrumentDTO SelectedItem()
+        private InstrumentDTO? SelectedItem()
         {
-            InstrumentDTO instrument;
+            if (instrumentsDataGridView.SelectedRows.Count == 0)
+                return null;
 
-            instrument = (InstrumentDTO)instrumentsDataGridView.SelectedRows[0].DataBoundItem;
-            return instrument;
+            return (InstrumentDTO)instrumentsDataGridView.SelectedRows[0].DataBoundItem;
         }
 
         private void DisableControls()

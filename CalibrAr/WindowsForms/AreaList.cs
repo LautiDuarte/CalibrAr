@@ -109,8 +109,14 @@ namespace WindowsForms
             {
                 DisableControls();
 
-                int id = this.SelectedItem().Id;
-                AreaDTO area = await AreaApiClient.GetAsync(id);
+                var selected = this.SelectedItem();
+                if (selected == null)
+                {
+                    MessageBox.Show("Seleccioná una fila primero.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                AreaDTO area = await AreaApiClient.GetAsync(selected.Id);
 
                 AreaDetail areaDetail = new AreaDetail(FormMode.Update, area);
                 areaDetail.ShowDialog();
@@ -129,7 +135,13 @@ namespace WindowsForms
 
         private async void deleteButton_Click(object sender, EventArgs e)
         {
-            AreaDTO area = this.SelectedItem();
+            var area = this.SelectedItem();
+
+            if (area == null)
+            {
+                MessageBox.Show("Seleccioná una fila primero.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             var result = MessageBox.Show($"¿Are you sure you want to delete this item:{area.Name}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
@@ -192,12 +204,12 @@ namespace WindowsForms
             }
         }
 
-        private AreaDTO SelectedItem()
+        private AreaDTO? SelectedItem()
         {
-            AreaDTO area;
+            if (areasDataGridView.SelectedRows.Count == 0)
+                return null;
 
-            area = (AreaDTO)areasDataGridView.SelectedRows[0].DataBoundItem;
-            return area;
+            return (AreaDTO)areasDataGridView.SelectedRows[0].DataBoundItem;
         }
 
         private void DisableControls()

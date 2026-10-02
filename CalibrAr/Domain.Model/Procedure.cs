@@ -9,9 +9,9 @@ namespace Domain.Model
     public class Procedure
     {
         public int Id { get; private set; }
-        public string Code { get; private set; }
-        public string Name { get; private set; }
-        public string VersionNumber { get; private set; }
+        public string Code { get; private set; } = string.Empty;
+        public string Name { get; private set; } = string.Empty;
+        public string VersionNumber { get; private set; } = string.Empty;
         public DateTime ApprovedAt { get; private set; }
 
         public bool IsActive { get; private set; }

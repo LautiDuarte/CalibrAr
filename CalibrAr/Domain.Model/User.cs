@@ -10,14 +10,14 @@ namespace Domain.Model
     public class User
     {
         public int Id { get; private set; }
-        public string FullName { get; private set; }
-        public string Email { get; private set; }
-        public string PasswordHash { get; private set; }
+        public string FullName { get; private set; } = String.Empty;
+        public string Email { get; private set; } = String.Empty;
+        public string PasswordHash { get; private set; } = String.Empty;
         public UserRole Role { get; private set; }
         public DateTime? LastLoginAt { get; private set; }
         public bool IsActive { get; private set; }
         public DateTime CreatedAt { get; private set; }
-        public string Salt { get; private set; }
+        public string Salt { get; private set; } = String.Empty;
 
         public int? PermissionGroupId { get; private set; }
         public virtual PermissionGroup? Group { get; private set; }

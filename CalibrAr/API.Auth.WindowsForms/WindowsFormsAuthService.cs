@@ -13,9 +13,9 @@ namespace API.Auth.WindowsForms
 
         public event Action<bool>? AuthenticationStateChanged;
 
-        public async Task<bool> IsAuthenticatedAsync()
+        public Task<bool> IsAuthenticatedAsync()
         {
-            return !string.IsNullOrEmpty(_currentToken) && DateTime.UtcNow < _tokenExpiration;
+            return Task.FromResult(!string.IsNullOrEmpty(_currentToken) && DateTime.UtcNow < _tokenExpiration);
         }
 
         public async Task<string?> GetTokenAsync()
@@ -54,13 +54,14 @@ namespace API.Auth.WindowsForms
             return false;
         }
 
-        public async Task LogoutAsync()
+        public Task LogoutAsync()
         {
             _currentToken = null;
             _tokenExpiration = default;
             _currentEmail = null;
 
             AuthenticationStateChanged?.Invoke(false);
+            return Task.CompletedTask;
         }
 
         public async Task CheckTokenExpirationAsync()
