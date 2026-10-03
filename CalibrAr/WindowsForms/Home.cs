@@ -57,10 +57,10 @@ namespace WindowsForms
             bool canViewAreas = authService.HasPermission("Areas.read");
             areasToolStripMenuItem.Visible = canViewAreas;
 
-            bool canViewProcedures = await authService.HasPermissionAsync("Procedures.read");
+            bool canViewProcedures = authService.HasPermission("Procedures.read");
             proceduresToolStripMenuItem.Visible = canViewProcedures;
 
-            bool canViewCalibrations = await authService.HasPermissionAsync("Calibrations.read");
+            bool canViewCalibrations = authService.HasPermission("Calibrations.read");
             calibrationsToolStripMenuItem.Visible = canViewCalibrations;
 
 

@@ -141,18 +141,18 @@ namespace WindowsForms
 
         private async void CalibrationList_Load(object sender, EventArgs e)
         {
-            await ConfigureButtonPermissions();
+            ConfigureButtonPermissions();
             await LoadCalibrations();
         }
 
-        private async Task ConfigureButtonPermissions()
+        private void ConfigureButtonPermissions()
         {
             var authService = AuthServiceProvider.Instance;
 
             // Verificar permisos para cada botón
-            bool canCreate = await authService.HasPermissionAsync("Calibrations.create");
-            bool canUpdate = await authService.HasPermissionAsync("Calibrations.update");
-            bool canDelete = await authService.HasPermissionAsync("Calibrations.delete");
+            bool canCreate = authService.HasPermission("Calibrations.create");
+            bool canUpdate = authService.HasPermission("Calibrations.update");
+            bool canDelete = authService.HasPermission("Calibrations.delete");
 
             // Configurar visibilidad de botones según permisos
             createButton.Visible = canCreate;

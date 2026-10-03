@@ -113,8 +113,6 @@ namespace WindowsForms
 
                 AreaDTO area = await AreaApiClient.GetAsync(selected.Id);
 
-                AreaDTO area = await AreaApiClient.GetAsync(selected.Id);
-
                 AreaDetail areaDetail = new AreaDetail(FormMode.Update, area);
                 areaDetail.ShowDialog(this);
                 await LoadAreas();
@@ -134,12 +132,6 @@ namespace WindowsForms
         {
             AreaDTO area = this.SelectedItem();
             if(area == null) return;
-
-            if (area == null)
-            {
-                MessageBox.Show("Seleccioná una fila primero.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
 
             var result = MessageBox.Show($"¿Are you sure you want to delete this item:{area.Name}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 

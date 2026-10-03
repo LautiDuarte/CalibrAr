@@ -133,12 +133,6 @@ namespace WindowsForms
             try
             {
                 DisableControls();
-                var selected = this.SelectedItem();
-                if (selected == null)
-                {
-                    MessageBox.Show("Seleccioná una fila primero.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
 
                 InstrumentTypeDTO instrumentType = await InstrumentTypeApiClient.GetAsync(selected.Id);
 

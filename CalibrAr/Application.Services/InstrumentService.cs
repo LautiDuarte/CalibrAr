@@ -151,7 +151,7 @@ namespace Application.Services
             return instrumentType?.CalibrationFrequencyMonths;
         }
 
-        public async Task<Instrument> IsActiveCheck(Instrument instrument)
+        public Task<Instrument> IsActiveCheck(Instrument instrument)
         {
             if (instrument.Status == InstrumentStatus.Decommissioned)
             {

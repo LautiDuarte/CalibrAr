@@ -42,7 +42,7 @@ namespace WindowsForms
             // menuStrip1
             // 
             menuStrip1.ImageScalingSize = new Size(20, 20);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { instrumentsToolStripMenuItem, instrumentTypesToolStripMenuItem, locationsToolStripMenuItem, areasToolStripMenuItem, proceduresToolStripMenuItem, calibrationsToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { instrumentsToolStripMenuItem, instrumentTypesToolStripMenuItem, locationsToolStripMenuItem, areasToolStripMenuItem, proceduresToolStripMenuItem, calibrationsToolStripMenuItem, logoutToolStripMenuItem});
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Padding = new Padding(7, 3, 0, 3);
