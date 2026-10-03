@@ -111,6 +111,7 @@ namespace Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
                 entity.Property(e => e.Code).IsRequired().HasMaxLength(50);
+                entity.HasIndex(e => e.Code).IsUnique();
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.SerialNumber).HasMaxLength(100);
                 entity.Property(e => e.Brand).HasMaxLength(100);
@@ -266,7 +267,6 @@ namespace Data
                 entity.Property(e => e.CertificateNumber).HasMaxLength(100);
                 entity.Property(e => e.Result).IsRequired();
                 entity.Property(e => e.RestrictionDetail).HasMaxLength(200);
-                entity.Property(e => e.NextCalibrationDate).IsRequired();
                 entity.Property(e => e.Notes).HasMaxLength(500);
                 entity.Property(e => e.CreatedAt).IsRequired();
                 entity.Property(e => e.InstrumentId).IsRequired().HasField("_instrumentId");
@@ -307,9 +307,9 @@ namespace Data
                 entity.Property(e => e.Error).IsRequired();
                 entity.Property(e => e.IsWithinTolerance).IsRequired();
                 entity.HasOne(e => e.Calibration)
-                      .WithMany()
+                      .WithMany(c => c.Measurements)
                       .HasForeignKey(e => e.CalibrationId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<NonConformity>(entity =>

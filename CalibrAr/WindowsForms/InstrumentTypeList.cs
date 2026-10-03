@@ -122,21 +122,22 @@ namespace WindowsForms
             InstrumentTypeDTO newInstrumentType = new InstrumentTypeDTO();
             InstrumentTypeDetail instrumentTypeDetail = new InstrumentTypeDetail(FormMode.Create, newInstrumentType);
 
-            instrumentTypeDetail.ShowDialog();
+            instrumentTypeDetail.ShowDialog(this);
             await this.LoadInstrumentTypes();
         }
 
         private async void updateButton_Click(object sender, EventArgs e)
         {
+            InstrumentTypeDTO? selected = this.SelectedItem();
+            if (selected == null) return;
             try
             {
                 DisableControls();
 
-                int id = this.SelectedItem().Id;
-                InstrumentTypeDTO instrumentType = await InstrumentTypeApiClient.GetAsync(id);
+                InstrumentTypeDTO instrumentType = await InstrumentTypeApiClient.GetAsync(selected.Id);
 
                 InstrumentTypeDetail instrumentTypeDetail = new InstrumentTypeDetail(FormMode.Update, instrumentType);
-                instrumentTypeDetail.ShowDialog();
+                instrumentTypeDetail.ShowDialog(this);
                 await this.LoadInstrumentTypes();
 
             }
@@ -153,6 +154,7 @@ namespace WindowsForms
         private async void deleteButton_Click(object sender, EventArgs e)
         {
             InstrumentTypeDTO instrumentType = this.SelectedItem();
+            if (instrumentType == null) return;
 
             var result = MessageBox.Show($"¿Are you sure you want to delete this item: {instrumentType.Name}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
@@ -219,6 +221,11 @@ namespace WindowsForms
         private InstrumentTypeDTO SelectedItem()
         {
             InstrumentTypeDTO instrumentType;
+            if(instrumentTypesDataGridView.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Please select an instrument type first.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
 
             instrumentType = (InstrumentTypeDTO)instrumentTypesDataGridView.SelectedRows[0].DataBoundItem;
             return instrumentType;

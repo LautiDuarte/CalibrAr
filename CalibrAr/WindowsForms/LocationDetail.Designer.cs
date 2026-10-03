@@ -37,6 +37,7 @@
             saveButton = new Button();
             errorProvider = new ErrorProvider(components);
             ((System.ComponentModel.ISupportInitialize)errorProvider).BeginInit();
+            StartPosition = FormStartPosition.CenterParent;
             SuspendLayout();
             // 
             // nameLabel

@@ -14,5 +14,7 @@ namespace Application.Services
         Task<InstrumentDTO?> GetAsync(int id);
         Task<IEnumerable<InstrumentDTO>> GetAllAsync();
         Task<bool> UpdateAsync(InstrumentDTO dto);
+        Task RecalculateCalibrationScheduleAsync(int instrumentId, DateTime? lastCalibrationDate);
+        Task RecalculateScheduleForTypeAsync(int instrumentTypeId);
     }
 }

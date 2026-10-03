@@ -23,8 +23,8 @@ namespace DTOs
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public int InstrumentTypeId { get; set; }
-        public string? InstrumentTypeName { get; set; }
+        public string InstrumentTypeName { get; set; }
         public int AreaId { get; set; }
-        public string? AreaName { get; set; }
+        public string AreaName { get; set; }
     }
 }

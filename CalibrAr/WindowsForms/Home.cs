@@ -15,8 +15,26 @@ namespace WindowsForms
     {
         public Home()
         {
+            IsMdiContainer = true;
+            WindowState = FormWindowState.Maximized;
             InitializeComponent();
             ConfigureMenuPermissions();
+        }
+
+        private void OpenMdiChild<T>() where T : Form, new()
+        {
+            foreach (Form child in this.MdiChildren)
+            {
+                if (child is T)
+                {
+                    child.Activate();
+                    return;
+                }
+            }
+
+            T form = new T();
+            form.MdiParent = this;
+            form.Show();
         }
 
         private async void ConfigureMenuPermissions()
@@ -38,30 +56,44 @@ namespace WindowsForms
             // Verificar permiso para Areas
             bool canViewAreas = await authService.HasPermissionAsync("Areas.read");
             areasToolStripMenuItem.Visible = canViewAreas;
+
+            bool canViewProcedures = await authService.HasPermissionAsync("Procedures.read");
+            proceduresToolStripMenuItem.Visible = canViewProcedures;
+
+            bool canViewCalibrations = await authService.HasPermissionAsync("Calibrations.read");
+            calibrationsToolStripMenuItem.Visible = canViewCalibrations;
+
+
         }
 
         private void instrumentsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            InstrumentList instrumentsForm = new InstrumentList();
-            instrumentsForm.ShowDialog();
+            OpenMdiChild<InstrumentList>();
+        }
+
+        private void proceduresToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenMdiChild<ProcedureList>();
         }
 
         private void instrumentTypesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            InstrumentTypeList instrumentTypesForm = new InstrumentTypeList();
-            instrumentTypesForm.ShowDialog();
+            OpenMdiChild<InstrumentTypeList>();
         }
 
         private void locationsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            LocationList locationsForm = new LocationList();
-            locationsForm.ShowDialog();
+            OpenMdiChild<LocationList>();
         }
 
         private void areasToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            AreaList areasForm = new AreaList();
-            areasForm.ShowDialog();
+            OpenMdiChild<AreaList>();
+        }
+
+        private void calibrationsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenMdiChild<CalibrationList>();
         }
 
         private void Home_Load(object sender, EventArgs e)

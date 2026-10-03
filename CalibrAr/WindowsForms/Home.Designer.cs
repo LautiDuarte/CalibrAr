@@ -33,12 +33,14 @@
             instrumentTypesToolStripMenuItem = new ToolStripMenuItem();
             locationsToolStripMenuItem = new ToolStripMenuItem();
             areasToolStripMenuItem = new ToolStripMenuItem();
+            proceduresToolStripMenuItem = new ToolStripMenuItem();
+            calibrationsToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { instrumentsToolStripMenuItem, instrumentTypesToolStripMenuItem, locationsToolStripMenuItem, areasToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { instrumentsToolStripMenuItem, instrumentTypesToolStripMenuItem, locationsToolStripMenuItem, areasToolStripMenuItem, proceduresToolStripMenuItem, calibrationsToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(800, 24);
@@ -73,6 +75,20 @@
             areasToolStripMenuItem.Text = "Areas";
             areasToolStripMenuItem.Click += areasToolStripMenuItem_Click;
             // 
+            // proceduresToolStripMenuItem
+            // 
+            proceduresToolStripMenuItem.Name = "proceduresToolStripMenuItem";
+            proceduresToolStripMenuItem.Size = new Size(78, 20);
+            proceduresToolStripMenuItem.Text = "Procedures";
+            proceduresToolStripMenuItem.Click += proceduresToolStripMenuItem_Click;
+            // 
+            // calibrationsToolStripMenuItem
+            // 
+            calibrationsToolStripMenuItem.Name = "calibrationsToolStripMenuItem";
+            calibrationsToolStripMenuItem.Size = new Size(82, 20);
+            calibrationsToolStripMenuItem.Text = "Calibrations";
+            calibrationsToolStripMenuItem.Click += calibrationsToolStripMenuItem_Click;
+            // 
             // Home
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -96,5 +112,7 @@
         private ToolStripMenuItem instrumentTypesToolStripMenuItem;
         private ToolStripMenuItem locationsToolStripMenuItem;
         private ToolStripMenuItem areasToolStripMenuItem;
+        private ToolStripMenuItem proceduresToolStripMenuItem;
+        private ToolStripMenuItem calibrationsToolStripMenuItem;
     }
 }

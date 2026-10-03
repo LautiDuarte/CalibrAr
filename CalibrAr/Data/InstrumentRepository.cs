@@ -79,5 +79,11 @@ namespace Data
             }
             return false;
         }
+
+        public async Task<bool> ExistsByCodeAsync(string code, int? excludeId = null)
+        {
+            return await context.Instruments
+                .AnyAsync(i => i.Code == code && (excludeId == null || i.Id != excludeId));
+        }
     }
 }

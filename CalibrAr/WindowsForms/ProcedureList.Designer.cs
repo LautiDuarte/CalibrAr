@@ -1,6 +1,6 @@
 ﻿namespace WindowsForms
 {
-    partial class InstrumentTypeList
+    partial class ProcedureList
     {
         /// <summary>
         /// Required designer variable.
@@ -29,25 +29,32 @@
         private void InitializeComponent()
         {
 
-            instrumentTypesDataGridView = new DataGridView();
+            components = new System.ComponentModel.Container();
+            errorProvider1 = new ErrorProvider(components);
+            proceduresDataGridView = new DataGridView();
             deleteButton = new Button();
             updateButton = new Button();
             createButton = new Button();
-            ((System.ComponentModel.ISupportInitialize)instrumentTypesDataGridView).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)errorProvider1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)proceduresDataGridView).BeginInit();
             SuspendLayout();
             // 
-            // instrumentTypesDataGridView
+            // errorProvider1
             // 
-            instrumentTypesDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            instrumentTypesDataGridView.Location = new Point(12, 12);
-            instrumentTypesDataGridView.Name = "instrumentTypesDataGridView";
-            instrumentTypesDataGridView.Size = new Size(776, 388);
-            instrumentTypesDataGridView.TabIndex = 0;
-            instrumentTypesDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            errorProvider1.ContainerControl = this;
+            // 
+            // proceduresDataGridView1
+            // 
+            proceduresDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            proceduresDataGridView.Location = new Point(12, 12);
+            proceduresDataGridView.Name = "proceduresDataGridView1";
+            proceduresDataGridView.Size = new Size(776, 402);
+            proceduresDataGridView.TabIndex = 0;
+            proceduresDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             // 
             // deleteButton
             // 
-            deleteButton.Location = new Point(551, 406);
+            deleteButton.Location = new Point(551, 420);
             deleteButton.Name = "deleteButton";
             deleteButton.Size = new Size(75, 23);
             deleteButton.TabIndex = 1;
@@ -58,7 +65,7 @@
             // 
             // updateButton
             // 
-            updateButton.Location = new Point(632, 406);
+            updateButton.Location = new Point(632, 420);
             updateButton.Name = "updateButton";
             updateButton.Size = new Size(75, 23);
             updateButton.TabIndex = 2;
@@ -69,36 +76,38 @@
             // 
             // createButton
             // 
-            createButton.Location = new Point(713, 406);
+            createButton.Location = new Point(713, 420);
             createButton.Name = "createButton";
             createButton.Size = new Size(75, 23);
             createButton.TabIndex = 3;
             createButton.Text = "Create";
             createButton.UseVisualStyleBackColor = true;
             createButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            createButton.Click += createButton_Click; 
+            createButton.Click += createButton_Click;
             // 
-            // InstrumentTypeList
+            // ProcedureList
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 435);
+            ClientSize = new Size(800, 450);
             Controls.Add(createButton);
             Controls.Add(updateButton);
             Controls.Add(deleteButton);
-            Controls.Add(instrumentTypesDataGridView);
-            Name = "InstrumentTypeList";
-            Text = "InstrumentTypeList";
-            Load += InstrumentTypeList_Load;
-            ((System.ComponentModel.ISupportInitialize)instrumentTypesDataGridView).EndInit();
+            Controls.Add(proceduresDataGridView);
+            Name = "ProcedureList";
+            Text = "ProcedureList";
+            Load += ProcedureList_Load;
+            ((System.ComponentModel.ISupportInitialize)errorProvider1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)proceduresDataGridView).EndInit();
             ResumeLayout(false);
         }
 
         #endregion
 
-        private DataGridView instrumentTypesDataGridView;
-        private Button deleteButton;
-        private Button updateButton;
+        private ErrorProvider errorProvider1;
+        private DataGridView proceduresDataGridView;
         private Button createButton;
+        private Button updateButton;
+        private Button deleteButton;
     }
 }
