@@ -64,18 +64,18 @@ namespace WindowsForms
 
         private async void LocationList_Load(object sender, EventArgs e)
         {
-            await ConfigureButonPermissions();
+            ConfigureButonPermissions();
             await LoadLocations();
         }
 
-        private async Task ConfigureButonPermissions()
+        private void ConfigureButonPermissions()
         {
             var authService = AuthServiceProvider.Instance;
 
             // Verificar permisos para cada botón
-            bool canCreate = await authService.HasPermissionAsync("Locations.create");
-            bool canUpdate = await authService.HasPermissionAsync("Locations.update");
-            bool canDelete = await authService.HasPermissionAsync("Locations.delete");
+            bool canCreate = authService.HasPermission("Locations.create");
+            bool canUpdate = authService.HasPermission("Locations.update");
+            bool canDelete = authService.HasPermission("Locations.delete");
 
             // Configurar visibilidad de botones según permisos
             createButton.Visible = canCreate;

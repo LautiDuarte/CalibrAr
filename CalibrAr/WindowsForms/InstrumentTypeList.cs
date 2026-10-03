@@ -92,19 +92,19 @@ namespace WindowsForms
 
         private async void InstrumentTypeList_Load(object sender, EventArgs e)
         {
-            await ConfigureButtonPermissions();
+            ConfigureButtonPermissions();
             await this.LoadInstrumentTypes();
         }
 
 
-        private async Task ConfigureButtonPermissions()
+        private void ConfigureButtonPermissions()
         {
             var authService = AuthServiceProvider.Instance;
 
             // Verificar permisos para cada botón
-            bool canCreate = await authService.HasPermissionAsync("InstrumentTypes.create");
-            bool canUpdate = await authService.HasPermissionAsync("InstrumentTypes.update");
-            bool canDelete = await authService.HasPermissionAsync("InstrumentTypes.delete");
+            bool canCreate = authService.HasPermission("InstrumentTypes.create");
+            bool canUpdate = authService.HasPermission("InstrumentTypes.update");
+            bool canDelete = authService.HasPermission("InstrumentTypes.delete");
 
             // Configurar visibilidad de botones según permisos
             createButton.Visible = canCreate;

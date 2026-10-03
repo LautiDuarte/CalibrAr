@@ -19,24 +19,24 @@ namespace WindowsForms
             ConfigureMenuPermissions();
         }
 
-        private async void ConfigureMenuPermissions()
+        private void ConfigureMenuPermissions()
         {
             var authService = AuthServiceProvider.Instance;
 
             // Verificar permiso para Instruments
-            bool canViewInstruments = await authService.HasPermissionAsync("Instruments.read");
+            bool canViewInstruments = authService.HasPermission("Instruments.read");
             instrumentsToolStripMenuItem.Visible = canViewInstruments;
 
             // Verificar permiso para IntrumentTypes
-            bool canViewInstrumentTypes = await authService.HasPermissionAsync("InstrumentTypes.read");
+            bool canViewInstrumentTypes = authService.HasPermission("InstrumentTypes.read");
             instrumentTypesToolStripMenuItem.Visible = canViewInstrumentTypes;
 
             // Verificar permiso para Locations
-            bool canViewLocations = await authService.HasPermissionAsync("Locations.read");
+            bool canViewLocations = authService.HasPermission("Locations.read");
             locationsToolStripMenuItem.Visible = canViewLocations;
 
             // Verificar permiso para Areas
-            bool canViewAreas = await authService.HasPermissionAsync("Areas.read");
+            bool canViewAreas = authService.HasPermission("Areas.read");
             areasToolStripMenuItem.Visible = canViewAreas;
         }
 
