@@ -1,6 +1,23 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 
-@Body
+<AuthorizeView>
+    <Authorized>
+        <header class="top-bar">
+            <span>Hola, @context.User.Identity?.Name</span>
+
+            @* Form HTML común (sin @onsubmit): el navegador hace un POST real a /logout,
+               no pasa por el circuito, porque borrar la cookie requiere una respuesta HTTP. *@
+            <form action="logout" method="post">
+                <AntiforgeryToken />
+                <button type="submit">Cerrar sesión</button>
+            </form>
+        </header>
+    </Authorized>
+</AuthorizeView>
+
+<main>
+    @Body
+</main>
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.

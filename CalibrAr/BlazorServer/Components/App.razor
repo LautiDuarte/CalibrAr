@@ -1,5 +1,5 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="es">
 
 <head>
     <meta charset="utf-8" />
@@ -7,12 +7,24 @@
     <base href="/" />
     <link rel="stylesheet" href="app.css" />
     <link rel="stylesheet" href="BlazorServer.styles.css" />
-    <HeadOutlet @rendermode="InteractiveServer" />
+    <HeadOutlet @rendermode="RenderModeForPage" />
 </head>
 
 <body>
-    <Routes @rendermode="InteractiveServer" />
+    <Routes @rendermode="RenderModeForPage" />
     <script src="_framework/blazor.web.js"></script>
 </body>
 
 </html>
+
+@code {
+    // Solo existe durante el request HTTP inicial (render estático), que es justo
+    // cuando se decide el modo de renderizado.
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    // /login se renderiza estático (sin circuito) porque emitir la cookie requiere una
+    // respuesta HTTP normal; el resto de la app es interactiva.
+    private IComponentRenderMode? RenderModeForPage =>
+        HttpContext.Request.Path.StartsWithSegments("/login") ? null : InteractiveServer;
+}
