@@ -9,8 +9,8 @@ namespace Domain.Model
     public class NonConformity
     {
         public int Id { get; private set; }
-        public string Code { get; private set; }
-        public string Description { get; private set; }
+        public string Code { get; private set; } = string.Empty;
+        public string Description { get; private set; } = string.Empty;
         public Origin Origin { get; private set; }
         public NonConformityStatus Status { get; private set; }
         public string? CorrectiveAction { get; private set; }

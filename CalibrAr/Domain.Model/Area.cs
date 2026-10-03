@@ -1,10 +1,11 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 namespace Domain.Model
 {
     public class Area
     {
         public int Id { get; private set; }
-        public string Name { get; private set; }
+        public string Name { get; private set; } = String.Empty;
         public string? Responsible { get; private set; }
         public bool IsActive { get; private set; }
         public DateTime CreatedAt { get; private set; }

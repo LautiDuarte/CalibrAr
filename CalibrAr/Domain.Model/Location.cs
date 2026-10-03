@@ -3,8 +3,8 @@
     public class Location
     {
         public int Id { get; private set; }
-        public string Name { get; private set; }
-        public string Address { get; private set; }
+        public string Name { get; private set; } = String.Empty;
+        public string? Address { get; private set; }
         public bool IsActive { get; private set; }
         public DateTime CreatedAt { get; private set; }
 
@@ -33,7 +33,7 @@
             Name = name;
         }
 
-        public void SetAddress(string address)
+        public void SetAddress(string? address)
         {
             Address = address;
         }

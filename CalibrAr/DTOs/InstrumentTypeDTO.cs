@@ -9,9 +9,9 @@ namespace DTOs
     public class InstrumentTypeDTO
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
-        public string MeasurementUnit { get; set; }
+        public string MeasurementUnit { get; set; } = string.Empty;
         public decimal MaxAllowedError { get; set; }
         public int CalibrationFrequencyMonths { get; set; }
         public bool IsActive { get; set; }

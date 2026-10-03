@@ -84,7 +84,7 @@ namespace Application.Services
             return await instrumentRepository.UpdateAsync(instrumentUpToDate);
         }
 
-        public async Task<Instrument> IsActiveCheck(Instrument instrument) // chequear funcionamiento de esta funcion
+        public Task<Instrument> IsActiveCheck(Instrument instrument) // chequear funcionamiento de esta funcion
         {
             if (instrument.Status == InstrumentStatus.Decommissioned)
             {
@@ -94,7 +94,7 @@ namespace Application.Services
             {
                 instrument.SetIsActive(true);
             }
-            return instrument;
+            return Task.FromResult(instrument);
         }
 
         public async Task<IEnumerable<Instrument>> CheckCalibrationExpiredAsync(IEnumerable<Instrument> instruments) //chequear funcionamiento de esta funcion

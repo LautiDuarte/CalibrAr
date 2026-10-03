@@ -9,9 +9,9 @@ namespace Domain.Model
     public class Permission
     {
         public int Id { get; private set; }
-        public string Name { get; private set; }
-        public string Description { get; private set; }
-        public string Category { get; private set; }
+        public string Name { get; private set; } = string.Empty;
+        public string Description { get; private set; } = string.Empty;
+        public string Category { get; private set; } = string.Empty;
         public bool IsActive { get; private set; }
 
         // Navigation properties

@@ -64,18 +64,18 @@ namespace WindowsForms
 
         private async void LocationList_Load(object sender, EventArgs e)
         {
-            await ConfigureButonPermissions();
+            ConfigureButonPermissions();
             await LoadLocations();
         }
 
-        private async Task ConfigureButonPermissions()
+        private void ConfigureButonPermissions()
         {
             var authService = AuthServiceProvider.Instance;
 
             // Verificar permisos para cada botón
-            bool canCreate = await authService.HasPermissionAsync("Locations.create");
-            bool canUpdate = await authService.HasPermissionAsync("Locations.update");
-            bool canDelete = await authService.HasPermissionAsync("Locations.delete");
+            bool canCreate = authService.HasPermission("Locations.create");
+            bool canUpdate = authService.HasPermission("Locations.update");
+            bool canDelete = authService.HasPermission("Locations.delete");
 
             // Configurar visibilidad de botones según permisos
             createButton.Visible = canCreate;
@@ -103,8 +103,13 @@ namespace WindowsForms
             {
                 DisableControls();
 
-                int id = this.SelectedItem().Id;
-                LocationDTO location = await LocationApiClient.GetAsync(id);
+                var selected = this.SelectedItem();
+                if (selected == null)
+                {
+                    MessageBox.Show("Seleccioná una fila primero.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                LocationDTO location = await LocationApiClient.GetAsync(selected.Id);
 
                 LocationDetail locationDetail = new LocationDetail(FormMode.Update, location);
                 locationDetail.ShowDialog();
@@ -123,16 +128,22 @@ namespace WindowsForms
 
         private async void deleteButton_Click(object sender, EventArgs e)
         {
-            LocationDTO location = this.SelectedItem();
+            var selected = this.SelectedItem();
 
-            var result = MessageBox.Show($"¿Are you sure you want to delete this item: {location.Name} {location.Address}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (selected == null)
+            {
+                MessageBox.Show("Seleccioná una fila primero.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var result = MessageBox.Show($"¿Are you sure you want to delete this item: {selected.Name} {selected.Address}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
             {
                 try
                 {
                     DisableControls();
-                    await LocationApiClient.DeleteAsync(location.Id);
+                    await LocationApiClient.DeleteAsync(selected.Id);
                     await LoadLocations();
 
                 }
@@ -187,12 +198,12 @@ namespace WindowsForms
             }
         }
 
-        private LocationDTO SelectedItem()
+        private LocationDTO? SelectedItem()
         {
-            LocationDTO location;
+            if (locationsDataGridView.SelectedRows.Count == 0)
+                return null;
 
-            location = (LocationDTO)locationsDataGridView.SelectedRows[0].DataBoundItem;
-            return location;
+            return (LocationDTO)locationsDataGridView.SelectedRows[0].DataBoundItem;
         }
 
         private void DisableControls()

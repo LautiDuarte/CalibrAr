@@ -14,7 +14,7 @@ namespace WindowsForms
 {
     public partial class AreaDetail : Form
     {
-        private AreaDTO area;
+        private AreaDTO area = new();
         private FormMode mode;
 
         public AreaDTO Area
@@ -83,7 +83,7 @@ namespace WindowsForms
 
                     this.Area.Name = nameTextBox.Text;
                     this.Area.Responsible = responsibleTextBox.Text;
-                    this.Area.LocationId = (int)locationComboBox.SelectedValue;
+                    this.Area.LocationId = (int)locationComboBox.SelectedValue!;
                     if (this.Mode == FormMode.Update)
                     {
                         await AreaApiClient.UpdateAsync(this.Area);

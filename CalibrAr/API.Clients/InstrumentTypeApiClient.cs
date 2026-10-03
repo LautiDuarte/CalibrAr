@@ -19,7 +19,8 @@ namespace API.Clients
                 HttpResponseMessage response = await client.GetAsync($"instrumentTypes/{id}");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<InstrumentTypeDTO>();
+                    var instrumentType = await response.Content.ReadFromJsonAsync<InstrumentTypeDTO>();
+                    return instrumentType ?? throw new Exception($"La respuesta del servidor para el tipo de instrumento con ID {id} vino vacia.");
                 }
                 else
                 {
@@ -45,7 +46,8 @@ namespace API.Clients
                 HttpResponseMessage response = await client.GetAsync("instrumentTypes");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<List<InstrumentTypeDTO>>();
+                    var instrumentTypes = await response.Content.ReadFromJsonAsync<List<InstrumentTypeDTO>>();
+                    return instrumentTypes ?? throw new Exception("La respuesta del servidor para la lista de tipos de instrumento vino vacia.");
                 }
                 else
                 {

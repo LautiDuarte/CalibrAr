@@ -18,7 +18,8 @@ namespace API.Clients
                 HttpResponseMessage response = await client.GetAsync($"procedures/{id}");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<ProcedureDTO>();
+                    var procedure = await response.Content.ReadFromJsonAsync<ProcedureDTO>();
+                    return procedure ?? throw new Exception($"La respuesta del servidor para el procedimiento con ID {id} vino vacia.");
                 }
                 else
                 {
@@ -44,7 +45,8 @@ namespace API.Clients
                 HttpResponseMessage response = await client.GetAsync("procedures");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<List<ProcedureDTO>>();
+                    var procedures = await response.Content.ReadFromJsonAsync<List<ProcedureDTO>>();
+                    return procedures ?? throw new Exception("La respuesta del servidor para la lista de procedimientos vino vacia.");
                 }
                 else
                 {

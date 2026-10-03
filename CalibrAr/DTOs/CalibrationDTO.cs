@@ -10,11 +10,11 @@ namespace DTOs
     {
         public int Id { get; set; }
         public DateTime CalibrationDate { get; set; }
-        public string InterventionType { get; set; }
+        public string InterventionType { get; set; } = string.Empty;
         public bool IsExternal { get; set; }
         public string? ExternalLab { get; set; }
         public string? CertificateNumber { get; set; }
-        public string Result { get; set; }
+        public string Result { get; set; } = string.Empty;
         public string? RestrictionDetail { get; set; }
         public DateTime NextCalibrationDate { get; set; }
         public string? Notes { get; set; }

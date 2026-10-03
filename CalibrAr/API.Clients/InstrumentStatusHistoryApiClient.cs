@@ -18,7 +18,8 @@ namespace API.Clients
                 HttpResponseMessage response = await client.GetAsync($"instrumentStatusHistories/{id}");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<InstrumentStatusHistoryDTO>();
+                    var instrumentStatusHistory = await response.Content.ReadFromJsonAsync<InstrumentStatusHistoryDTO>();
+                    return instrumentStatusHistory ?? throw new Exception($"La respuesta del servidor para el historial de estado con ID {id} vino vacia.");
                 }
                 else
                 {
@@ -44,7 +45,8 @@ namespace API.Clients
                 HttpResponseMessage response = await client.GetAsync("instrumentStatusHistories");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<List<InstrumentStatusHistoryDTO>>();
+                    var instrumentStatusHistories = await response.Content.ReadFromJsonAsync<List<InstrumentStatusHistoryDTO>>();
+                    return instrumentStatusHistories ?? throw new Exception("La respuesta del servidor para la lista de historiales de estado vino vacia.");
                 }
                 else
                 {

@@ -9,9 +9,9 @@ namespace Domain.Model
     public class ReferenceStandard
     {
         public int Id { get; private set; }
-        public string Description { get; private set; }
-        public string CertifyingBody { get; private set; }
-        public string CertificateNumber { get; private set; }
+        public string Description { get; private set; } = string.Empty;
+        public string CertifyingBody { get; private set; } = string.Empty;
+        public string CertificateNumber { get; private set; } = string.Empty;
         public DateTime CertificateIssuedAt { get; private set; }
         public DateTime CertificateExpiresAt { get; private set; }
         public bool IsActive { get; private set; }

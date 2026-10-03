@@ -10,12 +10,12 @@ namespace API.Clients
     {
         event Action<bool>? AuthenticationStateChanged;
 
-        Task<bool> IsAuthenticatedAsync();
-        Task<string?> GetTokenAsync();
-        Task<string?> GetEmailAsync();
+        bool IsAuthenticated();
+        string? GetToken();
+        string? GetEmail();
         Task<bool> LoginAsync(string email, string password);
         Task LogoutAsync();
         Task CheckTokenExpirationAsync();
-        Task<bool> HasPermissionAsync(string permission);
+        bool HasPermission(string permission);
     }
 }
