@@ -15,10 +15,10 @@ namespace WindowsForms
     public partial class LocationDetail : Form
     {
 
-        private LocationDTO location;
+        private LocationDTO location = new();
         private FormMode mode;
 
-        public LocationDTO Location
+        public new LocationDTO Location
         {
             get { return location; }
             set
@@ -46,7 +46,7 @@ namespace WindowsForms
             Init(mode, location);
         }
 
-        private async void Init(FormMode mode, LocationDTO location)
+        private void Init(FormMode mode, LocationDTO location)
         {
             try
             {

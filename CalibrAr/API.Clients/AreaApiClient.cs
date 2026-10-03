@@ -18,7 +18,8 @@ namespace API.Clients
                 HttpResponseMessage response = await client.GetAsync($"areas/{id}");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<AreaDTO>();
+                    var area = await response.Content.ReadFromJsonAsync<AreaDTO>();
+                    return area ?? throw new Exception($"La respuesta del servidor para el area con ID {id} vino vacia.");
                 }
                 else
                 {
@@ -44,7 +45,8 @@ namespace API.Clients
                 HttpResponseMessage response = await client.GetAsync("areas");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<List<AreaDTO>>();
+                    var areas = await response.Content.ReadFromJsonAsync<List<AreaDTO>>();
+                    return areas ?? throw new Exception("La respuesta del servidor para la lista de areas vino vacia.");
                 }
                 else
                 {

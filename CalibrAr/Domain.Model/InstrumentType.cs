@@ -9,9 +9,9 @@ namespace Domain.Model
     public class InstrumentType
     {
         public int Id { get; private set; }
-        public string Name { get; private set; }
+        public string Name { get; private set; } = String.Empty;
         public string? Description { get; private set; }
-        public string MeasurementUnit { get; private set; }
+        public string MeasurementUnit { get; private set; } = String.Empty;
         public decimal MaxAllowedError { get; private set; }
         public int CalibrationFrequencyMonths { get; private set; }
         public bool IsActive { get; private set; }

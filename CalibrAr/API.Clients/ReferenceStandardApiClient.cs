@@ -18,7 +18,8 @@ namespace API.Clients
                 HttpResponseMessage response = await client.GetAsync($"referenceStandards/{id}");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<ReferenceStandardDTO>();
+                    var referenceStandard = await response.Content.ReadFromJsonAsync<ReferenceStandardDTO>();
+                    return referenceStandard ?? throw new Exception($"La respuesta del servidor para el patron de referencia con ID {id} vino vacia.");
                 }
                 else
                 {
@@ -44,7 +45,8 @@ namespace API.Clients
                 HttpResponseMessage response = await client.GetAsync("referenceStandards");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<List<ReferenceStandardDTO>>();
+                    var referenceStandards = await response.Content.ReadFromJsonAsync<List<ReferenceStandardDTO>>();
+                    return referenceStandards ?? throw new Exception("La respuesta del servidor para la lista de patrones de referencia vino vacia.");
                 }
                 else
                 {

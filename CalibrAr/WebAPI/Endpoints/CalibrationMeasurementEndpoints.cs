@@ -21,7 +21,8 @@ namespace WebAPI
             .WithName("GetCalibrationMeasurement")
             .Produces<CalibrationMeasurementDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("CalibrationMeasurementsRead");
 
             app.MapGet("/calibrationmeasurements", async (ICalibrationMeasurementService calibrationMeasurementService) =>
             {
@@ -31,7 +32,8 @@ namespace WebAPI
             })
             .WithName("GetAllCalibrationMeasurements")
             .Produces<IEnumerable<CalibrationMeasurementDTO>>(StatusCodes.Status200OK)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("CalibrationMeasurementsRead");
 
             app.MapPost("/calibrationmeasurements", async (CalibrationMeasurementDTO dto, ICalibrationMeasurementService calibrationMeasurementService) =>
             {
@@ -53,7 +55,8 @@ namespace WebAPI
             .WithName("AddCalibrationMeasurement")
             .Produces<CalibrationMeasurementDTO>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("CalibrationMeasurementsCreate");
 
             app.MapPut("/calibrationmeasurements/{id}", async (int id, CalibrationMeasurementDTO dto, ICalibrationMeasurementService calibrationMeasurementService) =>
             {
@@ -82,7 +85,8 @@ namespace WebAPI
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("CalibrationMeasurementsUpdate");
 
             app.MapDelete("/calibrationmeasurements/{id}", async (int id, ICalibrationMeasurementService calibrationMeasurementService) =>
             {
@@ -98,7 +102,8 @@ namespace WebAPI
             .WithName("DeleteCalibrationMeasurement")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("CalibrationMeasurementsDelete");
         }
     }
 }

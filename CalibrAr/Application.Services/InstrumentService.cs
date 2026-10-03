@@ -89,7 +89,7 @@ namespace Application.Services
             await EnsureInstrumentTypeExistsAsync(dto.InstrumentTypeId);
             await EnsureAreaExistsAsync(dto.AreaId);
 
-            // La fuente de verdad de la última fecha son las calibraciones (existing), no el DTO
+            // La fuente de verdad de la ï¿½ltima fecha son las calibraciones (existing), no el DTO
             var lastCalibrationDate = existing.LastCalibrationDate;
             var effectiveFrequency = await ResolveFrequencyMonthsAsync(dto.CalibrationFrequencyMonths, dto.InstrumentTypeId);
             var nextCalibrationDate = Instrument.CalculateNextCalibrationDate(lastCalibrationDate, effectiveFrequency);
@@ -107,7 +107,7 @@ namespace Application.Services
             return await instrumentRepository.UpdateAsync(instrumentUpToDate);
         }
 
-        // Lo llama CalibrationService cuando cambia la última calibración del instrumento
+        // Lo llama CalibrationService cuando cambia la ï¿½ltima calibraciï¿½n del instrumento
         public async Task RecalculateCalibrationScheduleAsync(int instrumentId, DateTime? lastCalibrationDate)
         {
             var instrument = await instrumentRepository.GetAsync(instrumentId);
@@ -141,7 +141,7 @@ namespace Application.Services
                 await RecalculateCalibrationScheduleAsync(instrument.Id, instrument.LastCalibrationDate);
         }
 
-        // La frecuencia del instrumento sobreescribe la del tipo si está definida
+        // La frecuencia del instrumento sobreescribe la del tipo si estï¿½ definida
         private async Task<int?> ResolveFrequencyMonthsAsync(int? instrumentFrequencyMonths, int instrumentTypeId)
         {
             if (instrumentFrequencyMonths != null)
@@ -161,7 +161,7 @@ namespace Application.Services
             {
                 instrument.SetIsActive(true);
             }
-            return instrument;
+            return Task.FromResult(instrument);
         }
 
         public async Task<IEnumerable<Instrument>> CheckCalibrationExpiredAsync(IEnumerable<Instrument> instruments) //chequear funcionamiento de esta funcion

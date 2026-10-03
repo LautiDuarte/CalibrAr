@@ -21,7 +21,8 @@ namespace WebAPI
             .WithName("GetUser")
             .Produces<UserDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("UsersRead");
 
             app.MapGet("/users", async (IUserService userService) =>
             {
@@ -31,7 +32,8 @@ namespace WebAPI
             })
             .WithName("GetAllUsers")
             .Produces<IEnumerable<UserDTO>>(StatusCodes.Status200OK)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("UsersRead");
 
             app.MapPost("/users", async (UserDTO dto, IUserService userService) =>
             {
@@ -49,7 +51,8 @@ namespace WebAPI
             .WithName("AddUser")
             .Produces<UserDTO>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("UsersCreate");
 
             app.MapPut("/users", async (UserDTO dto, IUserService userService) =>
             {
@@ -73,7 +76,8 @@ namespace WebAPI
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("UsersUpdate");
 
             app.MapDelete("/users/{id}", async (int id, IUserService userService) =>
             {
@@ -89,7 +93,8 @@ namespace WebAPI
             .WithName("DeleteUser")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("UsersDelete");
         }
     }
 }

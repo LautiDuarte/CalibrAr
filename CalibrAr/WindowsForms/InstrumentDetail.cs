@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -21,7 +21,7 @@ namespace WindowsForms
     }
     public partial class InstrumentDetail : Form
     {
-        private InstrumentDTO instrument;
+        private InstrumentDTO instrument = new();
         private FormMode mode;
 
         public InstrumentDTO Instrument
@@ -114,7 +114,7 @@ namespace WindowsForms
                     this.Instrument.Model = modelTextBox.Text;
                     if (this.Mode == FormMode.Update && statusComboBox.SelectedItem != null)
                     {
-                        this.Instrument.Status = statusComboBox.SelectedItem.ToString();
+                        this.Instrument.Status = statusComboBox.SelectedItem.ToString() ?? string.Empty;
                     }
                     else
                     {

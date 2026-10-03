@@ -9,8 +9,8 @@ namespace Domain.Model
     public class Instrument
     {
         public int Id { get; private set; }
-        public string Code { get; private set; }
-        public string Name { get; private set; }
+        public string Code { get; private set; } = string.Empty;
+        public string Name { get; private set; } = string.Empty;
         public string? SerialNumber { get; private set; }
         public string? Brand { get; private set; }
         public string? Model { get; private set; }
@@ -158,7 +158,7 @@ namespace Domain.Model
             UpdatedAt = updatedAt;
         }
 
-        public void SetInstrumentTypeId( int instrumentTypeId)
+        public void SetInstrumentTypeId(int instrumentTypeId)
         {
             if (instrumentTypeId <= 0)
                 throw new ArgumentException("Instrument type Id must be greater than 0.", nameof(instrumentTypeId));

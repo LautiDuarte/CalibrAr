@@ -21,7 +21,8 @@ namespace WebAPI
             .WithName("GetReferenceStandard")
             .Produces<ReferenceStandardDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("ReferenceStandardsRead");
 
             app.MapGet("/referencestandards", async (IReferenceStandardService referenceStandardService) =>
             {
@@ -31,7 +32,8 @@ namespace WebAPI
             })
             .WithName("GetAllReferenceStandards")
             .Produces<IEnumerable<ReferenceStandardDTO>>(StatusCodes.Status200OK)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("ReferenceStandardsRead");
 
             app.MapPost("/referencestandards", async (ReferenceStandardDTO dto, IReferenceStandardService referenceStandardService) =>
             {
@@ -49,7 +51,8 @@ namespace WebAPI
             .WithName("AddReferenceStandard")
             .Produces<ReferenceStandardDTO>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("ReferenceStandardsCreate");
 
             app.MapPut("/referencestandards/{id}", async (int id, ReferenceStandardDTO dto, IReferenceStandardService referenceStandardService) =>
             {
@@ -74,7 +77,8 @@ namespace WebAPI
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("ReferenceStandardsUpdate");
 
             app.MapDelete("/referencestandards/{id}", async (int id, IReferenceStandardService referenceStandardService) =>
             {
@@ -90,7 +94,8 @@ namespace WebAPI
             .WithName("DeleteReferenceStandard")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("ReferenceStandardsDelete");
         }
     }
 }

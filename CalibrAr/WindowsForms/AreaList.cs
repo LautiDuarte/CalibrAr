@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -70,18 +70,18 @@ namespace WindowsForms
 
         private async void AreaList_Load(object sender, EventArgs e)
         {
-            await ConfigureButonPermissions();
+            ConfigureButonPermissions();
             await LoadAreas();
         }
 
-        private async Task ConfigureButonPermissions()
+        private void ConfigureButonPermissions()
         {
             var authService = AuthServiceProvider.Instance;
 
             // Verificar permisos para cada botón
-            bool canCreate = await authService.HasPermissionAsync("Areas.create");
-            bool canUpdate = await authService.HasPermissionAsync("Areas.update");
-            bool canDelete = await authService.HasPermissionAsync("Areas.delete");
+            bool canCreate = authService.HasPermission("Areas.create");
+            bool canUpdate = authService.HasPermission("Areas.update");
+            bool canDelete = authService.HasPermission("Areas.delete");
 
             // Configurar visibilidad de botones según permisos
             createButton.Visible = canCreate;
@@ -113,6 +113,8 @@ namespace WindowsForms
 
                 AreaDTO area = await AreaApiClient.GetAsync(selected.Id);
 
+                AreaDTO area = await AreaApiClient.GetAsync(selected.Id);
+
                 AreaDetail areaDetail = new AreaDetail(FormMode.Update, area);
                 areaDetail.ShowDialog(this);
                 await LoadAreas();
@@ -132,6 +134,12 @@ namespace WindowsForms
         {
             AreaDTO area = this.SelectedItem();
             if(area == null) return;
+
+            if (area == null)
+            {
+                MessageBox.Show("Seleccioná una fila primero.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             var result = MessageBox.Show($"¿Are you sure you want to delete this item:{area.Name}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
@@ -194,7 +202,7 @@ namespace WindowsForms
             }
         }
 
-        private AreaDTO SelectedItem()
+        private AreaDTO? SelectedItem()
         {
             AreaDTO area;
             if (areasDataGridView.SelectedRows.Count == 0)
@@ -203,8 +211,7 @@ namespace WindowsForms
                 return null;
             }
 
-            area = (AreaDTO)areasDataGridView.SelectedRows[0].DataBoundItem;
-            return area;
+            return (AreaDTO)areasDataGridView.SelectedRows[0].DataBoundItem;
         }
 
         private void DisableControls()

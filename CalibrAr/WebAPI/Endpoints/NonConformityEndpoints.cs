@@ -21,7 +21,8 @@ namespace WebAPI
             .WithName("GetNonConformity")
             .Produces<NonConformityDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("NonConformitiesRead");
 
             app.MapGet("/nonconformities", async (INonConformityService nonConformityService) =>
             {
@@ -31,7 +32,8 @@ namespace WebAPI
             })
             .WithName("GetAllNonConformities")
             .Produces<IEnumerable<NonConformityDTO>>(StatusCodes.Status200OK)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("NonConformitiesRead");
 
             app.MapPost("/nonconformities", async (NonConformityDTO dto, INonConformityService nonConformityService) =>
             {
@@ -53,7 +55,8 @@ namespace WebAPI
             .WithName("AddNonConformity")
             .Produces<NonConformityDTO>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("NonConformitiesCreate");
 
             app.MapPut("/nonconformities/{id}", async (int id, NonConformityDTO dto, INonConformityService nonConformityService) =>
             {
@@ -82,7 +85,8 @@ namespace WebAPI
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("NonConformitiesUpdate");
 
             app.MapDelete("/nonconformities/{id}", async (int id, INonConformityService nonConformityService) =>
             {
@@ -98,7 +102,8 @@ namespace WebAPI
             .WithName("DeleteNonConformity")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("NonConformitiesDelete");
         }
     }
 }

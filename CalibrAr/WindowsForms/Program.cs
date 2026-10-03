@@ -20,11 +20,10 @@ namespace WindowsForms
             Application.ThreadException += Application_ThreadException;
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 
-            // Ejecutar async main
-            Task.Run(async () => await MainAsync()).GetAwaiter().GetResult();
+            RunApplication();
         }
 
-        static async Task MainAsync()
+        static void RunApplication()
         {
             // Registrar AuthService en singleton
             var authService = new WindowsFormsAuthService();
@@ -34,7 +33,7 @@ namespace WindowsForms
             while (true)
             {
 
-                if (!await authService.IsAuthenticatedAsync())
+                if (!authService.IsAuthenticated())
                 {
                     var loginForm = new LoginForm();
                     if (loginForm.ShowDialog() != DialogResult.OK)
@@ -47,7 +46,11 @@ namespace WindowsForms
                 try
                 {
                     Application.Run(new Home());
-                    break; // La aplicación se cerró normalmente
+                    if (authService.IsAuthenticated())
+                    {
+                        break; // Cerró la ventana estando logueado -> salir de la app
+                    }
+                    // Si no: hizo logout -> el while sigue y vuelve a mostrar el LoginForm
                 }
                 catch (UnauthorizedAccessException ex)
                 {

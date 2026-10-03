@@ -67,7 +67,7 @@ namespace API.Clients
             // Verificar expiración antes de usar el token
             await authService.CheckTokenExpirationAsync();
 
-            var token = await authService.GetTokenAsync();
+            var token = authService.GetToken();
             if (!string.IsNullOrEmpty(token))
             {
                 client.DefaultRequestHeaders.Authorization =
@@ -82,7 +82,7 @@ namespace API.Clients
             // Verificar expiración primero
             await authService.CheckTokenExpirationAsync();
 
-            if (!await authService.IsAuthenticatedAsync())
+            if (!authService.IsAuthenticated())
             {
                 throw new UnauthorizedAccessException("Your session has expired.");
             }

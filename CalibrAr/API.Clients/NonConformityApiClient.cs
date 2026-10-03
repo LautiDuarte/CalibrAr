@@ -18,7 +18,8 @@ namespace API.Clients
                 HttpResponseMessage response = await client.GetAsync($"nonConformities/{id}");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<NonConformityDTO>();
+                    var nonConformity = await response.Content.ReadFromJsonAsync<NonConformityDTO>();
+                    return nonConformity ?? throw new Exception($"La respuesta del servidor para la no conformidad con ID {id} vino vacia.");
                 }
                 else
                 {
@@ -44,7 +45,8 @@ namespace API.Clients
                 HttpResponseMessage response = await client.GetAsync("nonConformities");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<List<NonConformityDTO>>();
+                    var nonConformities = await response.Content.ReadFromJsonAsync<List<NonConformityDTO>>();
+                    return nonConformities ?? throw new Exception("La respuesta del servidor para la lista de no conformidades vino vacia.");
                 }
                 else
                 {

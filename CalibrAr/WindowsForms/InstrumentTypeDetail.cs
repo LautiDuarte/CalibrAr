@@ -14,7 +14,7 @@ namespace WindowsForms
 {
     public partial class InstrumentTypeDetail : Form
     {
-        private InstrumentTypeDTO instrumentType;
+        private InstrumentTypeDTO instrumentType = new();
         private FormMode mode;
 
         public InstrumentTypeDTO InstrumentType
@@ -45,7 +45,7 @@ namespace WindowsForms
             Init(mode, instrumentType);
         }
 
-        private async void Init(FormMode mode, InstrumentTypeDTO instrumentType)
+        private void Init(FormMode mode, InstrumentTypeDTO instrumentType)
         {
             try
             {

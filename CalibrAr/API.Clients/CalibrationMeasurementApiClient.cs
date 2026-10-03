@@ -18,7 +18,8 @@ namespace API.Clients
                 HttpResponseMessage response = await client.GetAsync($"calibrationMeasurements/{id}");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<CalibrationMeasurementDTO>();
+                    var calibrationMeasurement = await response.Content.ReadFromJsonAsync<CalibrationMeasurementDTO>();
+                    return calibrationMeasurement ?? throw new Exception($"La respuesta del servidor para la medicion de calibracion con ID {id} vino vacia.");
                 }
                 else
                 {
@@ -44,7 +45,8 @@ namespace API.Clients
                 HttpResponseMessage response = await client.GetAsync("calibrationMeasurements");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<List<CalibrationMeasurementDTO>>();
+                    var calibrationMeasurements = await response.Content.ReadFromJsonAsync<List<CalibrationMeasurementDTO>>();
+                    return calibrationMeasurements ?? throw new Exception("La respuesta del servidor para la lista de mediciones de calibracion vino vacia.");
                 }
                 else
                 {

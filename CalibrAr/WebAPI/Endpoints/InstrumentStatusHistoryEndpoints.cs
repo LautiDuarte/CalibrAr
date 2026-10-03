@@ -21,7 +21,8 @@ namespace WebAPI
             .WithName("GetInstrumentStatusHistory")
             .Produces<InstrumentStatusHistoryDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentStatusHistoryRead");
 
             app.MapGet("/instrumentstatushistories", async (IInstrumentStatusHistoryService instrumentStatusHistoryService) =>
             {
@@ -31,7 +32,8 @@ namespace WebAPI
             })
             .WithName("GetAllInstrumentStatusHistories")
             .Produces<IEnumerable<InstrumentStatusHistoryDTO>>(StatusCodes.Status200OK)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentStatusHistoryRead");
 
             app.MapPost("/instrumentstatushistories", async (InstrumentStatusHistoryDTO dto, IInstrumentStatusHistoryService instrumentStatusHistoryService) =>
             {
@@ -53,7 +55,8 @@ namespace WebAPI
             .WithName("AddInstrumentStatusHistory")
             .Produces<InstrumentStatusHistoryDTO>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentStatusHistoryCreate");
 
             app.MapPut("/instrumentstatushistories/{id}", async (int id, InstrumentStatusHistoryDTO dto, IInstrumentStatusHistoryService instrumentStatusHistoryService) =>
             {
@@ -82,7 +85,8 @@ namespace WebAPI
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentStatusHistoryUpdate");
 
             app.MapDelete("/instrumentstatushistories/{id}", async (int id, IInstrumentStatusHistoryService instrumentStatusHistoryService) =>
             {
@@ -98,7 +102,8 @@ namespace WebAPI
             .WithName("DeleteInstrumentStatusHistory")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentStatusHistoryDelete");
         }
     }
 }

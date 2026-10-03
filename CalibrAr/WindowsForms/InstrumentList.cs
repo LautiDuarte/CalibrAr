@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -159,18 +159,18 @@ namespace WindowsForms
 
         private async void InstrumentList_Load(object sender, EventArgs e)
         {
-            await ConfigureButtonPermissions();
+            ConfigureButtonPermissions();
             await LoadInstruments();
         }
 
-        private async Task ConfigureButtonPermissions()
+        private void ConfigureButtonPermissions()
         {
             var authService = AuthServiceProvider.Instance;
 
             // Verificar permisos para cada botón
-            bool canCreate = await authService.HasPermissionAsync("Instruments.create");
-            bool canUpdate = await authService.HasPermissionAsync("Instruments.update");
-            bool canDelete = await authService.HasPermissionAsync("Instruments.delete");
+            bool canCreate = authService.HasPermission("Instruments.create");
+            bool canUpdate = authService.HasPermission("Instruments.update");
+            bool canDelete = authService.HasPermission("Instruments.delete");
 
             // Configurar visibilidad de botones según permisos
             createButton.Visible = canCreate;
@@ -283,7 +283,7 @@ namespace WindowsForms
             }
         }
 
-        private InstrumentDTO SelectedItem()
+        private InstrumentDTO? SelectedItem()
         {
             InstrumentDTO instrument;
             if (instrumentsDataGridView.SelectedRows.Count == 0)
@@ -292,8 +292,7 @@ namespace WindowsForms
                 return null;
             }
 
-            instrument = (InstrumentDTO)instrumentsDataGridView.SelectedRows[0].DataBoundItem;
-            return instrument;
+            return (InstrumentDTO)instrumentsDataGridView.SelectedRows[0].DataBoundItem;
         }
 
         private void DisableControls()

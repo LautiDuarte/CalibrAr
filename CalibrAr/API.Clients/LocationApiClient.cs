@@ -19,7 +19,8 @@ namespace API.Clients
                 HttpResponseMessage response = await client.GetAsync($"locations/{id}");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<LocationDTO>();
+                    var location = await response.Content.ReadFromJsonAsync<LocationDTO>();
+                    return location ?? throw new Exception($"La respuesta del servidor para la ubicacion con ID {id} vino vacia.");
                 }
                 else
                 {
@@ -46,7 +47,8 @@ namespace API.Clients
                 HttpResponseMessage response = await client.GetAsync("locations");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<List<LocationDTO>>();
+                    var locations = await response.Content.ReadFromJsonAsync<List<LocationDTO>>();
+                    return locations ?? throw new Exception("La respuesta del servidor para la lista de ubicaciones vino vacia.");
                 }
                 else
                 {
