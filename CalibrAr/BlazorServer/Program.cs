@@ -1,7 +1,9 @@
+using BlazorServer.Auth;
 using BlazorServer.Components;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
+
+// Reemplaza al proveedor por defecto (que nunca revisa al usuario) por uno que detecta el
+// vencimiento del JWT mientras el circuito está abierto. Scoped = uno por circuito/usuario.
+builder.Services.AddScoped<AuthenticationStateProvider, TokenExpirationAuthenticationStateProvider>();
 
 // HttpClient para hablar con la WebAPI (por ahora solo lo usa el login).
 builder.Services.AddHttpClient("WebAPI", client =>
