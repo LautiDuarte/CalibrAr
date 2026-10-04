@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -33,8 +34,13 @@ namespace API.Clients
                 });
             }
 
-            // Si no es successful, devolver null (credenciales incorrectas)
-            return null;
+            // 401 = credenciales incorrectas: es una respuesta esperada, no un error.
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+                return null;
+
+            // Cualquier otro código es una falla del servidor y no debe confundirse con una contraseña mal escrita.
+            string errorContent = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Login failed. Status code: {response.StatusCode}, Error: {errorContent}");
         }
     }
 }

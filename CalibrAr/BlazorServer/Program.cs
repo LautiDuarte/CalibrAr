@@ -1,3 +1,4 @@
+using API.Clients;
 using BlazorServer.Auth;
 using BlazorServer.Components;
 using Microsoft.AspNetCore.Antiforgery;
@@ -48,12 +49,14 @@ builder.Services.AddCascadingAuthenticationState();
 // vencimiento del JWT mientras el circuito está abierto. Scoped = uno por circuito/usuario.
 builder.Services.AddScoped<AuthenticationStateProvider, TokenExpirationAuthenticationStateProvider>();
 
-// HttpClient para hablar con la WebAPI (por ahora solo lo usa el login).
-builder.Services.AddHttpClient("WebAPI", client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["WebApi:BaseUrl"]
-        ?? throw new InvalidOperationException("Falta configurar WebApi:BaseUrl en appsettings.json."));
-});
+// Clientes de la WebAPI. Scoped = uno por circuito: cada usuario usa su propio token,
+// que DI les inyecta a través de ITokenProvider (nunca un estático compartido).
+builder.Services.AddScoped<ITokenProvider, BlazorTokenProvider>();
+builder.Services.AddScoped<AuthApiClient>();
+builder.Services.AddScoped<LocationApiClient>();
+builder.Services.AddScoped<AreaApiClient>();
+builder.Services.AddScoped<InstrumentTypeApiClient>();
+builder.Services.AddScoped<InstrumentApiClient>();
 
 var app = builder.Build();
 
