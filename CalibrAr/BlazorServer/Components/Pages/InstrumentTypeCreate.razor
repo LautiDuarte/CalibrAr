@@ -5,11 +5,11 @@
 
 <PageTitle>Nuevo tipo de instrumento - CalibrAr</PageTitle>
 
-<h1>Nuevo tipo de instrumento</h1>
+<h1 class="h3 mb-3">Nuevo tipo de instrumento</h1>
 
 @if (errorMessage != null)
 {
-    <p class="validation-message">@errorMessage</p>
+    <div class="alert alert-danger form-narrow">@errorMessage</div>
 }
 
 <InstrumentTypeForm Model="model" OnValidSubmit="SaveAsync" Saving="saving" />

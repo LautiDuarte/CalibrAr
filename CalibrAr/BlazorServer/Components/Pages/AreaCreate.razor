@@ -6,16 +6,16 @@
 
 <PageTitle>Nueva área - CalibrAr</PageTitle>
 
-<h1>Nueva área</h1>
+<h1 class="h3 mb-3">Nueva área</h1>
 
 @if (errorMessage != null)
 {
-    <p class="validation-message">@errorMessage</p>
+    <div class="alert alert-danger form-narrow">@errorMessage</div>
 }
 
 @if (locations == null)
 {
-    <p>Cargando...</p>
+    <p class="text-secondary">Cargando...</p>
 }
 else
 {

@@ -1,23 +1,23 @@
 @using System.ComponentModel.DataAnnotations
 
-<EditForm Model="Model" OnValidSubmit="OnValidSubmit">
+<EditForm Model="Model" OnValidSubmit="OnValidSubmit" class="form-narrow">
     <DataAnnotationsValidator />
 
-    <div class="field">
-        <label for="name">Nombre</label>
-        <InputText id="name" @bind-Value="Model.Name" />
+    <div class="mb-3">
+        <label for="name" class="form-label">Nombre</label>
+        <InputText id="name" class="form-control" @bind-Value="Model.Name" />
         <ValidationMessage For="() => Model.Name" />
     </div>
 
-    <div class="field">
-        <label for="responsible">Responsable</label>
-        <InputText id="responsible" @bind-Value="Model.Responsible" />
+    <div class="mb-3">
+        <label for="responsible" class="form-label">Responsable</label>
+        <InputText id="responsible" class="form-control" @bind-Value="Model.Responsible" />
         <ValidationMessage For="() => Model.Responsible" />
     </div>
 
-    <div class="field">
-        <label for="location">Ubicación</label>
-        <InputSelect id="location" @bind-Value="Model.LocationId">
+    <div class="mb-3">
+        <label for="location" class="form-label">Ubicación</label>
+        <InputSelect id="location" class="form-select" @bind-Value="Model.LocationId">
             <option value="0">Seleccione una ubicación</option>
             @foreach (var location in Locations)
             {
@@ -27,15 +27,13 @@
         <ValidationMessage For="() => Model.LocationId" />
     </div>
 
-    <div class="field">
-        <label for="isActive">Activa</label>
-        <InputCheckbox id="isActive" @bind-Value="Model.IsActive" />
+    <div class="form-check mb-4">
+        <InputCheckbox id="isActive" class="form-check-input" @bind-Value="Model.IsActive" />
+        <label for="isActive" class="form-check-label">Activa</label>
     </div>
 
-    <div class="actions">
-        <button type="submit" disabled="@Saving">Guardar</button>
-        <a href="areas">Cancelar</a>
-    </div>
+    <button type="submit" class="btn btn-primary" disabled="@Saving">Guardar</button>
+    <a href="areas" class="btn btn-outline-secondary">Cancelar</a>
 </EditForm>
 
 @code {

@@ -1,46 +1,45 @@
 @using System.ComponentModel.DataAnnotations
 
-<EditForm Model="Model" OnValidSubmit="OnValidSubmit">
+<EditForm Model="Model" OnValidSubmit="OnValidSubmit" class="form-narrow">
     <DataAnnotationsValidator />
 
-    <div class="field">
-        <label for="name">Nombre</label>
-        <InputText id="name" @bind-Value="Model.Name" />
+    <div class="mb-3">
+        <label for="name" class="form-label">Nombre</label>
+        <InputText id="name" class="form-control" @bind-Value="Model.Name" />
         <ValidationMessage For="() => Model.Name" />
     </div>
 
-    <div class="field">
-        <label for="description">Descripción</label>
-        <InputText id="description" @bind-Value="Model.Description" />
+    <div class="mb-3">
+        <label for="description" class="form-label">Descripción</label>
+        <InputText id="description" class="form-control" @bind-Value="Model.Description" />
     </div>
 
-    <div class="field">
-        <label for="unit">Unidad</label>
-        <InputText id="unit" @bind-Value="Model.MeasurementUnit" />
+    <div class="mb-3">
+        <label for="unit" class="form-label">Unidad de medida</label>
+        <InputText id="unit" class="form-control" @bind-Value="Model.MeasurementUnit" />
         <ValidationMessage For="() => Model.MeasurementUnit" />
     </div>
 
-    <div class="field">
-        <label for="maxError">Error máximo</label>
-        <InputNumber id="maxError" @bind-Value="Model.MaxAllowedError" />
-        <ValidationMessage For="() => Model.MaxAllowedError" />
+    <div class="row g-3 mb-3">
+        <div class="col-sm-6">
+            <label for="maxError" class="form-label">Error máximo</label>
+            <InputNumber id="maxError" class="form-control" @bind-Value="Model.MaxAllowedError" />
+            <ValidationMessage For="() => Model.MaxAllowedError" />
+        </div>
+        <div class="col-sm-6">
+            <label for="frequency" class="form-label">Frecuencia (meses)</label>
+            <InputNumber id="frequency" class="form-control" @bind-Value="Model.CalibrationFrequencyMonths" />
+            <ValidationMessage For="() => Model.CalibrationFrequencyMonths" />
+        </div>
     </div>
 
-    <div class="field">
-        <label for="frequency">Frecuencia (meses)</label>
-        <InputNumber id="frequency" @bind-Value="Model.CalibrationFrequencyMonths" />
-        <ValidationMessage For="() => Model.CalibrationFrequencyMonths" />
+    <div class="form-check mb-4">
+        <InputCheckbox id="isActive" class="form-check-input" @bind-Value="Model.IsActive" />
+        <label for="isActive" class="form-check-label">Activo</label>
     </div>
 
-    <div class="field">
-        <label for="isActive">Activo</label>
-        <InputCheckbox id="isActive" @bind-Value="Model.IsActive" />
-    </div>
-
-    <div class="actions">
-        <button type="submit" disabled="@Saving">Guardar</button>
-        <a href="instrument-types">Cancelar</a>
-    </div>
+    <button type="submit" class="btn btn-primary" disabled="@Saving">Guardar</button>
+    <a href="instrument-types" class="btn btn-outline-secondary">Cancelar</a>
 </EditForm>
 
 @code {

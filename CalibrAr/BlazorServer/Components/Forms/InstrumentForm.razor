@@ -1,41 +1,43 @@
 @using System.ComponentModel.DataAnnotations
 
-<EditForm Model="Model" OnValidSubmit="OnValidSubmit">
+<EditForm Model="Model" OnValidSubmit="OnValidSubmit" class="form-narrow">
     <DataAnnotationsValidator />
 
-    <div class="field">
-        <label for="code">Código</label>
-        <InputText id="code" @bind-Value="Model.Code" />
-        <ValidationMessage For="() => Model.Code" />
+    <div class="row g-3 mb-3">
+        <div class="col-sm-5">
+            <label for="code" class="form-label">Código</label>
+            <InputText id="code" class="form-control" @bind-Value="Model.Code" />
+            <ValidationMessage For="() => Model.Code" />
+        </div>
+        <div class="col-sm-7">
+            <label for="name" class="form-label">Nombre</label>
+            <InputText id="name" class="form-control" @bind-Value="Model.Name" />
+            <ValidationMessage For="() => Model.Name" />
+        </div>
     </div>
 
-    <div class="field">
-        <label for="name">Nombre</label>
-        <InputText id="name" @bind-Value="Model.Name" />
-        <ValidationMessage For="() => Model.Name" />
-    </div>
-
-    <div class="field">
-        <label for="serialNumber">N° de serie</label>
-        <InputText id="serialNumber" @bind-Value="Model.SerialNumber" />
+    <div class="mb-3">
+        <label for="serialNumber" class="form-label">N° de serie</label>
+        <InputText id="serialNumber" class="form-control" @bind-Value="Model.SerialNumber" />
         <ValidationMessage For="() => Model.SerialNumber" />
     </div>
 
-    <div class="field">
-        <label for="brand">Marca</label>
-        <InputText id="brand" @bind-Value="Model.Brand" />
-        <ValidationMessage For="() => Model.Brand" />
+    <div class="row g-3 mb-3">
+        <div class="col-sm-6">
+            <label for="brand" class="form-label">Marca</label>
+            <InputText id="brand" class="form-control" @bind-Value="Model.Brand" />
+            <ValidationMessage For="() => Model.Brand" />
+        </div>
+        <div class="col-sm-6">
+            <label for="model" class="form-label">Modelo</label>
+            <InputText id="model" class="form-control" @bind-Value="Model.Model" />
+            <ValidationMessage For="() => Model.Model" />
+        </div>
     </div>
 
-    <div class="field">
-        <label for="model">Modelo</label>
-        <InputText id="model" @bind-Value="Model.Model" />
-        <ValidationMessage For="() => Model.Model" />
-    </div>
-
-    <div class="field">
-        <label for="instrumentType">Tipo</label>
-        <InputSelect id="instrumentType" @bind-Value="Model.InstrumentTypeId" disabled="@IsEdit">
+    <div class="mb-3">
+        <label for="instrumentType" class="form-label">Tipo de instrumento</label>
+        <InputSelect id="instrumentType" class="form-select" @bind-Value="Model.InstrumentTypeId" disabled="@IsEdit">
             <option value="0">Seleccione un tipo</option>
             @foreach (var instrumentType in InstrumentTypes)
             {
@@ -45,13 +47,13 @@
         <ValidationMessage For="() => Model.InstrumentTypeId" />
         @if (IsEdit)
         {
-            <span class="hint">No se puede cambiar después de crear el instrumento.</span>
+            <div class="form-text">No se puede cambiar después de crear el instrumento.</div>
         }
     </div>
 
-    <div class="field">
-        <label for="area">Área</label>
-        <InputSelect id="area" @bind-Value="Model.AreaId">
+    <div class="mb-3">
+        <label for="area" class="form-label">Área</label>
+        <InputSelect id="area" class="form-select" @bind-Value="Model.AreaId">
             <option value="0">Seleccione un área</option>
             @foreach (var area in Areas)
             {
@@ -63,9 +65,9 @@
 
     @if (IsEdit)
     {
-        <div class="field">
-            <label for="status">Estado</label>
-            <InputSelect id="status" @bind-Value="Model.Status">
+        <div class="mb-3">
+            <label for="status" class="form-label">Estado</label>
+            <InputSelect id="status" class="form-select" @bind-Value="Model.Status">
                 @foreach (var status in Enum.GetValues<InstrumentStatusDTO>())
                 {
                     <option value="@status">@StatusText(status.ToString())</option>
@@ -74,24 +76,23 @@
         </div>
     }
 
-    <div class="field">
-        <label for="maxError">Error máximo</label>
-        <InputNumber id="maxError" @bind-Value="Model.MaxAllowedError" />
-        <span class="hint">Si se deja vacío se usa el del tipo.</span>
-        <ValidationMessage For="() => Model.MaxAllowedError" />
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6">
+            <label for="maxError" class="form-label">Error máximo</label>
+            <InputNumber id="maxError" class="form-control" @bind-Value="Model.MaxAllowedError" />
+            <div class="form-text">Si se deja vacío se usa el del tipo.</div>
+            <ValidationMessage For="() => Model.MaxAllowedError" />
+        </div>
+        <div class="col-sm-6">
+            <label for="frequency" class="form-label">Frecuencia (meses)</label>
+            <InputNumber id="frequency" class="form-control" @bind-Value="Model.CalibrationFrequencyMonths" />
+            <div class="form-text">Si se deja vacío se usa la del tipo.</div>
+            <ValidationMessage For="() => Model.CalibrationFrequencyMonths" />
+        </div>
     </div>
 
-    <div class="field">
-        <label for="frequency">Frecuencia (meses)</label>
-        <InputNumber id="frequency" @bind-Value="Model.CalibrationFrequencyMonths" />
-        <span class="hint">Si se deja vacío se usa la del tipo.</span>
-        <ValidationMessage For="() => Model.CalibrationFrequencyMonths" />
-    </div>
-
-    <div class="actions">
-        <button type="submit" disabled="@Saving">Guardar</button>
-        <a href="instruments">Cancelar</a>
-    </div>
+    <button type="submit" class="btn btn-primary" disabled="@Saving">Guardar</button>
+    <a href="instruments" class="btn btn-outline-secondary">Cancelar</a>
 </EditForm>
 
 @code {

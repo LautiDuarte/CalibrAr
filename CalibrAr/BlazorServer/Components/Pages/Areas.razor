@@ -6,57 +6,62 @@
 
 <PageTitle>Áreas - CalibrAr</PageTitle>
 
-<h1>Áreas</h1>
-
-<AuthorizeView Policy="AreasCreate">
-    <p><a href="areas/new">Nueva área</a></p>
-</AuthorizeView>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 m-0">Áreas</h1>
+    <AuthorizeView Policy="AreasCreate">
+        <a href="areas/new" class="btn btn-primary">Nueva área</a>
+    </AuthorizeView>
+</div>
 
 @if (errorMessage != null)
 {
-    <p class="validation-message">@errorMessage</p>
+    <div class="alert alert-danger">@errorMessage</div>
 }
 
 @if (areas == null)
 {
-    <p>Cargando...</p>
+    <p class="text-secondary">Cargando...</p>
 }
 else if (areas.Count == 0)
 {
-    <p>No hay áreas cargadas.</p>
+    <p class="text-secondary">No hay áreas cargadas.</p>
 }
 else
 {
-    <table class="grid">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Responsable</th>
-                <th>Ubicación</th>
-                <th>Activa</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var area in areas)
-            {
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead>
                 <tr>
-                    <td>@area.Name</td>
-                    <td>@area.Responsible</td>
-                    <td>@area.LocationName</td>
-                    <td>@(area.IsActive ? "Sí" : "No")</td>
-                    <td class="row-actions">
-                        <AuthorizeView Policy="AreasUpdate">
-                            <a href="areas/@area.Id/edit">Editar</a>
-                        </AuthorizeView>
-                        <AuthorizeView Policy="AreasDelete">
-                            <button @onclick="() => DeleteAsync(area)">Eliminar</button>
-                        </AuthorizeView>
-                    </td>
+                    <th>Nombre</th>
+                    <th>Responsable</th>
+                    <th>Ubicación</th>
+                    <th>Activa</th>
+                    <th></th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var area in areas)
+                {
+                    <tr>
+                        <td>@area.Name</td>
+                        <td>@area.Responsible</td>
+                        <td>@area.LocationName</td>
+                        <td>
+                            <span class="badge @(area.IsActive ? "text-bg-success" : "text-bg-secondary")">@(area.IsActive ? "Sí" : "No")</span>
+                        </td>
+                        <td class="text-end text-nowrap">
+                            <AuthorizeView Policy="AreasUpdate">
+                                <a href="areas/@area.Id/edit" class="btn btn-sm btn-outline-primary">Editar</a>
+                            </AuthorizeView>
+                            <AuthorizeView Policy="AreasDelete">
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteAsync(area)">Eliminar</button>
+                            </AuthorizeView>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
 
 @code {

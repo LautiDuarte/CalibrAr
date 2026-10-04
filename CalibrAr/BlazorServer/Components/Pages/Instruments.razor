@@ -6,61 +6,66 @@
 
 <PageTitle>Instrumentos - CalibrAr</PageTitle>
 
-<h1>Instrumentos</h1>
-
-<AuthorizeView Policy="InstrumentsCreate">
-    <p><a href="instruments/new">Nuevo instrumento</a></p>
-</AuthorizeView>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 m-0">Instrumentos</h1>
+    <AuthorizeView Policy="InstrumentsCreate">
+        <a href="instruments/new" class="btn btn-primary">Nuevo instrumento</a>
+    </AuthorizeView>
+</div>
 
 @if (errorMessage != null)
 {
-    <p class="validation-message">@errorMessage</p>
+    <div class="alert alert-danger">@errorMessage</div>
 }
 
 @if (instruments == null)
 {
-    <p>Cargando...</p>
+    <p class="text-secondary">Cargando...</p>
 }
 else if (instruments.Count == 0)
 {
-    <p>No hay instrumentos cargados.</p>
+    <p class="text-secondary">No hay instrumentos cargados.</p>
 }
 else
 {
-    <table class="grid">
-        <thead>
-            <tr>
-                <th>Código</th>
-                <th>Nombre</th>
-                <th>Tipo</th>
-                <th>Área</th>
-                <th>Estado</th>
-                <th>Próxima calibración</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var instrument in instruments)
-            {
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead>
                 <tr>
-                    <td>@instrument.Code</td>
-                    <td>@instrument.Name</td>
-                    <td>@instrument.InstrumentTypeName</td>
-                    <td>@instrument.AreaName</td>
-                    <td>@InstrumentForm.StatusText(instrument.Status)</td>
-                    <td>@(instrument.NextCalibrationDate?.ToString("dd/MM/yyyy") ?? "-")</td>
-                    <td class="row-actions">
-                        <AuthorizeView Policy="InstrumentsUpdate">
-                            <a href="instruments/@instrument.Id/edit">Editar</a>
-                        </AuthorizeView>
-                        <AuthorizeView Policy="InstrumentsDelete">
-                            <button @onclick="() => DeleteAsync(instrument)">Eliminar</button>
-                        </AuthorizeView>
-                    </td>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Tipo</th>
+                    <th>Área</th>
+                    <th>Estado</th>
+                    <th>Próxima calibración</th>
+                    <th></th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var instrument in instruments)
+                {
+                    <tr>
+                        <td>@instrument.Code</td>
+                        <td>@instrument.Name</td>
+                        <td>@instrument.InstrumentTypeName</td>
+                        <td>@instrument.AreaName</td>
+                        <td>
+                            <span class="badge @StatusBadge(instrument.Status)">@InstrumentForm.StatusText(instrument.Status)</span>
+                        </td>
+                        <td>@(instrument.NextCalibrationDate?.ToString("dd/MM/yyyy") ?? "-")</td>
+                        <td class="text-end text-nowrap">
+                            <AuthorizeView Policy="InstrumentsUpdate">
+                                <a href="instruments/@instrument.Id/edit" class="btn btn-sm btn-outline-primary">Editar</a>
+                            </AuthorizeView>
+                            <AuthorizeView Policy="InstrumentsDelete">
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteAsync(instrument)">Eliminar</button>
+                            </AuthorizeView>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
 
 @code {
@@ -71,6 +76,14 @@ else
     {
         await LoadInstruments();
     }
+
+    private static string StatusBadge(string status) => status switch
+    {
+        "Active" => "text-bg-success",
+        "CalibrationExpired" => "text-bg-danger",
+        "Decommissioned" => "text-bg-secondary",
+        _ => "text-bg-warning"
+    };
 
     private async Task LoadInstruments()
     {

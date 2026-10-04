@@ -5,22 +5,22 @@
 
 <PageTitle>Editar tipo de instrumento - CalibrAr</PageTitle>
 
-<h1>Editar tipo de instrumento</h1>
+<h1 class="h3 mb-3">Editar tipo de instrumento</h1>
 
 @if (errorMessage != null)
 {
-    <p class="validation-message">@errorMessage</p>
+    <div class="alert alert-danger form-narrow">@errorMessage</div>
 }
 
 @if (model == null)
 {
     @if (errorMessage == null)
     {
-        <p>Cargando...</p>
+        <p class="text-secondary">Cargando...</p>
     }
     else
     {
-        <a href="instrument-types">Volver</a>
+        <a href="instrument-types" class="btn btn-outline-secondary">Volver</a>
     }
 }
 else
