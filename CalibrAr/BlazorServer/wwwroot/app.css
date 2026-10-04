@@ -78,7 +78,7 @@ td.row-actions button {
 
     .field label {
         display: inline-block;
-        width: 90px;
+        width: 150px;
     }
 
     .field input[type=text],
@@ -94,3 +94,8 @@ td.row-actions button {
     .actions button {
         margin-right: 8px;
     }
+
+.hint {
+    margin-left: 6px;
+    color: #666;
+}

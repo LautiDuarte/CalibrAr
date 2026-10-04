@@ -1,8 +1,113 @@
 @page "/instruments"
 @attribute [Authorize(Policy = "InstrumentsRead")]
+@inject InstrumentApiClient InstrumentApiClient
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
 
 <PageTitle>Instrumentos - CalibrAr</PageTitle>
 
 <h1>Instrumentos</h1>
 
-<p>En construcción.</p>
+<AuthorizeView Policy="InstrumentsCreate">
+    <p><a href="instruments/new">Nuevo instrumento</a></p>
+</AuthorizeView>
+
+@if (errorMessage != null)
+{
+    <p class="validation-message">@errorMessage</p>
+}
+
+@if (instruments == null)
+{
+    <p>Cargando...</p>
+}
+else if (instruments.Count == 0)
+{
+    <p>No hay instrumentos cargados.</p>
+}
+else
+{
+    <table class="grid">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Tipo</th>
+                <th>Área</th>
+                <th>Estado</th>
+                <th>Próxima calibración</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var instrument in instruments)
+            {
+                <tr>
+                    <td>@instrument.Code</td>
+                    <td>@instrument.Name</td>
+                    <td>@instrument.InstrumentTypeName</td>
+                    <td>@instrument.AreaName</td>
+                    <td>@InstrumentForm.StatusText(instrument.Status)</td>
+                    <td>@(instrument.NextCalibrationDate?.ToString("dd/MM/yyyy") ?? "-")</td>
+                    <td class="row-actions">
+                        <AuthorizeView Policy="InstrumentsUpdate">
+                            <a href="instruments/@instrument.Id/edit">Editar</a>
+                        </AuthorizeView>
+                        <AuthorizeView Policy="InstrumentsDelete">
+                            <button @onclick="() => DeleteAsync(instrument)">Eliminar</button>
+                        </AuthorizeView>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<InstrumentDTO>? instruments;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadInstruments();
+    }
+
+    private async Task LoadInstruments()
+    {
+        try
+        {
+            instruments = await InstrumentApiClient.GetAllAsync();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+            instruments = new List<InstrumentDTO>();
+        }
+    }
+
+    private async Task DeleteAsync(InstrumentDTO instrument)
+    {
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"¿Eliminar el instrumento \"{instrument.Code}\"?");
+        if (!confirmed)
+            return;
+
+        try
+        {
+            await InstrumentApiClient.DeleteAsync(instrument.Id);
+            errorMessage = null;
+            await LoadInstruments();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+}

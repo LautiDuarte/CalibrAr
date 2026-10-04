@@ -1,0 +1,163 @@
+@using System.ComponentModel.DataAnnotations
+
+<EditForm Model="Model" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="field">
+        <label for="code">Código</label>
+        <InputText id="code" @bind-Value="Model.Code" />
+        <ValidationMessage For="() => Model.Code" />
+    </div>
+
+    <div class="field">
+        <label for="name">Nombre</label>
+        <InputText id="name" @bind-Value="Model.Name" />
+        <ValidationMessage For="() => Model.Name" />
+    </div>
+
+    <div class="field">
+        <label for="serialNumber">N° de serie</label>
+        <InputText id="serialNumber" @bind-Value="Model.SerialNumber" />
+        <ValidationMessage For="() => Model.SerialNumber" />
+    </div>
+
+    <div class="field">
+        <label for="brand">Marca</label>
+        <InputText id="brand" @bind-Value="Model.Brand" />
+        <ValidationMessage For="() => Model.Brand" />
+    </div>
+
+    <div class="field">
+        <label for="model">Modelo</label>
+        <InputText id="model" @bind-Value="Model.Model" />
+        <ValidationMessage For="() => Model.Model" />
+    </div>
+
+    <div class="field">
+        <label for="instrumentType">Tipo</label>
+        <InputSelect id="instrumentType" @bind-Value="Model.InstrumentTypeId" disabled="@IsEdit">
+            <option value="0">Seleccione un tipo</option>
+            @foreach (var instrumentType in InstrumentTypes)
+            {
+                <option value="@instrumentType.Id">@instrumentType.Name</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="() => Model.InstrumentTypeId" />
+        @if (IsEdit)
+        {
+            <span class="hint">No se puede cambiar después de crear el instrumento.</span>
+        }
+    </div>
+
+    <div class="field">
+        <label for="area">Área</label>
+        <InputSelect id="area" @bind-Value="Model.AreaId">
+            <option value="0">Seleccione un área</option>
+            @foreach (var area in Areas)
+            {
+                <option value="@area.Id">@area.Name</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="() => Model.AreaId" />
+    </div>
+
+    @if (IsEdit)
+    {
+        <div class="field">
+            <label for="status">Estado</label>
+            <InputSelect id="status" @bind-Value="Model.Status">
+                @foreach (var status in Enum.GetValues<InstrumentStatusDTO>())
+                {
+                    <option value="@status">@StatusText(status.ToString())</option>
+                }
+            </InputSelect>
+        </div>
+    }
+
+    <div class="field">
+        <label for="maxError">Error máximo</label>
+        <InputNumber id="maxError" @bind-Value="Model.MaxAllowedError" />
+        <span class="hint">Si se deja vacío se usa el del tipo.</span>
+        <ValidationMessage For="() => Model.MaxAllowedError" />
+    </div>
+
+    <div class="field">
+        <label for="frequency">Frecuencia (meses)</label>
+        <InputNumber id="frequency" @bind-Value="Model.CalibrationFrequencyMonths" />
+        <span class="hint">Si se deja vacío se usa la del tipo.</span>
+        <ValidationMessage For="() => Model.CalibrationFrequencyMonths" />
+    </div>
+
+    <div class="actions">
+        <button type="submit" disabled="@Saving">Guardar</button>
+        <a href="instruments">Cancelar</a>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter, EditorRequired]
+    public InstrumentFormModel Model { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public List<InstrumentTypeDTO> InstrumentTypes { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public List<AreaDTO> Areas { get; set; } = default!;
+
+    // El estado solo se elige al editar (al crear el servicio lo deja en Active)
+    // y el tipo no se puede cambiar una vez creado el instrumento.
+    [Parameter]
+    public bool IsEdit { get; set; }
+
+    [Parameter]
+    public EventCallback OnValidSubmit { get; set; }
+
+    [Parameter]
+    public bool Saving { get; set; }
+
+    public static string StatusText(string status) => status switch
+    {
+        "Active" => "Activo",
+        "TemporarilyOutOfService" => "Fuera de servicio temporal",
+        "CalibrationExpired" => "Calibración vencida",
+        "UnderRepair" => "En reparación",
+        "Decommissioned" => "Dado de baja",
+        "OnLoan" => "En préstamo",
+        _ => status
+    };
+
+    public class InstrumentFormModel
+    {
+        [Required(ErrorMessage = "El código es obligatorio.")]
+        [StringLength(50, ErrorMessage = "El código no puede superar los 50 caracteres.")]
+        public string Code { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El nombre es obligatorio.")]
+        [StringLength(100, ErrorMessage = "El nombre no puede superar los 100 caracteres.")]
+        public string Name { get; set; } = string.Empty;
+
+        [StringLength(100, ErrorMessage = "El número de serie no puede superar los 100 caracteres.")]
+        public string? SerialNumber { get; set; }
+
+        [StringLength(100, ErrorMessage = "La marca no puede superar los 100 caracteres.")]
+        public string? Brand { get; set; }
+
+        [StringLength(100, ErrorMessage = "El modelo no puede superar los 100 caracteres.")]
+        public string? Model { get; set; }
+
+        public string Status { get; set; } = nameof(InstrumentStatusDTO.Active);
+
+        [Range(1, int.MaxValue, ErrorMessage = "Seleccione un tipo de instrumento.")]
+        public int InstrumentTypeId { get; set; }
+
+        [Range(1, int.MaxValue, ErrorMessage = "Seleccione un área.")]
+        public int AreaId { get; set; }
+
+        [Range(typeof(decimal), "0", "999999", ParseLimitsInInvariantCulture = true, ConvertValueInInvariantCulture = true,
+            ErrorMessage = "El error máximo no puede ser negativo.")]
+        public decimal? MaxAllowedError { get; set; }
+
+        [Range(1, 1200, ErrorMessage = "La frecuencia debe ser mayor a 0.")]
+        public int? CalibrationFrequencyMonths { get; set; }
+    }
+}

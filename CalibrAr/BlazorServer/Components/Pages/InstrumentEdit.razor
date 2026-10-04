@@ -1,0 +1,111 @@
+@page "/instruments/{Id:int}/edit"
+@attribute [Authorize(Policy = "InstrumentsUpdate")]
+@inject InstrumentApiClient InstrumentApiClient
+@inject InstrumentTypeApiClient InstrumentTypeApiClient
+@inject AreaApiClient AreaApiClient
+@inject NavigationManager NavigationManager
+
+<PageTitle>Editar instrumento - CalibrAr</PageTitle>
+
+<h1>Editar instrumento</h1>
+
+@if (errorMessage != null)
+{
+    <p class="validation-message">@errorMessage</p>
+}
+
+@if (model == null || instrumentTypes == null || areas == null)
+{
+    @if (errorMessage == null)
+    {
+        <p>Cargando...</p>
+    }
+    else
+    {
+        <a href="instruments">Volver</a>
+    }
+}
+else
+{
+    <InstrumentForm Model="model" InstrumentTypes="instrumentTypes" Areas="areas" IsEdit="true" OnValidSubmit="SaveAsync" Saving="saving" />
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private InstrumentForm.InstrumentFormModel? model;
+    private List<InstrumentTypeDTO>? instrumentTypes;
+    private List<AreaDTO>? areas;
+    private string? errorMessage;
+    private bool saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            InstrumentDTO instrument = await InstrumentApiClient.GetAsync(Id);
+            instrumentTypes = await InstrumentTypeApiClient.GetAllAsync();
+            areas = await AreaApiClient.GetAllAsync();
+            model = new InstrumentForm.InstrumentFormModel
+            {
+                Code = instrument.Code,
+                Name = instrument.Name,
+                SerialNumber = instrument.SerialNumber,
+                Brand = instrument.Brand,
+                Model = instrument.Model,
+                Status = instrument.Status,
+                MaxAllowedError = instrument.MaxAllowedError,
+                CalibrationFrequencyMonths = instrument.CalibrationFrequencyMonths,
+                InstrumentTypeId = instrument.InstrumentTypeId,
+                AreaId = instrument.AreaId
+            };
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        saving = true;
+        try
+        {
+            // Las fechas de calibración y CreatedAt los resuelve el servicio a partir de lo ya guardado.
+            await InstrumentApiClient.UpdateAsync(new InstrumentDTO
+            {
+                Id = Id,
+                Code = model!.Code.Trim(),
+                Name = model.Name,
+                SerialNumber = model.SerialNumber,
+                Brand = model.Brand,
+                Model = model.Model,
+                Status = model.Status,
+                MaxAllowedError = model.MaxAllowedError,
+                CalibrationFrequencyMonths = model.CalibrationFrequencyMonths,
+                InstrumentTypeId = model.InstrumentTypeId,
+                InstrumentTypeName = string.Empty,
+                AreaId = model.AreaId,
+                AreaName = string.Empty
+            });
+            NavigationManager.NavigateTo("instruments");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}
