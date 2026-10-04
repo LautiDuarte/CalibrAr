@@ -1,0 +1,15 @@
+.nav-menu {
+    display: flex;
+    gap: 1rem;
+}
+
+    /* ::deep porque el <a> lo genera NavLink, no este componente. */
+    .nav-menu ::deep a {
+        text-decoration: none;
+        color: inherit;
+    }
+
+        .nav-menu ::deep a.active {
+            font-weight: bold;
+            text-decoration: underline;
+        }

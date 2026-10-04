@@ -17,13 +17,31 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(options =>
     {
         options.LoginPath = "/login";              // sin cookie → redirige acá
+        options.AccessDeniedPath = "/acceso-denegado"; // logueado pero sin el permiso → redirige acá
         options.Cookie.Name = "CalibrAr.Auth";
         options.Cookie.HttpOnly = true;            // JavaScript no puede leerla
         options.Cookie.SameSite = SameSiteMode.Strict;
         options.SlidingExpiration = false;         // no renovar: la cookie no puede vivir más que el JWT
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    // Mismo esquema que la WebAPI: la política "LocationsRead" exige el claim permission "Locations.read".
+    // Solo las entidades que tienen pantalla en Blazor.
+    string[] categories = ["Locations", "Areas", "Instruments", "InstrumentTypes"];
+    (string Suffix, string Action)[] actions =
+    [
+        ("Read", "read"), ("Create", "create"), ("Update", "update"), ("Delete", "delete")
+    ];
+
+    foreach (var category in categories)
+    {
+        foreach (var (suffix, action) in actions)
+        {
+            options.AddPolicy($"{category}{suffix}", policy => policy.RequireClaim("permission", $"{category}.{action}"));
+        }
+    }
+});
 builder.Services.AddCascadingAuthenticationState();
 
 // Reemplaza al proveedor por defecto (que nunca revisa al usuario) por uno que detecta el

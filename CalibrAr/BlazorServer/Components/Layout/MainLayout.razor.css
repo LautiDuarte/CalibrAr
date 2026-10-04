@@ -25,6 +25,12 @@
     border-bottom: 1px solid #ddd;
 }
 
+    .top-bar .user-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
     .top-bar form {
         margin: 0;
     }

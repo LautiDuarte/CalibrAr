@@ -3,14 +3,18 @@
 <AuthorizeView>
     <Authorized>
         <header class="top-bar">
-            <span>Hola, @context.User.Identity?.Name</span>
+            <NavMenu />
 
-            @* Form HTML común (sin @onsubmit): el navegador hace un POST real a /logout,
-               no pasa por el circuito, porque borrar la cookie requiere una respuesta HTTP. *@
-            <form action="logout" method="post">
-                <AntiforgeryToken />
-                <button type="submit">Cerrar sesión</button>
-            </form>
+            <div class="user-info">
+                <span>Hola, @context.User.Identity?.Name</span>
+
+                @* Form HTML común (sin @onsubmit): el navegador hace un POST real a /logout,
+                   no pasa por el circuito, porque borrar la cookie requiere una respuesta HTTP. *@
+                <form action="logout" method="post">
+                    <AntiforgeryToken />
+                    <button type="submit">Cerrar sesión</button>
+                </form>
+            </div>
         </header>
     </Authorized>
 </AuthorizeView>
