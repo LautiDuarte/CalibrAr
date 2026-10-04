@@ -2,14 +2,6 @@ h1:focus {
     outline: none;
 }
 
-.valid.modified:not([type=checkbox]) {
-    outline: 1px solid #26b050;
-}
-
-.invalid {
-    outline: 1px solid #e50000;
-}
-
 .validation-message {
     color: #e50000;
 }
@@ -28,74 +20,12 @@ h1:focus {
     border-color: #929292;
 }
 
-body {
-    margin: 0;
-    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
-    font-size: 14px;
-    color: #222;
-    background: #fff;
+/* Blazor marca los campos con la clase "invalid"; Bootstrap usa "is-invalid". */
+.form-control.invalid,
+.form-select.invalid {
+    border-color: #dc3545;
 }
 
-h1 {
-    font-size: 20px;
-    font-weight: 600;
-    margin: 0 0 12px 0;
-}
-
-a {
-    color: #0645ad;
-}
-
-table.grid {
-    border-collapse: collapse;
-    min-width: 600px;
-}
-
-    table.grid th,
-    table.grid td {
-        border: 1px solid #ccc;
-        padding: 4px 8px;
-        text-align: left;
-    }
-
-    table.grid th {
-        background: #eee;
-        font-weight: 600;
-    }
-
-    table.grid tbody tr:hover {
-        background: #f7f7f7;
-    }
-
-td.row-actions a,
-td.row-actions button {
-    margin-right: 8px;
-}
-
-.field {
-    margin-bottom: 8px;
-}
-
-    .field label {
-        display: inline-block;
-        width: 150px;
-    }
-
-    .field input[type=text],
-    .field input:not([type]),
-    .field input[type=password] {
-        width: 250px;
-    }
-
-.actions {
-    margin-top: 12px;
-}
-
-    .actions button {
-        margin-right: 8px;
-    }
-
-.hint {
-    margin-left: 6px;
-    color: #666;
+.form-narrow {
+    max-width: 560px;
 }

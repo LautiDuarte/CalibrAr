@@ -17,24 +17,3 @@
         top: 0.5rem;
     }
 
-.top-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.5rem 1rem;
-    border-bottom: 1px solid #ddd;
-}
-
-    .top-bar .user-info {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .top-bar form {
-        margin: 0;
-    }
-
-main {
-    padding: 1rem;
-}

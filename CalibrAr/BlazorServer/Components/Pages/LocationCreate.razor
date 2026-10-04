@@ -5,11 +5,11 @@
 
 <PageTitle>Nueva ubicación - CalibrAr</PageTitle>
 
-<h1>Nueva ubicación</h1>
+<h1 class="h3 mb-3">Nueva ubicación</h1>
 
 @if (errorMessage != null)
 {
-    <p class="validation-message">@errorMessage</p>
+    <div class="alert alert-danger form-narrow">@errorMessage</div>
 }
 
 <LocationForm Model="model" OnValidSubmit="SaveAsync" Saving="saving" />

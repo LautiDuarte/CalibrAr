@@ -1,8 +1,8 @@
 @* Mensaje común para "logueado pero sin permiso". Lo usan la página /acceso-denegado
    (cuando bloquea el middleware, en un request HTTP) y el NotAuthorized de Routes.razor
    (cuando bloquea AuthorizeRouteView, navegando dentro del circuito). *@
-<h1>Acceso denegado</h1>
+<h1 class="h3 mb-3">Acceso denegado</h1>
 
-<p>No tiene permisos para acceder a esta página.</p>
+<div class="alert alert-warning">No tiene permisos para acceder a esta página.</div>
 
-<a href="">Volver al inicio</a>
+<a href="" class="btn btn-outline-secondary">Volver al inicio</a>
