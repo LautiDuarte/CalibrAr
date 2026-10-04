@@ -1,0 +1,31 @@
+@* Cada link se muestra solo si el usuario cumple la política de lectura de esa entidad.
+   Ocultar el link es UX: la página en sí también exige la política con [Authorize]. *@
+<ul class="navbar-nav me-auto">
+    <li class="nav-item">
+        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">Inicio</NavLink>
+    </li>
+
+    <AuthorizeView Policy="InstrumentsRead">
+        <li class="nav-item">
+            <NavLink class="nav-link" href="instruments">Instrumentos</NavLink>
+        </li>
+    </AuthorizeView>
+
+    <AuthorizeView Policy="InstrumentTypesRead">
+        <li class="nav-item">
+            <NavLink class="nav-link" href="instrument-types">Tipos de instrumento</NavLink>
+        </li>
+    </AuthorizeView>
+
+    <AuthorizeView Policy="LocationsRead">
+        <li class="nav-item">
+            <NavLink class="nav-link" href="locations">Ubicaciones</NavLink>
+        </li>
+    </AuthorizeView>
+
+    <AuthorizeView Policy="AreasRead">
+        <li class="nav-item">
+            <NavLink class="nav-link" href="areas">Áreas</NavLink>
+        </li>
+    </AuthorizeView>
+</ul>

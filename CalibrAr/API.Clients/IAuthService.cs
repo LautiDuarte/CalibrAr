@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace API.Clients
 {
-    public interface IAuthService
+    public interface IAuthService : ITokenProvider
     {
         event Action<bool>? AuthenticationStateChanged;
 

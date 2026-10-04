@@ -11,7 +11,11 @@ namespace API.Clients
 {
     public class LocationApiClient : BaseApiClient
     {
-        public static async Task<LocationDTO> GetAsync(int id)
+        public LocationApiClient(ITokenProvider tokenProvider) : base(tokenProvider)
+        {
+        }
+
+        public async Task<LocationDTO> GetAsync(int id)
         {
             try
             {
@@ -24,6 +28,7 @@ namespace API.Clients
                 }
                 else
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to get location with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -39,7 +44,7 @@ namespace API.Clients
 
         }
 
-        public static async Task<List<LocationDTO>> GetAllAsync()
+        public async Task<List<LocationDTO>> GetAllAsync()
         {
             try
             {
@@ -52,7 +57,7 @@ namespace API.Clients
                 }
                 else
                 {
-                    await HandleUnauthorizedResponseAsync(response);
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to get locations. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -67,7 +72,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task AddAsync(LocationDTO location)
+        public async Task AddAsync(LocationDTO location)
         {
             try
             {
@@ -75,6 +80,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.PostAsJsonAsync("locations", location);
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to create location. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -89,7 +95,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             try
             {
@@ -97,6 +103,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.DeleteAsync($"locations/{id}");
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to delete location with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -111,7 +118,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task UpdateAsync(LocationDTO location)
+        public async Task UpdateAsync(LocationDTO location)
         {
             try
             {
@@ -119,6 +126,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.PutAsJsonAsync("locations", location);
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to update location with ID {location.Id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }

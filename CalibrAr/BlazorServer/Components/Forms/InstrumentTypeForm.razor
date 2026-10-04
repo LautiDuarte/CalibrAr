@@ -1,0 +1,75 @@
+@using System.ComponentModel.DataAnnotations
+
+<EditForm Model="Model" OnValidSubmit="OnValidSubmit" class="form-narrow">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label for="name" class="form-label">Nombre</label>
+        <InputText id="name" class="form-control" @bind-Value="Model.Name" />
+        <ValidationMessage For="() => Model.Name" />
+    </div>
+
+    <div class="mb-3">
+        <label for="description" class="form-label">Descripción</label>
+        <InputText id="description" class="form-control" @bind-Value="Model.Description" />
+    </div>
+
+    <div class="mb-3">
+        <label for="unit" class="form-label">Unidad de medida</label>
+        <InputText id="unit" class="form-control" @bind-Value="Model.MeasurementUnit" />
+        <ValidationMessage For="() => Model.MeasurementUnit" />
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-sm-6">
+            <label for="maxError" class="form-label">Error máximo</label>
+            <InputNumber id="maxError" class="form-control" @bind-Value="Model.MaxAllowedError" />
+            <ValidationMessage For="() => Model.MaxAllowedError" />
+        </div>
+        <div class="col-sm-6">
+            <label for="frequency" class="form-label">Frecuencia (meses)</label>
+            <InputNumber id="frequency" class="form-control" @bind-Value="Model.CalibrationFrequencyMonths" />
+            <ValidationMessage For="() => Model.CalibrationFrequencyMonths" />
+        </div>
+    </div>
+
+    <div class="form-check mb-4">
+        <InputCheckbox id="isActive" class="form-check-input" @bind-Value="Model.IsActive" />
+        <label for="isActive" class="form-check-label">Activo</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary" disabled="@Saving">Guardar</button>
+    <a href="instrument-types" class="btn btn-outline-secondary">Cancelar</a>
+</EditForm>
+
+@code {
+    [Parameter, EditorRequired]
+    public InstrumentTypeFormModel Model { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback OnValidSubmit { get; set; }
+
+    [Parameter]
+    public bool Saving { get; set; }
+
+    public class InstrumentTypeFormModel
+    {
+        [Required(ErrorMessage = "El nombre es obligatorio.")]
+        public string Name { get; set; } = string.Empty;
+
+        public string? Description { get; set; }
+
+        [Required(ErrorMessage = "La unidad de medida es obligatoria.")]
+        public string MeasurementUnit { get; set; } = string.Empty;
+
+        // Sin las opciones invariantes, con cultura es-AR "0.0001" no se puede convertir y valida con excepción.
+        [Range(typeof(decimal), "0.0001", "999999", ParseLimitsInInvariantCulture = true, ConvertValueInInvariantCulture = true,
+            ErrorMessage = "El error máximo debe ser mayor a 0.")]
+        public decimal MaxAllowedError { get; set; }
+
+        [Range(1, 1200, ErrorMessage = "La frecuencia debe ser mayor a 0.")]
+        public int CalibrationFrequencyMonths { get; set; }
+
+        public bool IsActive { get; set; } = true;
+    }
+}

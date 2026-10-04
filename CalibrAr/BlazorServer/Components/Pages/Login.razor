@@ -1,0 +1,142 @@
+@page "/login"
+@attribute [AllowAnonymous]
+@using System.ComponentModel.DataAnnotations
+@using System.IdentityModel.Tokens.Jwt
+@using System.Security.Claims
+@using API.Clients
+@using DTOs
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@inject AuthApiClient AuthApiClient
+@inject NavigationManager NavigationManager
+
+<PageTitle>Iniciar sesión - CalibrAr</PageTitle>
+
+<div class="row justify-content-center mt-5">
+    <div class="col-sm-8 col-md-6 col-lg-4">
+        <div class="card">
+            <div class="card-body p-4">
+                <h1 class="h4 mb-4 text-center">CalibrAr</h1>
+
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="alert alert-danger">@errorMessage</div>
+                }
+
+                @* Formulario estático: el submit es un POST HTTP clásico, no viaja por el circuito. *@
+                <EditForm Model="Input" FormName="login" method="post" OnValidSubmit="LoginAsync">
+                    <DataAnnotationsValidator />
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <InputText id="email" class="form-control" @bind-Value="Input.Email" autocomplete="username" />
+                        <ValidationMessage For="() => Input.Email" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <InputText id="password" type="password" class="form-control" @bind-Value="Input.Password" autocomplete="current-password" />
+                        <ValidationMessage For="() => Input.Password" />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Ingresar</button>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    // Nombre del claim donde guardamos el JWT completo para reenviarlo a la WebAPI.
+    public const string AccessTokenClaim = "access_token";
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    // Se completa con los campos del POST (en un GET queda en null y se crea vacío).
+    [SupplyParameterFromForm]
+    private LoginInput Input { get; set; } = new();
+
+    // Lo agrega el middleware de cookie al redirigir: /login?ReturnUrl=%2Finstruments
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    private string? errorMessage;
+
+    private async Task LoginAsync()
+    {
+        LoginResponse? loginResponse;
+        try
+        {
+            loginResponse = await AuthApiClient.LoginAsync(
+                new LoginRequest { Email = Input.Email, Password = Input.Password });
+        }
+        catch (HttpRequestException)
+        {
+            errorMessage = "No se pudo conectar con el servidor. Verifique que la WebAPI esté en ejecución.";
+            return;
+        }
+        catch (Exception)
+        {
+            errorMessage = "Error al iniciar sesión. Intente nuevamente más tarde.";
+            return;
+        }
+
+        // null = la WebAPI respondió 401.
+        if (loginResponse == null)
+        {
+            errorMessage = "Email o contraseña incorrectos.";
+            return;
+        }
+
+        if (string.IsNullOrEmpty(loginResponse.Token))
+        {
+            errorMessage = "La respuesta del servidor vino vacía.";
+            return;
+        }
+
+        // Solo leemos los claims: la firma la valida la WebAPI en cada request.
+        var jwt = new JwtSecurityTokenHandler().ReadJwtToken(loginResponse.Token);
+
+        // La WebAPI emite los claims con los tipos estándar de .NET (ClaimTypes.Name, etc.),
+        // más "permission" y "group". Copiamos los que necesita la UI y agregamos el token completo.
+        var claims = jwt.Claims
+            .Where(c => c.Type is ClaimTypes.Name
+                               or ClaimTypes.Email
+                               or ClaimTypes.NameIdentifier
+                               or "permission"
+                               or "group")
+            .Select(c => new Claim(c.Type, c.Value))
+            .Append(new Claim(AccessTokenClaim, loginResponse.Token));
+
+        // nameType/roleType le dicen a la identidad dónde está el nombre (User.Identity.Name).
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme,
+            nameType: ClaimTypes.Name, roleType: "group");
+
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(identity),
+            new AuthenticationProperties
+            {
+                IsPersistent = false,                 // cookie de sesión: muere al cerrar el navegador
+                ExpiresUtc = loginResponse.ExpiresAt  // y nunca vive más que el JWT
+            });
+
+        // Solo URLs locales, para evitar un "open redirect" hacia un sitio externo.
+        var destination = !string.IsNullOrEmpty(ReturnUrl) && Uri.IsWellFormedUriString(ReturnUrl, UriKind.Relative)
+                          && ReturnUrl.StartsWith('/') && !ReturnUrl.StartsWith("//") && !ReturnUrl.StartsWith("/\\")
+            ? ReturnUrl
+            : "/";
+
+        NavigationManager.NavigateTo(destination, forceLoad: true);
+    }
+
+    private sealed class LoginInput
+    {
+        [Required(ErrorMessage = "El email es obligatorio.")]
+        [EmailAddress(ErrorMessage = "El email no tiene un formato válido.")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La contraseña es obligatoria.")]
+        public string Password { get; set; } = string.Empty;
+    }
+}

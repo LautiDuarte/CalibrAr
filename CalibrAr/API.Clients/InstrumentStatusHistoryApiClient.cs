@@ -10,7 +10,11 @@ namespace API.Clients
 {
     public class InstrumentStatusHistoryApiClient : BaseApiClient
     {
-        public static async Task<InstrumentStatusHistoryDTO> GetAsync(int id)
+        public InstrumentStatusHistoryApiClient(ITokenProvider tokenProvider) : base(tokenProvider)
+        {
+        }
+
+        public async Task<InstrumentStatusHistoryDTO> GetAsync(int id)
         {
             try
             {
@@ -23,6 +27,7 @@ namespace API.Clients
                 }
                 else
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to get instrument status history with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -37,7 +42,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task<List<InstrumentStatusHistoryDTO>> GetAllAsync()
+        public async Task<List<InstrumentStatusHistoryDTO>> GetAllAsync()
         {
             try
             {
@@ -50,7 +55,7 @@ namespace API.Clients
                 }
                 else
                 {
-                    await HandleUnauthorizedResponseAsync(response);
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to get instrument status histories. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -65,7 +70,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task AddAsync(InstrumentStatusHistoryDTO instrumentStatusHistory)
+        public async Task AddAsync(InstrumentStatusHistoryDTO instrumentStatusHistory)
         {
             try
             {
@@ -73,6 +78,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.PostAsJsonAsync("instrumentStatusHistories", instrumentStatusHistory);
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to add instrument status history. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -87,7 +93,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             try
             {
@@ -95,6 +101,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.DeleteAsync($"instrumentStatusHistories/{id}");
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to delete instrument status history with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -109,7 +116,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task UpdateAsync(InstrumentStatusHistoryDTO instrumentStatusHistory)
+        public async Task UpdateAsync(InstrumentStatusHistoryDTO instrumentStatusHistory)
         {
             try
             {
@@ -117,6 +124,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.PutAsJsonAsync("instrumentStatusHistories", instrumentStatusHistory);
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to update instrument status history with ID {instrumentStatusHistory.Id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }

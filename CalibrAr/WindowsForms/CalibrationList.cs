@@ -8,12 +8,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using API.Clients;
+using API.Auth.WindowsForms;
 using DTOs;
 
 namespace WindowsForms
 {
     public partial class CalibrationList : Form
     {
+        private readonly CalibrationApiClient calibrationApiClient = new(AuthServiceProvider.Instance);
+
         public CalibrationList()
         {
             InitializeComponent();
@@ -182,7 +185,7 @@ namespace WindowsForms
             {
                 DisableControls();
 
-                CalibrationDTO calibration = await CalibrationApiClient.GetAsync(selected.Id);
+                CalibrationDTO calibration = await calibrationApiClient.GetAsync(selected.Id);
 
                 CalibrationDetail calibrationDetail = new CalibrationDetail(FormMode.Update, calibration);
                 calibrationDetail.ShowDialog(this);
@@ -211,7 +214,7 @@ namespace WindowsForms
                 try
                 {
                     DisableControls();
-                    await CalibrationApiClient.DeleteAsync(calibration.Id);
+                    await calibrationApiClient.DeleteAsync(calibration.Id);
                     await LoadCalibrations();
 
                 }
@@ -233,7 +236,7 @@ namespace WindowsForms
                 DisableControls();
                 this.calibrationsDataGridView.DataSource = null;
 
-                IEnumerable<CalibrationDTO> calibrations = await CalibrationApiClient.GetAllAsync();
+                IEnumerable<CalibrationDTO> calibrations = await calibrationApiClient.GetAllAsync();
 
                 this.calibrationsDataGridView.DataSource = calibrations;
                 // Solo manejar Enabled/Disabled si los botones son visibles (tienen permisos)

@@ -8,12 +8,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using API.Clients;
+using API.Auth.WindowsForms;
 using DTOs;
 
 namespace WindowsForms
 {
     public partial class AreaDetail : Form
     {
+        private readonly AreaApiClient areaApiClient = new(AuthServiceProvider.Instance);
+        private readonly LocationApiClient locationApiClient = new(AuthServiceProvider.Instance);
+
         private AreaDTO area = new();
         private FormMode mode;
 
@@ -66,7 +70,7 @@ namespace WindowsForms
 
         private async Task LoadLocations()
         {
-            var locations = await LocationApiClient.GetAllAsync();
+            var locations = await locationApiClient.GetAllAsync();
             locationComboBox.DataSource = locations.ToList();
             locationComboBox.DisplayMember = "Name";
             locationComboBox.ValueMember = "Id";
@@ -86,11 +90,11 @@ namespace WindowsForms
                     this.Area.LocationId = (int)locationComboBox.SelectedValue!;
                     if (this.Mode == FormMode.Update)
                     {
-                        await AreaApiClient.UpdateAsync(this.Area);
+                        await areaApiClient.UpdateAsync(this.Area);
                     }
                     else
                     {
-                        await AreaApiClient.AddAsync(this.Area);
+                        await areaApiClient.AddAsync(this.Area);
                     }
 
                     this.Close();

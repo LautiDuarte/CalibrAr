@@ -9,12 +9,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using API.Clients;
+using API.Auth.WindowsForms;
 using DTOs;
 
 namespace WindowsForms
 {
     public partial class ProcedureList : Form
     {
+        private readonly ProcedureApiClient procedureApiClient = new(AuthServiceProvider.Instance);
+
         public ProcedureList()
         {
             InitializeComponent();
@@ -135,7 +138,7 @@ namespace WindowsForms
             {
                 DisableControls();
 
-                ProcedureDTO procedure = await ProcedureApiClient.GetAsync(selected.Id);
+                ProcedureDTO procedure = await procedureApiClient.GetAsync(selected.Id);
 
                 ProcedureDetail procedureDetail = new ProcedureDetail(FormMode.Update, procedure);
                 procedureDetail.ShowDialog(this);
@@ -165,7 +168,7 @@ namespace WindowsForms
                 try
                 {
                     DisableControls();
-                    await ProcedureApiClient.DeleteAsync(procedure.Id);
+                    await procedureApiClient.DeleteAsync(procedure.Id);
                     await LoadProcedures();
 
                 }
@@ -187,7 +190,7 @@ namespace WindowsForms
                 DisableControls();
                 this.proceduresDataGridView.DataSource = null;
 
-                IEnumerable<ProcedureDTO> procedures = await ProcedureApiClient.GetAllAsync();
+                IEnumerable<ProcedureDTO> procedures = await procedureApiClient.GetAllAsync();
 
                 this.proceduresDataGridView.DataSource = procedures;
                 // Solo manejar Enabled/Disabled si los botones son visibles (tienen permisos)

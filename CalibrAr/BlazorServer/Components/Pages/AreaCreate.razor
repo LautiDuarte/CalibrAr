@@ -1,0 +1,74 @@
+@page "/areas/new"
+@attribute [Authorize(Policy = "AreasCreate")]
+@inject AreaApiClient AreaApiClient
+@inject LocationApiClient LocationApiClient
+@inject NavigationManager NavigationManager
+
+<PageTitle>Nueva área - CalibrAr</PageTitle>
+
+<h1 class="h3 mb-3">Nueva área</h1>
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger form-narrow">@errorMessage</div>
+}
+
+@if (locations == null)
+{
+    <p class="text-secondary">Cargando...</p>
+}
+else
+{
+    <AreaForm Model="model" Locations="locations" OnValidSubmit="SaveAsync" Saving="saving" />
+}
+
+@code {
+    private AreaForm.AreaFormModel model = new();
+    private List<LocationDTO>? locations;
+    private string? errorMessage;
+    private bool saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            locations = await LocationApiClient.GetAllAsync();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        saving = true;
+        try
+        {
+            await AreaApiClient.AddAsync(new AreaDTO
+            {
+                Name = model.Name,
+                Responsible = model.Responsible,
+                LocationId = model.LocationId,
+                IsActive = model.IsActive
+            });
+            NavigationManager.NavigateTo("areas");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

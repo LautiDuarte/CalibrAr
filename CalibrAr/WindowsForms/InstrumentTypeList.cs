@@ -8,12 +8,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using API.Clients;
+using API.Auth.WindowsForms;
 using DTOs;
 
 namespace WindowsForms
 {
     public partial class InstrumentTypeList : Form
     {
+        private readonly InstrumentTypeApiClient instrumentTypeApiClient = new(AuthServiceProvider.Instance);
+
         public InstrumentTypeList()
         {
             InitializeComponent();
@@ -134,7 +137,7 @@ namespace WindowsForms
             {
                 DisableControls();
 
-                InstrumentTypeDTO instrumentType = await InstrumentTypeApiClient.GetAsync(selected.Id);
+                InstrumentTypeDTO instrumentType = await instrumentTypeApiClient.GetAsync(selected.Id);
 
                 InstrumentTypeDetail instrumentTypeDetail = new InstrumentTypeDetail(FormMode.Update, instrumentType);
                 instrumentTypeDetail.ShowDialog(this);
@@ -163,7 +166,7 @@ namespace WindowsForms
                 try
                 {
                     DisableControls();
-                    await InstrumentTypeApiClient.DeleteAsync(instrumentType.Id);
+                    await instrumentTypeApiClient.DeleteAsync(instrumentType.Id);
                     await this.LoadInstrumentTypes();
 
                 }
@@ -185,7 +188,7 @@ namespace WindowsForms
                 DisableControls();
                 this.instrumentTypesDataGridView.DataSource = null;
 
-                IEnumerable<InstrumentTypeDTO> instrumentTypes = await InstrumentTypeApiClient.GetAllAsync();
+                IEnumerable<InstrumentTypeDTO> instrumentTypes = await instrumentTypeApiClient.GetAllAsync();
 
                 this.instrumentTypesDataGridView.DataSource = instrumentTypes;
 

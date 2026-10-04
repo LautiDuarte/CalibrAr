@@ -95,7 +95,7 @@ namespace Data
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.Description).HasMaxLength(200);
                 entity.Property(e => e.MeasurementUnit).IsRequired().HasMaxLength(50);
-                entity.Property(e => e.MaxAllowedError).IsRequired();
+                entity.Property(e => e.MaxAllowedError).IsRequired().HasPrecision(18, 4);
                 entity.Property(e => e.CalibrationFrequencyMonths).IsRequired();
                 entity.Property(e => e.IsActive).IsRequired();
                 entity.Property(e => e.CreatedAt).IsRequired();
@@ -118,7 +118,7 @@ namespace Data
                 entity.Property(e => e.Brand).HasMaxLength(100);
                 entity.Property(e => e.Model).HasMaxLength(100);
                 entity.Property(e => e.Status).IsRequired();
-                entity.Property(e => e.MaxAllowedError);
+                entity.Property(e => e.MaxAllowedError).HasPrecision(18, 4);
                 entity.Property(e => e.CalibrationFrequencyMonths);
                 entity.Property(e => e.LastCalibrationDate);
                 entity.Property(e => e.NextCalibrationDate);
@@ -302,10 +302,11 @@ namespace Data
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
                 entity.Property(e => e.CalibrationId).IsRequired().HasField("_calibrationId");
                 entity.Navigation(e => e.Calibration).HasField("_calibration");
-                entity.Property(e => e.NominalValue).IsRequired();
+                // Sin precisión explícita EF usa decimal(18,2) y redondea a 0 valores como 0.004.
+                entity.Property(e => e.NominalValue).IsRequired().HasPrecision(18, 4);
                 entity.Property(e => e.Notes).HasMaxLength(500);
-                entity.Property(e => e.MeasuredValue).IsRequired();
-                entity.Property(e => e.Error).IsRequired();
+                entity.Property(e => e.MeasuredValue).IsRequired().HasPrecision(18, 4);
+                entity.Property(e => e.Error).IsRequired().HasPrecision(18, 4);
                 entity.Property(e => e.IsWithinTolerance).IsRequired();
                 entity.HasOne(e => e.Calibration)
                       .WithMany(c => c.Measurements)

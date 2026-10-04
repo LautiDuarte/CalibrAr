@@ -1,0 +1,116 @@
+@page "/instrument-types"
+@attribute [Authorize(Policy = "InstrumentTypesRead")]
+@inject InstrumentTypeApiClient InstrumentTypeApiClient
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+<PageTitle>Tipos de instrumento - CalibrAr</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 m-0">Tipos de instrumento</h1>
+    <AuthorizeView Policy="InstrumentTypesCreate">
+        <a href="instrument-types/new" class="btn btn-primary">Nuevo tipo de instrumento</a>
+    </AuthorizeView>
+</div>
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+@if (instrumentTypes == null)
+{
+    <p class="text-secondary">Cargando...</p>
+}
+else if (instrumentTypes.Count == 0)
+{
+    <p class="text-secondary">No hay tipos de instrumento cargados.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Unidad</th>
+                    <th class="text-end">Error máximo</th>
+                    <th class="text-end">Frecuencia (meses)</th>
+                    <th>Activo</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var instrumentType in instrumentTypes)
+                {
+                    <tr>
+                        <td>@instrumentType.Name</td>
+                        <td>@instrumentType.MeasurementUnit</td>
+                        <td class="text-end">@instrumentType.MaxAllowedError</td>
+                        <td class="text-end">@instrumentType.CalibrationFrequencyMonths</td>
+                        <td>
+                            <span class="badge @(instrumentType.IsActive ? "text-bg-success" : "text-bg-secondary")">@(instrumentType.IsActive ? "Sí" : "No")</span>
+                        </td>
+                        <td class="text-end text-nowrap">
+                            <AuthorizeView Policy="InstrumentTypesUpdate">
+                                <a href="instrument-types/@instrumentType.Id/edit" class="btn btn-sm btn-outline-primary">Editar</a>
+                            </AuthorizeView>
+                            <AuthorizeView Policy="InstrumentTypesDelete">
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteAsync(instrumentType)">Eliminar</button>
+                            </AuthorizeView>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<InstrumentTypeDTO>? instrumentTypes;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadInstrumentTypes();
+    }
+
+    private async Task LoadInstrumentTypes()
+    {
+        try
+        {
+            instrumentTypes = await InstrumentTypeApiClient.GetAllAsync();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+            instrumentTypes = new List<InstrumentTypeDTO>();
+        }
+    }
+
+    private async Task DeleteAsync(InstrumentTypeDTO instrumentType)
+    {
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"¿Eliminar el tipo de instrumento \"{instrumentType.Name}\"?");
+        if (!confirmed)
+            return;
+
+        try
+        {
+            await InstrumentTypeApiClient.DeleteAsync(instrumentType.Id);
+            errorMessage = null;
+            await LoadInstrumentTypes();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+}

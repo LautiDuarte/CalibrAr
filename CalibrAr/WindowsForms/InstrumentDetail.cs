@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using DTOs;
 using API.Clients;
+using API.Auth.WindowsForms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace WindowsForms
@@ -21,6 +22,10 @@ namespace WindowsForms
     }
     public partial class InstrumentDetail : Form
     {
+        private readonly AreaApiClient areaApiClient = new(AuthServiceProvider.Instance);
+        private readonly InstrumentApiClient instrumentApiClient = new(AuthServiceProvider.Instance);
+        private readonly InstrumentTypeApiClient instrumentTypeApiClient = new(AuthServiceProvider.Instance);
+
         private InstrumentDTO instrument = new();
         private FormMode mode;
 
@@ -83,7 +88,7 @@ namespace WindowsForms
 
         private async Task LoadInstrumentTypes()
         {
-            var instrumentTypes = await InstrumentTypeApiClient.GetAllAsync();
+            var instrumentTypes = await instrumentTypeApiClient.GetAllAsync();
             instrumentTypeComboBox.DataSource = instrumentTypes.ToList();
             instrumentTypeComboBox.DisplayMember = "Name";
             instrumentTypeComboBox.ValueMember = "Id";
@@ -92,7 +97,7 @@ namespace WindowsForms
 
         private async Task LoadAreas()
         {
-            var areas = await AreaApiClient.GetAllAsync();
+            var areas = await areaApiClient.GetAllAsync();
             areaComboBox.DataSource = areas.ToList();
             areaComboBox.DisplayMember = "Name";
             areaComboBox.ValueMember = "Id";
@@ -155,11 +160,11 @@ namespace WindowsForms
                     this.Instrument.AreaId = (int)areaComboBox.SelectedValue;
                     if (this.Mode == FormMode.Update)
                     {
-                        await InstrumentApiClient.UpdateAsync(this.Instrument);
+                        await instrumentApiClient.UpdateAsync(this.Instrument);
                     }
                     else
                     {
-                        await InstrumentApiClient.AddAsync(this.Instrument);
+                        await instrumentApiClient.AddAsync(this.Instrument);
                     }
 
                     this.Close();

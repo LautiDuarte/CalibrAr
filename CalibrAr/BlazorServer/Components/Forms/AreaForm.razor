@@ -1,0 +1,67 @@
+@using System.ComponentModel.DataAnnotations
+
+<EditForm Model="Model" OnValidSubmit="OnValidSubmit" class="form-narrow">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label for="name" class="form-label">Nombre</label>
+        <InputText id="name" class="form-control" @bind-Value="Model.Name" />
+        <ValidationMessage For="() => Model.Name" />
+    </div>
+
+    <div class="mb-3">
+        <label for="responsible" class="form-label">Responsable</label>
+        <InputText id="responsible" class="form-control" @bind-Value="Model.Responsible" />
+        <ValidationMessage For="() => Model.Responsible" />
+    </div>
+
+    <div class="mb-3">
+        <label for="location" class="form-label">Ubicación</label>
+        <InputSelect id="location" class="form-select" @bind-Value="Model.LocationId">
+            <option value="0">Seleccione una ubicación</option>
+            @foreach (var location in Locations)
+            {
+                <option value="@location.Id">@location.Name</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="() => Model.LocationId" />
+    </div>
+
+    <div class="form-check mb-4">
+        <InputCheckbox id="isActive" class="form-check-input" @bind-Value="Model.IsActive" />
+        <label for="isActive" class="form-check-label">Activa</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary" disabled="@Saving">Guardar</button>
+    <a href="areas" class="btn btn-outline-secondary">Cancelar</a>
+</EditForm>
+
+@code {
+    [Parameter, EditorRequired]
+    public AreaFormModel Model { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public List<LocationDTO> Locations { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback OnValidSubmit { get; set; }
+
+    [Parameter]
+    public bool Saving { get; set; }
+
+    public class AreaFormModel
+    {
+        [Required(ErrorMessage = "El nombre es obligatorio.")]
+        public string Name { get; set; } = string.Empty;
+
+        // Obligatorio en la base de datos (columna NOT NULL, máximo 100).
+        [Required(ErrorMessage = "El responsable es obligatorio.")]
+        [StringLength(100, ErrorMessage = "El responsable no puede superar los 100 caracteres.")]
+        public string Responsible { get; set; } = string.Empty;
+
+        [Range(1, int.MaxValue, ErrorMessage = "Seleccione una ubicación.")]
+        public int LocationId { get; set; }
+
+        public bool IsActive { get; set; } = true;
+    }
+}

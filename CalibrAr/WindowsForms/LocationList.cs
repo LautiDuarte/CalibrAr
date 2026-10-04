@@ -8,12 +8,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using API.Clients;
+using API.Auth.WindowsForms;
 using DTOs;
 
 namespace WindowsForms
 {
     public partial class LocationList : Form
     {
+        private readonly LocationApiClient locationApiClient = new(AuthServiceProvider.Instance);
+
         public LocationList()
         {
             InitializeComponent();
@@ -105,7 +108,7 @@ namespace WindowsForms
             {
                 DisableControls();
 
-                LocationDTO location = await LocationApiClient.GetAsync(selected.Id);
+                LocationDTO location = await locationApiClient.GetAsync(selected.Id);
 
                 LocationDetail locationDetail = new LocationDetail(FormMode.Update, location);
                 locationDetail.ShowDialog(this);
@@ -134,7 +137,7 @@ namespace WindowsForms
                 try
                 {
                     DisableControls();
-                    await LocationApiClient.DeleteAsync(location.Id);
+                    await locationApiClient.DeleteAsync(location.Id);
                     await LoadLocations();
 
                 }
@@ -156,7 +159,7 @@ namespace WindowsForms
                 DisableControls();
                 this.locationsDataGridView.DataSource = null;
 
-                IEnumerable<LocationDTO> locations = await LocationApiClient.GetAllAsync();
+                IEnumerable<LocationDTO> locations = await locationApiClient.GetAllAsync();
 
                 this.locationsDataGridView.DataSource = locations;
 

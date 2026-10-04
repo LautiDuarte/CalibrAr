@@ -1,0 +1,96 @@
+@page "/areas/{Id:int}/edit"
+@attribute [Authorize(Policy = "AreasUpdate")]
+@inject AreaApiClient AreaApiClient
+@inject LocationApiClient LocationApiClient
+@inject NavigationManager NavigationManager
+
+<PageTitle>Editar área - CalibrAr</PageTitle>
+
+<h1 class="h3 mb-3">Editar área</h1>
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger form-narrow">@errorMessage</div>
+}
+
+@if (model == null || locations == null)
+{
+    @if (errorMessage == null)
+    {
+        <p class="text-secondary">Cargando...</p>
+    }
+    else
+    {
+        <a href="areas" class="btn btn-outline-secondary">Volver</a>
+    }
+}
+else
+{
+    <AreaForm Model="model" Locations="locations" OnValidSubmit="SaveAsync" Saving="saving" />
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private AreaForm.AreaFormModel? model;
+    private List<LocationDTO>? locations;
+    private DateTime createdAt;
+    private string? errorMessage;
+    private bool saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            AreaDTO area = await AreaApiClient.GetAsync(Id);
+            locations = await LocationApiClient.GetAllAsync();
+            createdAt = area.CreatedAt;
+            model = new AreaForm.AreaFormModel
+            {
+                Name = area.Name,
+                Responsible = area.Responsible ?? string.Empty,
+                LocationId = area.LocationId,
+                IsActive = area.IsActive
+            };
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        saving = true;
+        try
+        {
+            await AreaApiClient.UpdateAsync(new AreaDTO
+            {
+                Id = Id,
+                Name = model!.Name,
+                Responsible = model.Responsible,
+                LocationId = model.LocationId,
+                IsActive = model.IsActive,
+                CreatedAt = createdAt
+            });
+            NavigationManager.NavigateTo("areas");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}
