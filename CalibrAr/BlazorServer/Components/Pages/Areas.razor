@@ -1,8 +1,109 @@
 @page "/areas"
 @attribute [Authorize(Policy = "AreasRead")]
+@inject AreaApiClient AreaApiClient
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
 
 <PageTitle>Áreas - CalibrAr</PageTitle>
 
 <h1>Áreas</h1>
 
-<p>En construcción.</p>
+<AuthorizeView Policy="AreasCreate">
+    <p><a href="areas/new">Nueva área</a></p>
+</AuthorizeView>
+
+@if (errorMessage != null)
+{
+    <p class="validation-message">@errorMessage</p>
+}
+
+@if (areas == null)
+{
+    <p>Cargando...</p>
+}
+else if (areas.Count == 0)
+{
+    <p>No hay áreas cargadas.</p>
+}
+else
+{
+    <table class="grid">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Responsable</th>
+                <th>Ubicación</th>
+                <th>Activa</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var area in areas)
+            {
+                <tr>
+                    <td>@area.Name</td>
+                    <td>@area.Responsible</td>
+                    <td>@area.LocationName</td>
+                    <td>@(area.IsActive ? "Sí" : "No")</td>
+                    <td class="row-actions">
+                        <AuthorizeView Policy="AreasUpdate">
+                            <a href="areas/@area.Id/edit">Editar</a>
+                        </AuthorizeView>
+                        <AuthorizeView Policy="AreasDelete">
+                            <button @onclick="() => DeleteAsync(area)">Eliminar</button>
+                        </AuthorizeView>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<AreaDTO>? areas;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAreas();
+    }
+
+    private async Task LoadAreas()
+    {
+        try
+        {
+            areas = await AreaApiClient.GetAllAsync();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+            areas = new List<AreaDTO>();
+        }
+    }
+
+    private async Task DeleteAsync(AreaDTO area)
+    {
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"¿Eliminar el área \"{area.Name}\"?");
+        if (!confirmed)
+            return;
+
+        try
+        {
+            await AreaApiClient.DeleteAsync(area.Id);
+            errorMessage = null;
+            await LoadAreas();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+}
