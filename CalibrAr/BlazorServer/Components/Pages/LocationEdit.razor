@@ -1,0 +1,91 @@
+@page "/locations/{Id:int}/edit"
+@attribute [Authorize(Policy = "LocationsUpdate")]
+@inject LocationApiClient LocationApiClient
+@inject NavigationManager NavigationManager
+
+<PageTitle>Editar ubicación - CalibrAr</PageTitle>
+
+<h1>Editar ubicación</h1>
+
+@if (errorMessage != null)
+{
+    <p class="validation-message">@errorMessage</p>
+}
+
+@if (model == null)
+{
+    @if (errorMessage == null)
+    {
+        <p>Cargando...</p>
+    }
+    else
+    {
+        <a href="locations">Volver</a>
+    }
+}
+else
+{
+    <LocationForm Model="model" OnValidSubmit="SaveAsync" Saving="saving" />
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private LocationForm.LocationFormModel? model;
+    private DateTime createdAt;
+    private string? errorMessage;
+    private bool saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            LocationDTO location = await LocationApiClient.GetAsync(Id);
+            createdAt = location.CreatedAt;
+            model = new LocationForm.LocationFormModel
+            {
+                Name = location.Name,
+                Address = location.Address,
+                IsActive = location.IsActive
+            };
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        saving = true;
+        try
+        {
+            await LocationApiClient.UpdateAsync(new LocationDTO
+            {
+                Id = Id,
+                Name = model!.Name,
+                Address = model.Address,
+                IsActive = model.IsActive,
+                CreatedAt = createdAt
+            });
+            NavigationManager.NavigateTo("locations");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

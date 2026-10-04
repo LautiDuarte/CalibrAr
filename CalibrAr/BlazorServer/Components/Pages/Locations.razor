@@ -1,8 +1,107 @@
 @page "/locations"
 @attribute [Authorize(Policy = "LocationsRead")]
+@inject LocationApiClient LocationApiClient
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
 
 <PageTitle>Ubicaciones - CalibrAr</PageTitle>
 
 <h1>Ubicaciones</h1>
 
-<p>En construcción.</p>
+<AuthorizeView Policy="LocationsCreate">
+    <p><a href="locations/new">Nueva ubicación</a></p>
+</AuthorizeView>
+
+@if (errorMessage != null)
+{
+    <p class="validation-message">@errorMessage</p>
+}
+
+@if (locations == null)
+{
+    <p>Cargando...</p>
+}
+else if (locations.Count == 0)
+{
+    <p>No hay ubicaciones cargadas.</p>
+}
+else
+{
+    <table class="grid">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Dirección</th>
+                <th>Activa</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var location in locations)
+            {
+                <tr>
+                    <td>@location.Name</td>
+                    <td>@location.Address</td>
+                    <td>@(location.IsActive ? "Sí" : "No")</td>
+                    <td class="row-actions">
+                        <AuthorizeView Policy="LocationsUpdate">
+                            <a href="locations/@location.Id/edit">Editar</a>
+                        </AuthorizeView>
+                        <AuthorizeView Policy="LocationsDelete">
+                            <button @onclick="() => DeleteAsync(location)">Eliminar</button>
+                        </AuthorizeView>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<LocationDTO>? locations;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadLocations();
+    }
+
+    private async Task LoadLocations()
+    {
+        try
+        {
+            locations = await LocationApiClient.GetAllAsync();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+            locations = new List<LocationDTO>();
+        }
+    }
+
+    private async Task DeleteAsync(LocationDTO location)
+    {
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"¿Eliminar la ubicación \"{location.Name}\"?");
+        if (!confirmed)
+            return;
+
+        try
+        {
+            await LocationApiClient.DeleteAsync(location.Id);
+            errorMessage = null;
+            await LoadLocations();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+}

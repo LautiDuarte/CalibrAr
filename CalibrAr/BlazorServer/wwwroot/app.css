@@ -27,3 +27,70 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    font-size: 14px;
+    color: #222;
+    background: #fff;
+}
+
+h1 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 12px 0;
+}
+
+a {
+    color: #0645ad;
+}
+
+table.grid {
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+    table.grid th,
+    table.grid td {
+        border: 1px solid #ccc;
+        padding: 4px 8px;
+        text-align: left;
+    }
+
+    table.grid th {
+        background: #eee;
+        font-weight: 600;
+    }
+
+    table.grid tbody tr:hover {
+        background: #f7f7f7;
+    }
+
+td.row-actions a,
+td.row-actions button {
+    margin-right: 8px;
+}
+
+.field {
+    margin-bottom: 8px;
+}
+
+    .field label {
+        display: inline-block;
+        width: 90px;
+    }
+
+    .field input[type=text],
+    .field input:not([type]),
+    .field input[type=password] {
+        width: 250px;
+    }
+
+.actions {
+    margin-top: 12px;
+}
+
+    .actions button {
+        margin-right: 8px;
+    }

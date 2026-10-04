@@ -1,0 +1,48 @@
+@using System.ComponentModel.DataAnnotations
+
+<EditForm Model="Model" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="field">
+        <label for="name">Nombre</label>
+        <InputText id="name" @bind-Value="Model.Name" />
+        <ValidationMessage For="() => Model.Name" />
+    </div>
+
+    <div class="field">
+        <label for="address">Dirección</label>
+        <InputText id="address" @bind-Value="Model.Address" />
+    </div>
+
+    <div class="field">
+        <label for="isActive">Activa</label>
+        <InputCheckbox id="isActive" @bind-Value="Model.IsActive" />
+    </div>
+
+    <div class="actions">
+        <button type="submit" disabled="@Saving">Guardar</button>
+        <a href="locations">Cancelar</a>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter, EditorRequired]
+    public LocationFormModel Model { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback OnValidSubmit { get; set; }
+
+    [Parameter]
+    public bool Saving { get; set; }
+
+    // Las validaciones de pantalla van acá y no en el DTO, que lo comparten WinForms y la WebAPI.
+    public class LocationFormModel
+    {
+        [Required(ErrorMessage = "El nombre es obligatorio.")]
+        public string Name { get; set; } = string.Empty;
+
+        public string? Address { get; set; }
+
+        public bool IsActive { get; set; } = true;
+    }
+}

@@ -1,0 +1,48 @@
+@page "/locations/new"
+@attribute [Authorize(Policy = "LocationsCreate")]
+@inject LocationApiClient LocationApiClient
+@inject NavigationManager NavigationManager
+
+<PageTitle>Nueva ubicación - CalibrAr</PageTitle>
+
+<h1>Nueva ubicación</h1>
+
+@if (errorMessage != null)
+{
+    <p class="validation-message">@errorMessage</p>
+}
+
+<LocationForm Model="model" OnValidSubmit="SaveAsync" Saving="saving" />
+
+@code {
+    private LocationForm.LocationFormModel model = new();
+    private string? errorMessage;
+    private bool saving;
+
+    private async Task SaveAsync()
+    {
+        saving = true;
+        try
+        {
+            await LocationApiClient.AddAsync(new LocationDTO
+            {
+                Name = model.Name,
+                Address = model.Address,
+                IsActive = model.IsActive
+            });
+            NavigationManager.NavigateTo("locations");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}
