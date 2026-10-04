@@ -11,7 +11,11 @@ namespace API.Clients
 {
     public class InstrumentApiClient : BaseApiClient
     {
-        public static async Task<InstrumentDTO> GetAsync(int id)
+        public InstrumentApiClient(ITokenProvider tokenProvider) : base(tokenProvider)
+        {
+        }
+
+        public async Task<InstrumentDTO> GetAsync(int id)
         {
             try
             {
@@ -24,6 +28,7 @@ namespace API.Clients
                 }
                 else
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to get instrument with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -38,7 +43,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task<List<InstrumentDTO>> GetAllAsync()
+        public async Task<List<InstrumentDTO>> GetAllAsync()
         {
             try
             {
@@ -51,7 +56,7 @@ namespace API.Clients
                 }
                 else
                 {
-                    await HandleUnauthorizedResponseAsync(response);
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to get instruments. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -66,7 +71,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task AddAsync(InstrumentDTO instrument)
+        public async Task AddAsync(InstrumentDTO instrument)
         {
             try
             {
@@ -74,6 +79,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.PostAsJsonAsync("instruments", instrument);
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to add instrument. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -88,7 +94,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             try
             {
@@ -96,6 +102,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.DeleteAsync($"instruments/{id}");
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to delete instrument with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -110,7 +117,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task UpdateAsync(InstrumentDTO instrument)
+        public async Task UpdateAsync(InstrumentDTO instrument)
         {
             try
             {
@@ -118,6 +125,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.PutAsJsonAsync("instruments", instrument);
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to update instrument with ID {instrument.Id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }

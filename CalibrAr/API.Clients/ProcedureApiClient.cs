@@ -10,7 +10,11 @@ namespace API.Clients
 {
     public class ProcedureApiClient : BaseApiClient
     {
-        public static async Task<ProcedureDTO> GetAsync(int id)
+        public ProcedureApiClient(ITokenProvider tokenProvider) : base(tokenProvider)
+        {
+        }
+
+        public async Task<ProcedureDTO> GetAsync(int id)
         {
             try
             {
@@ -23,6 +27,7 @@ namespace API.Clients
                 }
                 else
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to get procedure with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -37,7 +42,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task<List<ProcedureDTO>> GetAllAsync()
+        public async Task<List<ProcedureDTO>> GetAllAsync()
         {
             try
             {
@@ -50,7 +55,7 @@ namespace API.Clients
                 }
                 else
                 {
-                    await HandleUnauthorizedResponseAsync(response);
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to get procedures. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -65,7 +70,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task AddAsync(ProcedureDTO procedure)
+        public async Task AddAsync(ProcedureDTO procedure)
         {
             try
             {
@@ -73,6 +78,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.PostAsJsonAsync("procedures", procedure);
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to add procedure. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -87,7 +93,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             try
             {
@@ -95,6 +101,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.DeleteAsync($"procedures/{id}");
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to delete procedure with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -109,7 +116,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task UpdateAsync(ProcedureDTO procedure)
+        public async Task UpdateAsync(ProcedureDTO procedure)
         {
             try
             {
@@ -117,6 +124,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.PutAsJsonAsync("procedures", procedure);
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to update procedure with ID {procedure.Id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }

@@ -8,12 +8,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using API.Clients;
+using API.Auth.WindowsForms;
 using DTOs;
 
 namespace WindowsForms
 {
     public partial class InstrumentList : Form
     {
+        private readonly InstrumentApiClient instrumentApiClient = new(AuthServiceProvider.Instance);
+
         public InstrumentList()
         {
             InitializeComponent();
@@ -200,7 +203,7 @@ namespace WindowsForms
             {
                 DisableControls();
 
-                InstrumentDTO instrument = await InstrumentApiClient.GetAsync(selected.Id);
+                InstrumentDTO instrument = await instrumentApiClient.GetAsync(selected.Id);
 
                 InstrumentDetail instrumentDetail = new InstrumentDetail(FormMode.Update, instrument);
                 instrumentDetail.ShowDialog(this);
@@ -229,7 +232,7 @@ namespace WindowsForms
                 try
                 {
                     DisableControls();
-                    await InstrumentApiClient.DeleteAsync(instrument.Id);
+                    await instrumentApiClient.DeleteAsync(instrument.Id);
                     await LoadInstruments();
 
                 }
@@ -251,7 +254,7 @@ namespace WindowsForms
                 DisableControls();
                 this.instrumentsDataGridView.DataSource = null;
 
-                IEnumerable<InstrumentDTO> instruments = await InstrumentApiClient.GetAllAsync();
+                IEnumerable<InstrumentDTO> instruments = await instrumentApiClient.GetAllAsync();
 
                 this.instrumentsDataGridView.DataSource = instruments;
                 // Solo manejar Enabled/Disabled si los botones son visibles (tienen permisos)

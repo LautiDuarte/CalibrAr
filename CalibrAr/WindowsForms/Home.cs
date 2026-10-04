@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using API.Clients;
+using API.Auth.WindowsForms;
 
 namespace WindowsForms
 {

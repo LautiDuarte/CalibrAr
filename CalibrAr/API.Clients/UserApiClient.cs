@@ -10,7 +10,11 @@ namespace API.Clients
 {
     public class UserApiClient : BaseApiClient
     {
-        public static async Task<UserDTO> GetAsync(int id)
+        public UserApiClient(ITokenProvider tokenProvider) : base(tokenProvider)
+        {
+        }
+
+        public async Task<UserDTO> GetAsync(int id)
         {
             try
             {
@@ -22,6 +26,7 @@ namespace API.Clients
                 }
                 else
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to get user with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -36,7 +41,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task<List<UserDTO>> GetAllAsync()
+        public async Task<List<UserDTO>> GetAllAsync()
         {
             try
             {
@@ -48,7 +53,7 @@ namespace API.Clients
                 }
                 else
                 {
-                    await HandleUnauthorizedResponseAsync(response);
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to get users. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -63,7 +68,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task AddAsync(UserDTO user)
+        public async Task AddAsync(UserDTO user)
         {
             try
             {
@@ -71,6 +76,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.PostAsJsonAsync("users", user);
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to create user. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -85,7 +91,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             try
             {
@@ -93,6 +99,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.DeleteAsync($"users/{id}");
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to delete user with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -107,7 +114,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task UpdateAsync(UserDTO user)
+        public async Task UpdateAsync(UserDTO user)
         {
             try
             {
@@ -115,6 +122,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.PutAsJsonAsync("users", user);
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to update user with ID {user.Id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }

@@ -10,7 +10,11 @@ namespace API.Clients
 {
     public class NonConformityApiClient : BaseApiClient
     {
-        public static async Task<NonConformityDTO> GetAsync(int id)
+        public NonConformityApiClient(ITokenProvider tokenProvider) : base(tokenProvider)
+        {
+        }
+
+        public async Task<NonConformityDTO> GetAsync(int id)
         {
             try
             {
@@ -23,6 +27,7 @@ namespace API.Clients
                 }
                 else
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to get non conformity with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -37,7 +42,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task<List<NonConformityDTO>> GetAllAsync()
+        public async Task<List<NonConformityDTO>> GetAllAsync()
         {
             try
             {
@@ -50,7 +55,7 @@ namespace API.Clients
                 }
                 else
                 {
-                    await HandleUnauthorizedResponseAsync(response);
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to get non conformities. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -65,7 +70,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task AddAsync(NonConformityDTO nonConformity)
+        public async Task AddAsync(NonConformityDTO nonConformity)
         {
             try
             {
@@ -73,6 +78,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.PostAsJsonAsync("nonConformities", nonConformity);
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to add non conformity. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -87,7 +93,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             try
             {
@@ -95,6 +101,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.DeleteAsync($"nonConformities/{id}");
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to delete non conformity with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -109,7 +116,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task UpdateAsync(NonConformityDTO nonConformity)
+        public async Task UpdateAsync(NonConformityDTO nonConformity)
         {
             try
             {
@@ -117,6 +124,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.PutAsJsonAsync("nonConformities", nonConformity);
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to update non conformity with ID {nonConformity.Id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }

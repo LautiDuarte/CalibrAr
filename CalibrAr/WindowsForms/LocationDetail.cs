@@ -8,12 +8,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using API.Clients;
+using API.Auth.WindowsForms;
 using DTOs;
 
 namespace WindowsForms
 {
     public partial class LocationDetail : Form
     {
+        private readonly LocationApiClient locationApiClient = new(AuthServiceProvider.Instance);
+
 
         private LocationDTO location = new();
         private FormMode mode;
@@ -76,11 +79,11 @@ namespace WindowsForms
                     this.Location.Address = addressTextBox.Text;
                     if (this.Mode == FormMode.Update)
                     {
-                        await LocationApiClient.UpdateAsync(this.Location);
+                        await locationApiClient.UpdateAsync(this.Location);
                     }
                     else
                     {
-                        await LocationApiClient.AddAsync(this.Location);
+                        await locationApiClient.AddAsync(this.Location);
                     }
 
                     this.Close();

@@ -10,7 +10,11 @@ namespace API.Clients
 {
     public class ReferenceStandardApiClient : BaseApiClient
     {
-        public static async Task<ReferenceStandardDTO> GetAsync(int id)
+        public ReferenceStandardApiClient(ITokenProvider tokenProvider) : base(tokenProvider)
+        {
+        }
+
+        public async Task<ReferenceStandardDTO> GetAsync(int id)
         {
             try
             {
@@ -23,6 +27,7 @@ namespace API.Clients
                 }
                 else
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to get reference standard with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -37,7 +42,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task<List<ReferenceStandardDTO>> GetAllAsync()
+        public async Task<List<ReferenceStandardDTO>> GetAllAsync()
         {
             try
             {
@@ -50,7 +55,7 @@ namespace API.Clients
                 }
                 else
                 {
-                    await HandleUnauthorizedResponseAsync(response);
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to get reference standards. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -65,7 +70,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task AddAsync(ReferenceStandardDTO referenceStandard)
+        public async Task AddAsync(ReferenceStandardDTO referenceStandard)
         {
             try
             {
@@ -73,6 +78,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.PostAsJsonAsync("referenceStandards", referenceStandard);
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to add reference standard. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -87,7 +93,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             try
             {
@@ -95,6 +101,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.DeleteAsync($"referenceStandards/{id}");
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to delete reference standard with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -109,7 +116,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task UpdateAsync(ReferenceStandardDTO referenceStandard)
+        public async Task UpdateAsync(ReferenceStandardDTO referenceStandard)
         {
             try
             {
@@ -117,6 +124,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.PutAsJsonAsync("referenceStandards", referenceStandard);
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to update reference standard with ID {referenceStandard.Id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }

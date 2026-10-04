@@ -8,12 +8,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using API.Clients;
+using API.Auth.WindowsForms;
 using DTOs;
 
 namespace WindowsForms
 {
     public partial class InstrumentTypeDetail : Form
     {
+        private readonly InstrumentTypeApiClient instrumentTypeApiClient = new(AuthServiceProvider.Instance);
+
         private InstrumentTypeDTO instrumentType = new();
         private FormMode mode;
 
@@ -78,11 +81,11 @@ namespace WindowsForms
                     this.InstrumentType.CalibrationFrequencyMonths = int.Parse(calibrationFrequencyMonthsTextBox.Text);
                     if (this.Mode == FormMode.Update)
                     {
-                        await InstrumentTypeApiClient.UpdateAsync(this.InstrumentType);
+                        await instrumentTypeApiClient.UpdateAsync(this.InstrumentType);
                     }
                     else
                     {
-                        await InstrumentTypeApiClient.AddAsync(this.InstrumentType);
+                        await instrumentTypeApiClient.AddAsync(this.InstrumentType);
                     }
 
                     this.Close();

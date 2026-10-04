@@ -24,6 +24,14 @@ namespace API.Auth.WindowsForms
             return isAuth ? _currentToken : null;
         }
 
+        // ITokenProvider: lo usan los ApiClient antes de cada request.
+        // Si el token venció, cierra la sesión y devuelve null.
+        public async Task<string?> GetTokenAsync()
+        {
+            await CheckTokenExpirationAsync();
+            return GetToken();
+        }
+
         public string? GetEmail()
         {
             var isAuth = IsAuthenticated();

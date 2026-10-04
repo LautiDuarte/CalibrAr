@@ -9,11 +9,18 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using DTOs;
 using API.Clients;
+using API.Auth.WindowsForms;
 
 namespace WindowsForms
 {
     public partial class CalibrationDetail : Form
     {
+        private readonly CalibrationApiClient calibrationApiClient = new(AuthServiceProvider.Instance);
+        private readonly InstrumentApiClient instrumentApiClient = new(AuthServiceProvider.Instance);
+        private readonly InstrumentTypeApiClient instrumentTypeApiClient = new(AuthServiceProvider.Instance);
+        private readonly ProcedureApiClient procedureApiClient = new(AuthServiceProvider.Instance);
+        private readonly UserApiClient userApiClient = new(AuthServiceProvider.Instance);
+
         private CalibrationDTO calibration;
         private FormMode mode;
         private List<ProcedureDTO> allProcedures = new List<ProcedureDTO>();
@@ -140,13 +147,13 @@ namespace WindowsForms
 
         private async Task LoadInstrumentTypes()
         {
-            var types = await InstrumentTypeApiClient.GetAllAsync();
+            var types = await instrumentTypeApiClient.GetAllAsync();
             instrumentTypes = types.ToList();
         }
 
         private async Task LoadInstruments()
         {
-            var instruments = await InstrumentApiClient.GetAllAsync();
+            var instruments = await instrumentApiClient.GetAllAsync();
             instrumentComboBox.DataSource = instruments.ToList();
             instrumentComboBox.DisplayMember = "Code";
             instrumentComboBox.ValueMember = "Id";
@@ -155,7 +162,7 @@ namespace WindowsForms
 
         private async Task LoadProcedures()
         {
-            var procedures = await ProcedureApiClient.GetAllAsync();
+            var procedures = await procedureApiClient.GetAllAsync();
             allProcedures = procedures.ToList();
             FilterProcedures();
         }
@@ -187,13 +194,13 @@ namespace WindowsForms
 
         private async Task LoadUsers()
         {
-            var performedByUsers = await UserApiClient.GetAllAsync();
+            var performedByUsers = await userApiClient.GetAllAsync();
             performedByUserComboBox.DataSource = performedByUsers.ToList();
             performedByUserComboBox.DisplayMember = "FullName";
             performedByUserComboBox.ValueMember = "Id";
             performedByUserComboBox.SelectedIndex = -1;
 
-            var approvedByUsers = await UserApiClient.GetAllAsync();
+            var approvedByUsers = await userApiClient.GetAllAsync();
             approvedByUserComboBox.DataSource = approvedByUsers.ToList();
             approvedByUserComboBox.DisplayMember = "FullName";
             approvedByUserComboBox.ValueMember = "Id";
@@ -262,11 +269,11 @@ namespace WindowsForms
 
                     if (this.Mode == FormMode.Update)
                     {
-                        await CalibrationApiClient.UpdateAsync(this.Calibration);
+                        await calibrationApiClient.UpdateAsync(this.Calibration);
                     }
                     else
                     {
-                        await CalibrationApiClient.AddAsync(this.Calibration);
+                        await calibrationApiClient.AddAsync(this.Calibration);
                     }
 
                     this.Close();

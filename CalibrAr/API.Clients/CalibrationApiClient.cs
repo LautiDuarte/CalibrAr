@@ -10,7 +10,11 @@ namespace API.Clients
 {
     public class CalibrationApiClient : BaseApiClient
     {
-        public static async Task<CalibrationDTO> GetAsync(int id)
+        public CalibrationApiClient(ITokenProvider tokenProvider) : base(tokenProvider)
+        {
+        }
+
+        public async Task<CalibrationDTO> GetAsync(int id)
         {
             try
             {
@@ -23,6 +27,7 @@ namespace API.Clients
                 }
                 else
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to get calibration with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -37,7 +42,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task<List<CalibrationDTO>> GetAllAsync()
+        public async Task<List<CalibrationDTO>> GetAllAsync()
         {
             try
             {
@@ -50,7 +55,7 @@ namespace API.Clients
                 }
                 else
                 {
-                    await HandleUnauthorizedResponseAsync(response);
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to get calibrations. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -65,7 +70,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task AddAsync(CalibrationDTO calibration)
+        public async Task AddAsync(CalibrationDTO calibration)
         {
             try
             {
@@ -73,6 +78,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.PostAsJsonAsync("calibrations", calibration);
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to add calibration. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -87,7 +93,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             try
             {
@@ -95,6 +101,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.DeleteAsync($"calibrations/{id}");
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to delete calibration with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }
@@ -109,7 +116,7 @@ namespace API.Clients
             }
         }
 
-        public static async Task UpdateAsync(CalibrationDTO calibration)
+        public async Task UpdateAsync(CalibrationDTO calibration)
         {
             try
             {
@@ -117,6 +124,7 @@ namespace API.Clients
                 HttpResponseMessage response = await client.PutAsJsonAsync("calibrations", calibration);
                 if (!response.IsSuccessStatusCode)
                 {
+                    ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
                     throw new Exception($"Failed to update calibration with ID {calibration.Id}. Status code: {response.StatusCode}, Error: {errorContent}");
                 }

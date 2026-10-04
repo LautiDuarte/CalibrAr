@@ -8,12 +8,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using API.Clients;
+using API.Auth.WindowsForms;
 using DTOs;
 
 namespace WindowsForms
 {
     public partial class AreaList : Form
     {
+        private readonly AreaApiClient areaApiClient = new(AuthServiceProvider.Instance);
+
         public AreaList()
         {
             InitializeComponent();
@@ -111,7 +114,7 @@ namespace WindowsForms
             {
                 DisableControls();
 
-                AreaDTO area = await AreaApiClient.GetAsync(selected.Id);
+                AreaDTO area = await areaApiClient.GetAsync(selected.Id);
 
                 AreaDetail areaDetail = new AreaDetail(FormMode.Update, area);
                 areaDetail.ShowDialog(this);
@@ -140,7 +143,7 @@ namespace WindowsForms
                 try
                 {
                     DisableControls();
-                    await AreaApiClient.DeleteAsync(area.Id);
+                    await areaApiClient.DeleteAsync(area.Id);
                     await LoadAreas();
 
                 }
@@ -162,7 +165,7 @@ namespace WindowsForms
                 DisableControls();
                 this.areasDataGridView.DataSource = null;
 
-                IEnumerable<AreaDTO> areas = await AreaApiClient.GetAllAsync();
+                IEnumerable<AreaDTO> areas = await areaApiClient.GetAllAsync();
 
                 this.areasDataGridView.DataSource = areas;
                 // Solo manejar Enabled/Disabled si los botones son visibles (tienen permisos)

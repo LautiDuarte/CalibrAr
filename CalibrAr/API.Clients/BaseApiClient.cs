@@ -1,18 +1,26 @@
-﻿using System.Net;
+using System.Net;
 using System.Net.Http.Headers;
 
 namespace API.Clients
 {
     public abstract class BaseApiClient
     {
-        protected static async Task<HttpClient> CreateHttpClientAsync()
+        // null = cliente anónimo (por ejemplo el login, que todavía no tiene token).
+        private readonly ITokenProvider? tokenProvider;
+
+        protected BaseApiClient(ITokenProvider? tokenProvider)
+        {
+            this.tokenProvider = tokenProvider;
+        }
+
+        protected async Task<HttpClient> CreateHttpClientAsync()
         {
             var client = new HttpClient();
             await ConfigureHttpClientAsync(client);
             return client;
         }
 
-        protected static async Task ConfigureHttpClientAsync(HttpClient client)
+        private async Task ConfigureHttpClientAsync(HttpClient client)
         {
             // Leer URL base de configuración, si no existe usar localhost por defecto
             string baseUrl = GetBaseUrlFromConfig();
@@ -21,8 +29,17 @@ namespace API.Clients
             client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
 
-            // Agregar Bearer token automáticamente si está autenticado
-            await AddAuthorizationHeaderAsync(client);
+            // El token se lo pedimos a quien usa el cliente (WinForms o Blazor),
+            // nunca a un estático global compartido.
+            if (tokenProvider != null)
+            {
+                var token = await tokenProvider.GetTokenAsync();
+                if (!string.IsNullOrEmpty(token))
+                {
+                    client.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
+                }
+            }
         }
 
         private static string GetBaseUrlFromConfig()
@@ -60,43 +77,12 @@ namespace API.Clients
             return defaultUrl;
         }
 
-        protected static async Task AddAuthorizationHeaderAsync(HttpClient client)
-        {
-            var authService = AuthServiceProvider.Instance;
-
-            // Verificar expiración antes de usar el token
-            await authService.CheckTokenExpirationAsync();
-
-            var token = authService.GetToken();
-            if (!string.IsNullOrEmpty(token))
-            {
-                client.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", token);
-            }
-        }
-
-        protected static async Task EnsureAuthenticatedAsync()
-        {
-            var authService = AuthServiceProvider.Instance;
-
-            // Verificar expiración primero
-            await authService.CheckTokenExpirationAsync();
-
-            if (!authService.IsAuthenticated())
-            {
-                throw new UnauthorizedAccessException("Your session has expired.");
-            }
-        }
-
-        protected static async Task HandleUnauthorizedResponseAsync(HttpResponseMessage response)
+        // Ya no cierra la sesión: solo avisa con la excepción y cada UI decide qué hacer
+        // (WinForms vuelve al login, Blazor redirige a /login).
+        protected static void ThrowIfUnauthorized(HttpResponseMessage response)
         {
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
-                // Limpiar sesión actual
-                var authService = AuthServiceProvider.Instance;
-                await authService.LogoutAsync();
-
-                // Lanzar excepción con mensaje simple
                 throw new UnauthorizedAccessException("Your session has expired.");
             }
         }

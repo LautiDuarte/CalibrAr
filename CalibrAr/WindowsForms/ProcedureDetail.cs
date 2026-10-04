@@ -10,11 +10,15 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using DTOs;
 using API.Clients;
+using API.Auth.WindowsForms;
 
 namespace WindowsForms
 {
     public partial class ProcedureDetail : Form
     {
+        private readonly InstrumentTypeApiClient instrumentTypeApiClient = new(AuthServiceProvider.Instance);
+        private readonly ProcedureApiClient procedureApiClient = new(AuthServiceProvider.Instance);
+
         private ProcedureDTO procedure;
         private FormMode mode;
 
@@ -70,7 +74,7 @@ namespace WindowsForms
 
         private async Task LoadInstrumentTypes()
         {
-            var instrumentTypes = await InstrumentTypeApiClient.GetAllAsync();
+            var instrumentTypes = await instrumentTypeApiClient.GetAllAsync();
             instrumentTypeComboBox.DataSource = instrumentTypes.ToList();
             instrumentTypeComboBox.DisplayMember = "Name";
             instrumentTypeComboBox.ValueMember = "Id";
@@ -92,11 +96,11 @@ namespace WindowsForms
                     this.Procedure.InstrumentTypeId = (int)instrumentTypeComboBox.SelectedValue;
                     if (this.Mode == FormMode.Update)
                     {
-                        await ProcedureApiClient.UpdateAsync(this.Procedure);
+                        await procedureApiClient.UpdateAsync(this.Procedure);
                     }
                     else
                     {
-                        await ProcedureApiClient.AddAsync(this.Procedure);
+                        await procedureApiClient.AddAsync(this.Procedure);
                     }
 
                     this.Close();

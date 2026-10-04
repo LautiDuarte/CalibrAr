@@ -10,6 +10,11 @@ namespace API.Clients
 {
     public class AuthApiClient : BaseApiClient
     {
+        // Anónimo: el login todavía no tiene token.
+        public AuthApiClient() : base(null)
+        {
+        }
+
         public async Task<LoginResponse?> LoginAsync(LoginRequest request)
         {
             using var httpClient = await CreateHttpClientAsync();
