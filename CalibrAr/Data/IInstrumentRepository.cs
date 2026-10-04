@@ -14,5 +14,6 @@ namespace Data
         Task<Instrument?> GetAsync(int id);
         Task<IEnumerable<Instrument>> GetAllAsync();
         Task<bool> UpdateAsync(Instrument instrument);
+        Task<bool> ExistsByCodeAsync(string code, int? excludeId = null);
     }
 }

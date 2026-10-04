@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -107,7 +107,7 @@ namespace WindowsForms
                 {
                     DisableControls();
 
-                    this.Instrument.Code = codeTextBox.Text;
+                    this.Instrument.Code = codeTextBox.Text.Trim();
                     this.Instrument.Name = nameTextBox.Text;
                     this.Instrument.SerialNumber = serialNumberTextBox.Text;
                     this.Instrument.Brand = brandTextBox.Text;
@@ -151,10 +151,8 @@ namespace WindowsForms
                         return;
                     }
 
-                    this.Instrument.LastCalibrationDate = lastCalibrationDateTimePicker.Value;
-                    this.Instrument.NextCalibrationDate = nextCalibrationDateTimePicker.Value;
-                    this.Instrument.InstrumentTypeId = (int)instrumentTypeComboBox.SelectedValue!;
-                    this.Instrument.AreaId = (int)areaComboBox.SelectedValue!;
+                    this.Instrument.InstrumentTypeId = (int)instrumentTypeComboBox.SelectedValue;
+                    this.Instrument.AreaId = (int)areaComboBox.SelectedValue;
                     if (this.Mode == FormMode.Update)
                     {
                         await InstrumentApiClient.UpdateAsync(this.Instrument);
@@ -204,17 +202,6 @@ namespace WindowsForms
                 ? this.Instrument.CalibrationFrequencyMonths.Value.ToString()
                 : string.Empty;
 
-            if (this.Instrument.LastCalibrationDate.HasValue)
-            {
-                this.lastCalibrationDateTimePicker.Value =
-                    this.Instrument.LastCalibrationDate.Value;
-            }
-
-            if (this.Instrument.NextCalibrationDate.HasValue)
-            {
-                this.nextCalibrationDateTimePicker.Value =
-                    this.Instrument.NextCalibrationDate.Value;
-            }
             this.instrumentTypeComboBox.SelectedValue = this.Instrument.InstrumentTypeId;
             this.areaComboBox.SelectedValue = this.Instrument.AreaId;
         }
@@ -233,6 +220,9 @@ namespace WindowsForms
             {
                 statusLabel.Visible = true;
                 statusComboBox.Visible = true;
+                instrumentTypeLabel.Visible = false;
+                instrumentTypeComboBox.Visible = false;
+                InstrumentTypeWarningLabel.Visible = false;
             }
         }
 
@@ -243,7 +233,6 @@ namespace WindowsForms
             errorProvider.SetError(codeTextBox, string.Empty);
             errorProvider.SetError(nameTextBox, string.Empty);
             errorProvider.SetError(statusComboBox, string.Empty);
-            errorProvider.SetError(lastCalibrationDateTimePicker, string.Empty);
             errorProvider.SetError(instrumentTypeComboBox, string.Empty);
             errorProvider.SetError(areaComboBox, string.Empty);
 
@@ -263,12 +252,6 @@ namespace WindowsForms
             {
                 isValid = false;
                 errorProvider.SetError(statusComboBox, "Status is required");
-            }
-
-            if (this.lastCalibrationDateTimePicker.Checked == false)
-            {
-                isValid = false;
-                errorProvider.SetError(lastCalibrationDateTimePicker, "Last Calibration Date is required");
             }
 
             if (this.instrumentTypeComboBox.SelectedValue == null)
@@ -296,8 +279,6 @@ namespace WindowsForms
             statusComboBox.Enabled = false;
             maxAllowedErrorTextBox.Enabled = false;
             calibrationFrequencyMonthsTextBox.Enabled = false;
-            lastCalibrationDateTimePicker.Enabled = false;
-            nextCalibrationDateTimePicker.Enabled = false;
             instrumentTypeComboBox.Enabled = false;
             areaComboBox.Enabled = false;
         }
@@ -312,8 +293,6 @@ namespace WindowsForms
             statusComboBox.Enabled = true;
             maxAllowedErrorTextBox.Enabled = true;
             calibrationFrequencyMonthsTextBox.Enabled = true;
-            lastCalibrationDateTimePicker.Enabled = true;
-            nextCalibrationDateTimePicker.Enabled = true;
             instrumentTypeComboBox.Enabled = true;
             areaComboBox.Enabled = true;
         }
@@ -322,5 +301,6 @@ namespace WindowsForms
         {
 
         }
+
     }
 }

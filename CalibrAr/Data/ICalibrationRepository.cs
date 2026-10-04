@@ -14,5 +14,6 @@ namespace Data
         Task<Calibration?> GetAsync(int id);
         Task<IEnumerable<Calibration>> GetAllAsync();
         Task<bool> UpdateAsync(Calibration calibration);
+        Task<Calibration?> GetLatestByInstrumentAsync(int instrumentId);
     }
 }

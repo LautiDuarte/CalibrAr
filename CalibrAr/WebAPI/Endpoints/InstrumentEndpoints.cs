@@ -51,6 +51,10 @@ namespace WebAPI
                 {
                     return Results.NotFound(new { error = ex.Message });
                 }
+                catch (InvalidOperationException ex)
+                {
+                    return Results.Conflict(new { error = ex.Message });
+                }
             })
             .WithName("AddInstrument")
             .Produces<InstrumentDTO>(StatusCodes.Status201Created)
@@ -78,6 +82,10 @@ namespace WebAPI
                 catch (KeyNotFoundException ex)
                 {
                     return Results.NotFound(new { error = ex.Message });
+                }
+                catch (InvalidOperationException ex)
+                {
+                    return Results.Conflict(new { error = ex.Message });
                 }
             })
             .WithName("UpdateInstrument")

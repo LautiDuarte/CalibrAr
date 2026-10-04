@@ -58,9 +58,8 @@ namespace WebAPI
             .WithOpenApi()
             .RequireAuthorization("ProceduresCreate");
 
-            app.MapPut("/procedures/{id}", async (int id, ProcedureDTO dto, IProcedureService procedureService) =>
+            app.MapPut("/procedures", async (ProcedureDTO dto, IProcedureService procedureService) =>
             {
-                dto.Id = id;
                 try
                 {
                     var updated = await procedureService.UpdateAsync(dto);

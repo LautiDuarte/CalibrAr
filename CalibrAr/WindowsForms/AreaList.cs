@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -99,27 +99,22 @@ namespace WindowsForms
             AreaDTO newArea = new AreaDTO();
             AreaDetail areaDetail = new AreaDetail(FormMode.Create, newArea);
 
-            areaDetail.ShowDialog();
+            areaDetail.ShowDialog(this);
             await LoadAreas();
         }
 
         private async void updateButton_Click(object sender, EventArgs e)
         {
+            AreaDTO selected = this.SelectedItem();
+            if (selected == null) return;
             try
             {
                 DisableControls();
 
-                var selected = this.SelectedItem();
-                if (selected == null)
-                {
-                    MessageBox.Show("Seleccioná una fila primero.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
                 AreaDTO area = await AreaApiClient.GetAsync(selected.Id);
 
                 AreaDetail areaDetail = new AreaDetail(FormMode.Update, area);
-                areaDetail.ShowDialog();
+                areaDetail.ShowDialog(this);
                 await LoadAreas();
 
             }
@@ -135,13 +130,8 @@ namespace WindowsForms
 
         private async void deleteButton_Click(object sender, EventArgs e)
         {
-            var area = this.SelectedItem();
-
-            if (area == null)
-            {
-                MessageBox.Show("Seleccioná una fila primero.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            AreaDTO area = this.SelectedItem();
+            if(area == null) return;
 
             var result = MessageBox.Show($"¿Are you sure you want to delete this item:{area.Name}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
@@ -206,8 +196,12 @@ namespace WindowsForms
 
         private AreaDTO? SelectedItem()
         {
+            AreaDTO area;
             if (areasDataGridView.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Please select an area first.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
+            }
 
             return (AreaDTO)areasDataGridView.SelectedRows[0].DataBoundItem;
         }

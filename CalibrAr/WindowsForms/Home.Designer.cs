@@ -1,4 +1,4 @@
-﻿namespace WindowsForms
+namespace WindowsForms
 {
     partial class Home
     {
@@ -33,6 +33,8 @@
             instrumentTypesToolStripMenuItem = new ToolStripMenuItem();
             locationsToolStripMenuItem = new ToolStripMenuItem();
             areasToolStripMenuItem = new ToolStripMenuItem();
+            proceduresToolStripMenuItem = new ToolStripMenuItem();
+            calibrationsToolStripMenuItem = new ToolStripMenuItem();
             logoutToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -40,7 +42,7 @@
             // menuStrip1
             // 
             menuStrip1.ImageScalingSize = new Size(20, 20);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { instrumentsToolStripMenuItem, instrumentTypesToolStripMenuItem, locationsToolStripMenuItem, areasToolStripMenuItem, logoutToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { instrumentsToolStripMenuItem, instrumentTypesToolStripMenuItem, locationsToolStripMenuItem, areasToolStripMenuItem, proceduresToolStripMenuItem, calibrationsToolStripMenuItem, logoutToolStripMenuItem});
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Padding = new Padding(7, 3, 0, 3);
@@ -76,6 +78,20 @@
             areasToolStripMenuItem.Text = "Areas";
             areasToolStripMenuItem.Click += areasToolStripMenuItem_Click;
             // 
+            // proceduresToolStripMenuItem
+            // 
+            proceduresToolStripMenuItem.Name = "proceduresToolStripMenuItem";
+            proceduresToolStripMenuItem.Size = new Size(78, 20);
+            proceduresToolStripMenuItem.Text = "Procedures";
+            proceduresToolStripMenuItem.Click += proceduresToolStripMenuItem_Click;
+            // 
+            // calibrationsToolStripMenuItem
+            // 
+            calibrationsToolStripMenuItem.Name = "calibrationsToolStripMenuItem";
+            calibrationsToolStripMenuItem.Size = new Size(82, 20);
+            calibrationsToolStripMenuItem.Text = "Calibrations";
+            calibrationsToolStripMenuItem.Click += calibrationsToolStripMenuItem_Click;
+            // 
             // logoutToolStripMenuItem
             // 
             logoutToolStripMenuItem.Name = "logoutToolStripMenuItem";
@@ -107,6 +123,8 @@
         private ToolStripMenuItem instrumentTypesToolStripMenuItem;
         private ToolStripMenuItem locationsToolStripMenuItem;
         private ToolStripMenuItem areasToolStripMenuItem;
+        private ToolStripMenuItem proceduresToolStripMenuItem;
+        private ToolStripMenuItem calibrationsToolStripMenuItem;
         private ToolStripMenuItem logoutToolStripMenuItem;
     }
 }

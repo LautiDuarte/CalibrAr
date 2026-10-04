@@ -87,7 +87,7 @@ namespace Domain.Model
         {
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentException("The code cannot be null.", nameof(code));
-            Code = code;
+            Code = code.Trim();
         }
 
         public void SetName(string name)
@@ -186,6 +186,13 @@ namespace Domain.Model
         {
             ArgumentNullException.ThrowIfNull(area);
             Area = area;
+        }
+
+        public static DateTime? CalculateNextCalibrationDate(DateTime? lastCalibrationDate, int? frequencyMonths)
+        {
+            return lastCalibrationDate.HasValue && frequencyMonths.HasValue
+                ? lastCalibrationDate.Value.AddMonths(frequencyMonths.Value)
+                : null;
         }
     }
 }

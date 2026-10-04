@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -93,26 +93,22 @@ namespace WindowsForms
             LocationDTO newLocation = new LocationDTO();
             LocationDetail locationDetail = new LocationDetail(FormMode.Create, newLocation);
 
-            locationDetail.ShowDialog();
+            locationDetail.ShowDialog(this);
             await LoadLocations();
         }
 
         private async void updateButton_Click(object sender, EventArgs e)
         {
+            LocationDTO? selected = this.SelectedItem();
+            if (selected == null) return;
             try
             {
                 DisableControls();
 
-                var selected = this.SelectedItem();
-                if (selected == null)
-                {
-                    MessageBox.Show("Seleccioná una fila primero.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
                 LocationDTO location = await LocationApiClient.GetAsync(selected.Id);
 
                 LocationDetail locationDetail = new LocationDetail(FormMode.Update, location);
-                locationDetail.ShowDialog();
+                locationDetail.ShowDialog(this);
                 await LoadLocations();
 
             }
@@ -128,22 +124,17 @@ namespace WindowsForms
 
         private async void deleteButton_Click(object sender, EventArgs e)
         {
-            var selected = this.SelectedItem();
+            LocationDTO? location = this.SelectedItem();
+            if (location == null) return;
 
-            if (selected == null)
-            {
-                MessageBox.Show("Seleccioná una fila primero.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            var result = MessageBox.Show($"¿Are you sure you want to delete this item: {selected.Name} {selected.Address}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = MessageBox.Show($"¿Are you sure you want to delete this item: {location.Name} {location.Address}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
             {
                 try
                 {
                     DisableControls();
-                    await LocationApiClient.DeleteAsync(selected.Id);
+                    await LocationApiClient.DeleteAsync(location.Id);
                     await LoadLocations();
 
                 }
@@ -200,8 +191,12 @@ namespace WindowsForms
 
         private LocationDTO? SelectedItem()
         {
+            LocationDTO location;
             if (locationsDataGridView.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Please select a location first.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
+            }
 
             return (LocationDTO)locationsDataGridView.SelectedRows[0].DataBoundItem;
         }

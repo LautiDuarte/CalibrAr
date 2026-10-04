@@ -42,6 +42,7 @@
             areasDataGridView.Name = "areasDataGridView";
             areasDataGridView.Size = new Size(776, 406);
             areasDataGridView.TabIndex = 0;
+            areasDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             // 
             // deleteButton
             // 
@@ -51,6 +52,7 @@
             deleteButton.TabIndex = 1;
             deleteButton.Text = "Delete";
             deleteButton.UseVisualStyleBackColor = true;
+            deleteButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             deleteButton.Click += deleteButton_Click;
             // 
             // updateButton
@@ -61,6 +63,7 @@
             updateButton.TabIndex = 2;
             updateButton.Text = "Update";
             updateButton.UseVisualStyleBackColor = true;
+            updateButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             updateButton.Click += updateButton_Click;
             // 
             // createButton
@@ -71,6 +74,7 @@
             createButton.TabIndex = 3;
             createButton.Text = "Create";
             createButton.UseVisualStyleBackColor = true;
+            createButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             createButton.Click += createButton_Click;
             // 
             // AreaList

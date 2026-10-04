@@ -1,6 +1,6 @@
 ﻿namespace WindowsForms
 {
-    partial class InstrumentList
+    partial class CalibrationList
     {
         /// <summary>
         /// Required designer variable.
@@ -29,21 +29,21 @@
         private void InitializeComponent()
         {
 
-            instrumentsDataGridView = new DataGridView();
+            calibrationsDataGridView = new DataGridView();
             createButton = new Button();
             updateButton = new Button();
             deleteButton = new Button();
-            ((System.ComponentModel.ISupportInitialize)instrumentsDataGridView).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)calibrationsDataGridView).BeginInit();
             SuspendLayout();
             // 
-            // instrumentsDataGridView
+            // calibrationsDataGridView
             // 
-            instrumentsDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            instrumentsDataGridView.Location = new Point(12, 52);
-            instrumentsDataGridView.Name = "instrumentsDataGridView";
-            instrumentsDataGridView.Size = new Size(1442, 472);
-            instrumentsDataGridView.TabIndex = 0;
-            instrumentsDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            calibrationsDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            calibrationsDataGridView.Location = new Point(12, 52);
+            calibrationsDataGridView.Name = "calibrationsDataGridView";
+            calibrationsDataGridView.Size = new Size(1442, 472);
+            calibrationsDataGridView.TabIndex = 0;
+            calibrationsDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             // 
             // createButton
             // 
@@ -78,7 +78,7 @@
             deleteButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             deleteButton.Click += deleteButton_Click;
             // 
-            // InstrumentList
+            // CalibrationList
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -86,17 +86,17 @@
             Controls.Add(deleteButton);
             Controls.Add(updateButton);
             Controls.Add(createButton);
-            Controls.Add(instrumentsDataGridView);
-            Name = "InstrumentList";
-            Text = "InstrumentList";
-            Load += InstrumentList_Load;
-            ((System.ComponentModel.ISupportInitialize)instrumentsDataGridView).EndInit();
+            Controls.Add(calibrationsDataGridView);
+            Name = "CalibrationList";
+            Text = "CalibrationList";
+            Load += CalibrationList_Load;
+            ((System.ComponentModel.ISupportInitialize)calibrationsDataGridView).EndInit();
             ResumeLayout(false);
         }
 
         #endregion
 
-        private DataGridView instrumentsDataGridView;
+        private DataGridView calibrationsDataGridView;
         private Button createButton;
         private Button updateButton;
         private Button deleteButton;

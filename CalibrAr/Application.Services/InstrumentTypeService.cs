@@ -13,11 +13,13 @@ namespace Application.Services
     {
         private readonly IInstrumentTypeRepository instrumentTypeRepository;
         private readonly IInstrumentRepository instrumentRepository;
+        private readonly IInstrumentService instrumentService;
 
-        public InstrumentTypeService(IInstrumentTypeRepository instrumentTypeRepository, IInstrumentRepository instrumentRepository)
+        public InstrumentTypeService(IInstrumentTypeRepository instrumentTypeRepository, IInstrumentRepository instrumentRepository, IInstrumentService instrumentService)
         {
             this.instrumentTypeRepository = instrumentTypeRepository;
             this.instrumentRepository = instrumentRepository;
+            this.instrumentService = instrumentService;
         }
 
         public async Task<InstrumentTypeDTO> AddAsync(InstrumentTypeDTO dto)
@@ -51,6 +53,39 @@ namespace Application.Services
             if (instrumentType == null)
                 return null;
 
+            return MapToDto(instrumentType);
+        }
+
+        public async Task<IEnumerable<InstrumentTypeDTO>> GetAllAsync()
+        {
+            var instrumentTypes = await instrumentTypeRepository.GetAllAsync();
+            return instrumentTypes.Select(MapToDto);
+        }
+
+        public async Task<bool> UpdateAsync(InstrumentTypeDTO dto)
+        {
+            var existing = await instrumentTypeRepository.GetAsync(dto.Id);
+            if (existing == null)
+                return false;
+
+            // Capturar antes de guardar: el repositorio puede devolver la misma instancia trackeada
+            var previousFrequencyMonths = existing.CalibrationFrequencyMonths;
+
+            InstrumentType instrumentType = new InstrumentType(dto.Id, dto.Name, dto.Description, dto.MeasurementUnit, dto.MaxAllowedError, dto.CalibrationFrequencyMonths, dto.IsActive, existing.CreatedAt);
+            var updated = await instrumentTypeRepository.UpdateAsync(instrumentType);
+            if (!updated)
+                return false;
+
+            // Si cambió la frecuencia del tipo, los instrumentos que la heredan (frecuencia null)
+            // tienen que recalcular su próxima fecha de calibración
+            if (previousFrequencyMonths != dto.CalibrationFrequencyMonths)
+                await instrumentService.RecalculateScheduleForTypeAsync(dto.Id);
+
+            return true;
+        }
+
+        private static InstrumentTypeDTO MapToDto(InstrumentType instrumentType)
+        {
             return new InstrumentTypeDTO
             {
                 Id = instrumentType.Id,
@@ -62,32 +97,6 @@ namespace Application.Services
                 IsActive = instrumentType.IsActive,
                 CreatedAt = instrumentType.CreatedAt
             };
-        }
-
-        public async Task<IEnumerable<InstrumentTypeDTO>> GetAllAsync()
-        {
-            var instrumentTypes = await instrumentTypeRepository.GetAllAsync();
-            return instrumentTypes.Select(instrumentType => new InstrumentTypeDTO
-            {
-                Id = instrumentType.Id,
-                Name = instrumentType.Name,
-                Description = instrumentType.Description,
-                MeasurementUnit = instrumentType.MeasurementUnit,
-                MaxAllowedError = instrumentType.MaxAllowedError,
-                CalibrationFrequencyMonths = instrumentType.CalibrationFrequencyMonths,
-                IsActive = instrumentType.IsActive,
-                CreatedAt = instrumentType.CreatedAt
-            });
-        }
-
-        public async Task<bool> UpdateAsync(InstrumentTypeDTO dto)
-        {
-            var existing = await instrumentTypeRepository.GetAsync(dto.Id);
-            if (existing == null)
-                return false;
-
-            InstrumentType instrumentType = new InstrumentType(dto.Id, dto.Name, dto.Description, dto.MeasurementUnit, dto.MaxAllowedError, dto.CalibrationFrequencyMonths, dto.IsActive, existing.CreatedAt);
-            return await instrumentTypeRepository.UpdateAsync(instrumentType);
         }
     }
 }
