@@ -13,33 +13,50 @@ namespace Application.Services
     {
         private readonly ICalibrationRepository calibrationRepository;
         private readonly IInstrumentRepository instrumentRepository;
+        private readonly IInstrumentTypeRepository instrumentTypeRepository;
         private readonly IProcedureRepository procedureRepository;
         private readonly IUserRepository userRepository;
+        private readonly IInstrumentService instrumentService;
 
-        public CalibrationService(ICalibrationRepository calibrationRepository, IInstrumentRepository instrumentRepository, IProcedureRepository procedureRepository, IUserRepository userRepository)
+        public CalibrationService(
+            ICalibrationRepository calibrationRepository,
+            IInstrumentRepository instrumentRepository,
+            IInstrumentTypeRepository instrumentTypeRepository,
+            IProcedureRepository procedureRepository,
+            IUserRepository userRepository,
+            IInstrumentService instrumentService)
         {
             this.calibrationRepository = calibrationRepository;
             this.instrumentRepository = instrumentRepository;
+            this.instrumentTypeRepository = instrumentTypeRepository;
             this.procedureRepository = procedureRepository;
             this.userRepository = userRepository;
+            this.instrumentService = instrumentService;
         }
 
         public async Task<CalibrationDTO> AddAsync(CalibrationDTO dto)
         {
-            await EnsureInstrumentExistsAsync(dto.InstrumentId);
+            var instrument = await GetInstrumentOrThrowAsync(dto.InstrumentId);
             await EnsureProcedureExistsAsync(dto.ProcedureId);
             await EnsureUserExistsAsync(dto.PerformedByUserId);
             await EnsureUserExistsAsync(dto.ApprovedByUserId);
 
-            var createdAt = DateTime.Now;
+            var now = DateTime.Now;
             var interventionType = ParseEnum<InterventionType>(dto.InterventionType, nameof(dto.InterventionType));
             var result = ParseEnum<Result>(dto.Result, nameof(dto.Result));
-            Calibration calibration = new Calibration(0, dto.CalibrationDate, interventionType, dto.IsExternal, dto.ExternalLab, dto.CertificateNumber, result, dto.RestrictionDetail, dto.NextCalibrationDate, dto.Notes, createdAt, dto.InstrumentId, dto.ProcedureId, dto.PerformedByUserId, dto.ApprovedByUserId);
+
+            Calibration calibration = new Calibration(0, now, interventionType, dto.IsExternal, dto.ExternalLab, dto.CertificateNumber, result, dto.RestrictionDetail, dto.Notes, now, dto.InstrumentId, dto.ProcedureId, dto.PerformedByUserId, dto.ApprovedByUserId);
+
+            var maxAllowedError = await ResolveMaxAllowedErrorAsync(instrument);
+            calibration.SetMeasurements(BuildMeasurements(dto.Measurements, 0, maxAllowedError, resetIds: true));
 
             await calibrationRepository.AddAsync(calibration);
+            await RefreshInstrumentCalibrationDatesAsync(dto.InstrumentId);
 
             dto.Id = calibration.Id;
+            dto.CalibrationDate = calibration.CalibrationDate;
             dto.CreatedAt = calibration.CreatedAt;
+            dto.Measurements = calibration.Measurements.Select(MapMeasurementToDto).ToList();
             FillNavigationNames(dto, calibration);
 
             return dto;
@@ -47,7 +64,15 @@ namespace Application.Services
 
         public async Task<bool> DeleteAsync(int id)
         {
-            return await calibrationRepository.DeleteAsync(id);
+            var existing = await calibrationRepository.GetAsync(id);
+            if (existing == null)
+                return false;
+
+            var deleted = await calibrationRepository.DeleteAsync(id);
+            if (deleted)
+                await RefreshInstrumentCalibrationDatesAsync(existing.InstrumentId);
+
+            return deleted;
         }
 
         public async Task<CalibrationDTO?> GetAsync(int id)
@@ -72,22 +97,76 @@ namespace Application.Services
             if (existing == null)
                 return false;
 
-            await EnsureInstrumentExistsAsync(dto.InstrumentId);
+            var previousInstrumentId = existing.InstrumentId; // capturar antes de guardar
+
+            var instrument = await GetInstrumentOrThrowAsync(dto.InstrumentId);
             await EnsureProcedureExistsAsync(dto.ProcedureId);
             await EnsureUserExistsAsync(dto.PerformedByUserId);
             await EnsureUserExistsAsync(dto.ApprovedByUserId);
 
+            if (dto.CalibrationDate.Date > DateTime.Today)
+                throw new ArgumentException("The calibration date cannot be in the future.", nameof(dto.CalibrationDate));
+
             var interventionType = ParseEnum<InterventionType>(dto.InterventionType, nameof(dto.InterventionType));
             var result = ParseEnum<Result>(dto.Result, nameof(dto.Result));
-            Calibration calibration = new Calibration(dto.Id, dto.CalibrationDate, interventionType, dto.IsExternal, dto.ExternalLab, dto.CertificateNumber, result, dto.RestrictionDetail, dto.NextCalibrationDate, dto.Notes, existing.CreatedAt, dto.InstrumentId, dto.ProcedureId, dto.PerformedByUserId, dto.ApprovedByUserId);
-            return await calibrationRepository.UpdateAsync(calibration);
+
+            Calibration calibration = new Calibration(dto.Id, dto.CalibrationDate, interventionType, dto.IsExternal, dto.ExternalLab, dto.CertificateNumber, result, dto.RestrictionDetail, dto.Notes, existing.CreatedAt, dto.InstrumentId, dto.ProcedureId, dto.PerformedByUserId, dto.ApprovedByUserId);
+
+            var maxAllowedError = await ResolveMaxAllowedErrorAsync(instrument);
+            calibration.SetMeasurements(BuildMeasurements(dto.Measurements, dto.Id, maxAllowedError, resetIds: false));
+
+            var updated = await calibrationRepository.UpdateAsync(calibration);
+            if (!updated)
+                return false;
+
+            await RefreshInstrumentCalibrationDatesAsync(dto.InstrumentId);
+            if (previousInstrumentId != dto.InstrumentId)
+                await RefreshInstrumentCalibrationDatesAsync(previousInstrumentId);
+
+            return true;
         }
 
-        private async Task EnsureInstrumentExistsAsync(int instrumentId)
+        // La última calibración real (fecha máxima) manda; InstrumentService aplica la regla de fechas
+        private async Task RefreshInstrumentCalibrationDatesAsync(int instrumentId)
+        {
+            var latest = await calibrationRepository.GetLatestByInstrumentAsync(instrumentId);
+            if (latest == null)
+                return; // sin calibraciones: no pisar lo que ya tenga el instrumento
+
+            await instrumentService.RecalculateCalibrationScheduleAsync(instrumentId, latest.CalibrationDate);
+        }
+
+        private async Task<Instrument> GetInstrumentOrThrowAsync(int instrumentId)
         {
             var instrument = await instrumentRepository.GetAsync(instrumentId);
             if (instrument == null)
                 throw new KeyNotFoundException($"There is no instrument with id {instrumentId}.");
+            return instrument;
+        }
+
+        // El error del instrumento sobreescribe el del tipo si está definido
+        private async Task<decimal?> ResolveMaxAllowedErrorAsync(Instrument instrument)
+        {
+            if (instrument.MaxAllowedError.HasValue)
+                return instrument.MaxAllowedError;
+
+            var type = await instrumentTypeRepository.GetAsync(instrument.InstrumentTypeId);
+            return type?.MaxAllowedError;
+        }
+
+        private static List<CalibrationMeasurement> BuildMeasurements(IEnumerable<CalibrationMeasurementDTO>? dtos, int calibrationId, decimal? maxAllowedError, bool resetIds)
+        {
+            var list = dtos?.ToList() ?? new List<CalibrationMeasurementDTO>();
+
+            if (list.Count > 0 && !maxAllowedError.HasValue)
+                throw new ArgumentException("Neither the instrument nor its type define a maximum allowed error, so the measurements cannot be evaluated.", nameof(dtos));
+
+            return list.Select(m =>
+            {
+                var error = m.MeasuredValue - m.NominalValue;
+                var isWithinTolerance = Math.Abs(error) <= maxAllowedError!.Value;
+                return new CalibrationMeasurement(resetIds ? 0 : m.Id, m.NominalValue, m.MeasuredValue, error, isWithinTolerance, m.Notes, calibrationId);
+            }).ToList();
         }
 
         private async Task EnsureProcedureExistsAsync(int? procedureId)
@@ -123,6 +202,20 @@ namespace Application.Services
             dto.ApprovedByUserName = calibration.ApprovedByUser?.FullName;
         }
 
+        private static CalibrationMeasurementDTO MapMeasurementToDto(CalibrationMeasurement m)
+        {
+            return new CalibrationMeasurementDTO
+            {
+                Id = m.Id,
+                NominalValue = m.NominalValue,
+                MeasuredValue = m.MeasuredValue,
+                Error = m.Error,
+                IsWithinTolerance = m.IsWithinTolerance,
+                Notes = m.Notes,
+                CalibrationId = m.CalibrationId
+            };
+        }
+
         private static CalibrationDTO MapToDto(Calibration calibration)
         {
             var dto = new CalibrationDTO
@@ -135,13 +228,14 @@ namespace Application.Services
                 CertificateNumber = calibration.CertificateNumber,
                 Result = calibration.Result.ToString(),
                 RestrictionDetail = calibration.RestrictionDetail,
-                NextCalibrationDate = calibration.NextCalibrationDate,
                 Notes = calibration.Notes,
                 CreatedAt = calibration.CreatedAt,
                 InstrumentId = calibration.InstrumentId,
                 ProcedureId = calibration.ProcedureId,
                 PerformedByUserId = calibration.PerformedByUserId,
-                ApprovedByUserId = calibration.ApprovedByUserId
+                ApprovedByUserId = calibration.ApprovedByUserId,
+                Measurements = calibration.Measurements?.Select(MapMeasurementToDto).ToList()
+                               ?? new List<CalibrationMeasurementDTO>()
             };
             FillNavigationNames(dto, calibration);
             return dto;

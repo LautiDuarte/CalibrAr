@@ -33,10 +33,8 @@
             codeLabel = new Label();
             nameLabel = new Label();
             nameTextBox = new TextBox();
-            lastCalibrationDateTimePicker = new DateTimePicker();
             serialNumberTextBox = new TextBox();
             serialNumberLabel = new Label();
-            lastCalibrationDateLabel = new Label();
             brandLabel = new Label();
             brandTextBox = new TextBox();
             modelLabel = new Label();
@@ -47,8 +45,6 @@
             calibrationFrequencyMonthsLabel = new Label();
             maxAllowedErrorTextBox = new TextBox();
             calibrationFrequencyMonthsTextBox = new TextBox();
-            nextCalibrationDateLabel = new Label();
-            nextCalibrationDateTimePicker = new DateTimePicker();
             instrumentTypeLabel = new Label();
             instrumentTypeComboBox = new ComboBox();
             areaLabel = new Label();
@@ -56,6 +52,7 @@
             cancelButton = new Button();
             saveButton = new Button();
             errorProvider = new ErrorProvider(components);
+            InstrumentTypeWarningLabel = new Label();
             ((System.ComponentModel.ISupportInitialize)errorProvider).BeginInit();
             SuspendLayout();
             // 
@@ -91,13 +88,6 @@
             nameTextBox.Size = new Size(166, 23);
             nameTextBox.TabIndex = 3;
             // 
-            // lastCalibrationDateTimePicker
-            // 
-            lastCalibrationDateTimePicker.Location = new Point(165, 248);
-            lastCalibrationDateTimePicker.Name = "lastCalibrationDateTimePicker";
-            lastCalibrationDateTimePicker.Size = new Size(200, 23);
-            lastCalibrationDateTimePicker.TabIndex = 4;
-            // 
             // serialNumberTextBox
             // 
             serialNumberTextBox.Location = new Point(128, 73);
@@ -113,15 +103,6 @@
             serialNumberLabel.Size = new Size(82, 15);
             serialNumberLabel.TabIndex = 6;
             serialNumberLabel.Text = "Serial Number";
-            // 
-            // lastCalibrationDateLabel
-            // 
-            lastCalibrationDateLabel.AutoSize = true;
-            lastCalibrationDateLabel.Location = new Point(40, 254);
-            lastCalibrationDateLabel.Name = "lastCalibrationDateLabel";
-            lastCalibrationDateLabel.Size = new Size(114, 15);
-            lastCalibrationDateLabel.TabIndex = 7;
-            lastCalibrationDateLabel.Text = "Last time calibration";
             // 
             // brandLabel
             // 
@@ -204,26 +185,10 @@
             calibrationFrequencyMonthsTextBox.Size = new Size(100, 23);
             calibrationFrequencyMonthsTextBox.TabIndex = 17;
             // 
-            // nextCalibrationDateLabel
-            // 
-            nextCalibrationDateLabel.AutoSize = true;
-            nextCalibrationDateLabel.Location = new Point(40, 285);
-            nextCalibrationDateLabel.Name = "nextCalibrationDateLabel";
-            nextCalibrationDateLabel.Size = new Size(120, 15);
-            nextCalibrationDateLabel.TabIndex = 18;
-            nextCalibrationDateLabel.Text = "Next Calibration Date";
-            // 
-            // nextCalibrationDateTimePicker
-            // 
-            nextCalibrationDateTimePicker.Location = new Point(165, 279);
-            nextCalibrationDateTimePicker.Name = "nextCalibrationDateTimePicker";
-            nextCalibrationDateTimePicker.Size = new Size(200, 23);
-            nextCalibrationDateTimePicker.TabIndex = 19;
-            // 
             // instrumentTypeLabel
             // 
             instrumentTypeLabel.AutoSize = true;
-            instrumentTypeLabel.Location = new Point(40, 311);
+            instrumentTypeLabel.Location = new Point(40, 285);
             instrumentTypeLabel.Name = "instrumentTypeLabel";
             instrumentTypeLabel.Size = new Size(92, 15);
             instrumentTypeLabel.TabIndex = 21;
@@ -232,7 +197,7 @@
             // instrumentTypeComboBox
             // 
             instrumentTypeComboBox.FormattingEnabled = true;
-            instrumentTypeComboBox.Location = new Point(138, 308);
+            instrumentTypeComboBox.Location = new Point(138, 282);
             instrumentTypeComboBox.Name = "instrumentTypeComboBox";
             instrumentTypeComboBox.Size = new Size(121, 23);
             instrumentTypeComboBox.TabIndex = 22;
@@ -240,7 +205,7 @@
             // areaLabel
             // 
             areaLabel.AutoSize = true;
-            areaLabel.Location = new Point(40, 340);
+            areaLabel.Location = new Point(40, 249);
             areaLabel.Name = "areaLabel";
             areaLabel.Size = new Size(31, 15);
             areaLabel.TabIndex = 23;
@@ -249,14 +214,14 @@
             // areaComboBox
             // 
             areaComboBox.FormattingEnabled = true;
-            areaComboBox.Location = new Point(77, 337);
+            areaComboBox.Location = new Point(77, 246);
             areaComboBox.Name = "areaComboBox";
             areaComboBox.Size = new Size(121, 23);
             areaComboBox.TabIndex = 24;
             // 
             // cancelButton
             // 
-            cancelButton.Location = new Point(713, 415);
+            cancelButton.Location = new Point(721, 333);
             cancelButton.Name = "cancelButton";
             cancelButton.Size = new Size(75, 23);
             cancelButton.TabIndex = 25;
@@ -266,7 +231,7 @@
             // 
             // saveButton
             // 
-            saveButton.Location = new Point(632, 415);
+            saveButton.Location = new Point(640, 333);
             saveButton.Name = "saveButton";
             saveButton.Size = new Size(75, 23);
             saveButton.TabIndex = 26;
@@ -278,19 +243,29 @@
             // 
             errorProvider.ContainerControl = this;
             // 
-            // IntrumentDetail
+            // InstrumentTypeWarningLabel
+            // 
+            InstrumentTypeWarningLabel.AutoSize = true;
+            InstrumentTypeWarningLabel.Font = new Font("Segoe UI", 6F, FontStyle.Italic);
+            InstrumentTypeWarningLabel.ForeColor = Color.Red;
+            InstrumentTypeWarningLabel.Location = new Point(40, 308);
+            InstrumentTypeWarningLabel.Name = "InstrumentTypeWarningLabel";
+            InstrumentTypeWarningLabel.Size = new Size(121, 11);
+            InstrumentTypeWarningLabel.TabIndex = 27;
+            InstrumentTypeWarningLabel.Text = "Instrument type cannot be changed after creation.";
+            // 
+            // InstrumentDetail
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 448);
+            ClientSize = new Size(800, 359);
+            Controls.Add(InstrumentTypeWarningLabel);
             Controls.Add(saveButton);
             Controls.Add(cancelButton);
             Controls.Add(areaComboBox);
             Controls.Add(areaLabel);
             Controls.Add(instrumentTypeComboBox);
             Controls.Add(instrumentTypeLabel);
-            Controls.Add(nextCalibrationDateTimePicker);
-            Controls.Add(nextCalibrationDateLabel);
             Controls.Add(calibrationFrequencyMonthsTextBox);
             Controls.Add(maxAllowedErrorTextBox);
             Controls.Add(calibrationFrequencyMonthsLabel);
@@ -301,15 +276,14 @@
             Controls.Add(modelLabel);
             Controls.Add(brandTextBox);
             Controls.Add(brandLabel);
-            Controls.Add(lastCalibrationDateLabel);
             Controls.Add(serialNumberLabel);
             Controls.Add(serialNumberTextBox);
-            Controls.Add(lastCalibrationDateTimePicker);
             Controls.Add(nameTextBox);
             Controls.Add(nameLabel);
             Controls.Add(codeLabel);
             Controls.Add(codeTextBox);
-            Name = "IntrumentDetail";
+            Name = "InstrumentDetail";
+            StartPosition = FormStartPosition.CenterParent;
             Text = "IntrumentDetail";
             Load += IntrumentDetail_Load;
             ((System.ComponentModel.ISupportInitialize)errorProvider).EndInit();
@@ -323,10 +297,8 @@
         private Label codeLabel;
         private Label nameLabel;
         private TextBox nameTextBox;
-        private DateTimePicker lastCalibrationDateTimePicker;
         private TextBox serialNumberTextBox;
         private Label serialNumberLabel;
-        private Label lastCalibrationDateLabel;
         private Label brandLabel;
         private TextBox brandTextBox;
         private Label modelLabel;
@@ -337,8 +309,6 @@
         private Label calibrationFrequencyMonthsLabel;
         private TextBox maxAllowedErrorTextBox;
         private TextBox calibrationFrequencyMonthsTextBox;
-        private Label nextCalibrationDateLabel;
-        private DateTimePicker nextCalibrationDateTimePicker;
         private Label instrumentTypeLabel;
         private ComboBox instrumentTypeComboBox;
         private Label areaLabel;
@@ -346,5 +316,6 @@
         private Button cancelButton;
         private Button saveButton;
         private ErrorProvider errorProvider;
+        private Label InstrumentTypeWarningLabel;
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -122,26 +122,22 @@ namespace WindowsForms
             InstrumentTypeDTO newInstrumentType = new InstrumentTypeDTO();
             InstrumentTypeDetail instrumentTypeDetail = new InstrumentTypeDetail(FormMode.Create, newInstrumentType);
 
-            instrumentTypeDetail.ShowDialog();
+            instrumentTypeDetail.ShowDialog(this);
             await this.LoadInstrumentTypes();
         }
 
         private async void updateButton_Click(object sender, EventArgs e)
         {
+            InstrumentTypeDTO? selected = this.SelectedItem();
+            if (selected == null) return;
             try
             {
                 DisableControls();
-                var selected = this.SelectedItem();
-                if (selected == null)
-                {
-                    MessageBox.Show("Seleccioná una fila primero.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
 
                 InstrumentTypeDTO instrumentType = await InstrumentTypeApiClient.GetAsync(selected.Id);
 
                 InstrumentTypeDetail instrumentTypeDetail = new InstrumentTypeDetail(FormMode.Update, instrumentType);
-                instrumentTypeDetail.ShowDialog();
+                instrumentTypeDetail.ShowDialog(this);
                 await this.LoadInstrumentTypes();
 
             }
@@ -157,12 +153,9 @@ namespace WindowsForms
 
         private async void deleteButton_Click(object sender, EventArgs e)
         {
-            var instrumentType = this.SelectedItem();
-            if (instrumentType == null)
-            {
-                MessageBox.Show("Seleccioná una fila primero.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            InstrumentTypeDTO instrumentType = this.SelectedItem();
+            if (instrumentType == null) return;
+
             var result = MessageBox.Show($"¿Are you sure you want to delete this item: {instrumentType.Name}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
@@ -227,8 +220,12 @@ namespace WindowsForms
 
         private InstrumentTypeDTO? SelectedItem()
         {
-            if (instrumentTypesDataGridView.SelectedRows.Count == 0)
+            InstrumentTypeDTO instrumentType;
+            if(instrumentTypesDataGridView.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Please select an instrument type first.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
+            }
 
             return (InstrumentTypeDTO)instrumentTypesDataGridView.SelectedRows[0].DataBoundItem;
         }

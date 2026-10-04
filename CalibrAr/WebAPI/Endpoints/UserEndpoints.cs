@@ -54,9 +54,8 @@ namespace WebAPI
             .WithOpenApi()
             .RequireAuthorization("UsersCreate");
 
-            app.MapPut("/users/{id}", async (int id, UserDTO dto, IUserService userService) =>
+            app.MapPut("/users", async (UserDTO dto, IUserService userService) =>
             {
-                dto.Id = id;
                 try
                 {
                     var updated = await userService.UpdateAsync(dto);

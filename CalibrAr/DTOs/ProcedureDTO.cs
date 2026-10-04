@@ -16,6 +16,6 @@ namespace DTOs
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
         public int InstrumentTypeId { get; set; }
-        public string? InstrumentTypeName { get; set; }
+        public string InstrumentTypeName { get; set; }
     }
 }

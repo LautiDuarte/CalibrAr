@@ -58,9 +58,8 @@ namespace WebAPI
             .WithOpenApi()
             .RequireAuthorization("CalibrationsCreate");
 
-            app.MapPut("/calibrations/{id}", async (int id, CalibrationDTO dto, ICalibrationService calibrationService) =>
+            app.MapPut("/calibrations", async (CalibrationDTO dto, ICalibrationService calibrationService) =>
             {
-                dto.Id = id;
                 try
                 {
                     var updated = await calibrationService.UpdateAsync(dto);

@@ -16,7 +16,6 @@ namespace Domain.Model
         public string? CertificateNumber { get; private set; }
         public Result Result { get; private set; }
         public string? RestrictionDetail { get; private set; }
-        public DateTime NextCalibrationDate { get; private set; }
         public string? Notes { get; private set; }
         public DateTime CreatedAt { get; private set; }
         private int _instrumentId;
@@ -87,7 +86,9 @@ namespace Domain.Model
 
         public virtual ICollection<ReferenceStandard> ReferenceStandards { get; private set; } = new List<ReferenceStandard>();
 
-        public Calibration(int id, DateTime calibrationDate, InterventionType interventionType, bool isExternal, string? externalLab, string? certificateNumber, Result result, string? restrictionDetail, DateTime nextCalibrationDate, string? notes, DateTime createdAt, int instrumentId, int? procedureId, int? performedByUserId, int? approvedByUserId)
+        public virtual ICollection<CalibrationMeasurement> Measurements { get; private set; } = new List<CalibrationMeasurement>();
+
+        public Calibration(int id, DateTime calibrationDate, InterventionType interventionType, bool isExternal, string? externalLab, string? certificateNumber, Result result, string? restrictionDetail, string? notes, DateTime createdAt, int instrumentId, int? procedureId, int? performedByUserId, int? approvedByUserId)
         {
             SetId(id);
             SetCalibrationDate(calibrationDate);
@@ -97,7 +98,6 @@ namespace Domain.Model
             SetCertificateNumber(certificateNumber);
             SetResult(result);
             SetRestrictionDetail(restrictionDetail);
-            SetNextCalibrationDate(nextCalibrationDate);
             SetNotes(notes);
             SetCreatedAt(createdAt);
             SetInstrumentId(instrumentId);
@@ -150,13 +150,6 @@ namespace Domain.Model
         public void SetRestrictionDetail(string? restrictionDetail)
         {
             RestrictionDetail = restrictionDetail;
-        }
-
-        public void SetNextCalibrationDate(DateTime nextCalibrationDate)
-        {
-            if (nextCalibrationDate == default)
-                throw new ArgumentException("Next calibration date cannot be null.", nameof(nextCalibrationDate));
-            NextCalibrationDate = nextCalibrationDate;
         }
 
         public void SetNotes(string? notes)
@@ -229,6 +222,12 @@ namespace Domain.Model
         {
             ArgumentNullException.ThrowIfNull(approvedByUser);
             ApprovedByUser = approvedByUser;
+        }
+
+        public void SetMeasurements(IEnumerable<CalibrationMeasurement> measurements)
+        {
+            ArgumentNullException.ThrowIfNull(measurements);
+            Measurements = measurements.ToList();
         }
     }
 }

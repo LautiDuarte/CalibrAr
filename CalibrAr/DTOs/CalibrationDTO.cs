@@ -16,7 +16,6 @@ namespace DTOs
         public string? CertificateNumber { get; set; }
         public string Result { get; set; } = string.Empty;
         public string? RestrictionDetail { get; set; }
-        public DateTime NextCalibrationDate { get; set; }
         public string? Notes { get; set; }
         public DateTime CreatedAt { get; set; }
         public int InstrumentId { get; set; }
@@ -27,5 +26,6 @@ namespace DTOs
         public string? PerformedByUserName { get; set; }
         public int? ApprovedByUserId { get; set; }
         public string? ApprovedByUserName { get; set; }
+        public List<CalibrationMeasurementDTO> Measurements { get; set; } = new List<CalibrationMeasurementDTO>();
     }
 }
