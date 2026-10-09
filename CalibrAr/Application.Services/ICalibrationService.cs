@@ -14,5 +14,6 @@ namespace Application.Services
         Task<CalibrationDTO?> GetAsync(int id);
         Task<IEnumerable<CalibrationDTO>> GetAllAsync();
         Task<bool> UpdateAsync(CalibrationDTO dto);
+        Task<bool> ApproveAsync(int id, int approverUserId);
     }
 }

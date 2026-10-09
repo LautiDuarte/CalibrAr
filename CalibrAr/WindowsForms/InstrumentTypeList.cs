@@ -167,8 +167,6 @@ namespace WindowsForms
                 {
                     DisableControls();
                     await instrumentTypeApiClient.DeleteAsync(instrumentType.Id);
-                    await this.LoadInstrumentTypes();
-
                 }
                 catch (Exception ex)
                 {
@@ -176,7 +174,7 @@ namespace WindowsForms
                 }
                 finally
                 {
-                    EnableControls();
+                    await this.LoadInstrumentTypes();
                 }
             }
         }

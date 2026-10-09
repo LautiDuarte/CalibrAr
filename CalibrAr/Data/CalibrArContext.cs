@@ -281,7 +281,7 @@ namespace Data
                 entity.HasOne(e => e.Instrument)
                       .WithMany()
                       .HasForeignKey(e => e.InstrumentId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.Cascade);
                 entity.HasOne(e => e.Procedure)
                       .WithMany()
                       .HasForeignKey(e => e.ProcedureId)
@@ -289,11 +289,11 @@ namespace Data
                 entity.HasOne(e => e.PerformedByUser)
                       .WithMany()
                       .HasForeignKey(e => e.PerformedByUserId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.NoAction);
                 entity.HasOne(e => e.ApprovedByUser)
                       .WithMany()
                       .HasForeignKey(e => e.ApprovedByUserId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<CalibrationMeasurement>(entity =>
@@ -419,49 +419,48 @@ namespace Data
                 new { Id = 14, Name = "create", Description = "Create calibrations", Category = "Calibrations", IsActive = true },
                 new { Id = 15, Name = "update", Description = "Update calibrations", Category = "Calibrations", IsActive = true },
                 new { Id = 16, Name = "delete", Description = "Delete calibrations", Category = "Calibrations", IsActive = true },
-                new { Id = 17, Name = "approve", Description = "Approve calibrations", Category = "Calibrations", IsActive = true },
 
                 // Permisos para Users
-                new { Id = 18, Name = "read", Description = "Read users", Category = "Users", IsActive = true },
-                new { Id = 19, Name = "create", Description = "Create users", Category = "Users", IsActive = true },
-                new { Id = 20, Name = "update", Description = "Update users", Category = "Users", IsActive = true },
-                new { Id = 21, Name = "delete", Description = "Delete users", Category = "Users", IsActive = true },
+                new { Id = 17, Name = "read", Description = "Read users", Category = "Users", IsActive = true },
+                new { Id = 18, Name = "create", Description = "Create users", Category = "Users", IsActive = true },
+                new { Id = 19, Name = "update", Description = "Update users", Category = "Users", IsActive = true },
+                new { Id = 20, Name = "delete", Description = "Delete users", Category = "Users", IsActive = true },
 
                 // Permisos para InstrumentTypes
-                new { Id = 22, Name = "read", Description = "Read instrument types", Category = "InstrumentTypes", IsActive = true },
-                new { Id = 23, Name = "create", Description = "Create instrument types", Category = "InstrumentTypes", IsActive = true },
-                new { Id = 24, Name = "update", Description = "Update instrument types", Category = "InstrumentTypes", IsActive = true },
-                new { Id = 25, Name = "delete", Description = "Delete instrument types", Category = "InstrumentTypes", IsActive = true },
+                new { Id = 21, Name = "read", Description = "Read instrument types", Category = "InstrumentTypes", IsActive = true },
+                new { Id = 22, Name = "create", Description = "Create instrument types", Category = "InstrumentTypes", IsActive = true },
+                new { Id = 23, Name = "update", Description = "Update instrument types", Category = "InstrumentTypes", IsActive = true },
+                new { Id = 24, Name = "delete", Description = "Delete instrument types", Category = "InstrumentTypes", IsActive = true },
 
                 // Permisos para Procedures
-                new { Id = 26, Name = "read", Description = "Read procedures", Category = "Procedures", IsActive = true },
-                new { Id = 27, Name = "create", Description = "Create procedures", Category = "Procedures", IsActive = true },
-                new { Id = 28, Name = "update", Description = "Update procedures", Category = "Procedures", IsActive = true },
-                new { Id = 29, Name = "delete", Description = "Delete procedures", Category = "Procedures", IsActive = true },
+                new { Id = 25, Name = "read", Description = "Read procedures", Category = "Procedures", IsActive = true },
+                new { Id = 26, Name = "create", Description = "Create procedures", Category = "Procedures", IsActive = true },
+                new { Id = 27, Name = "update", Description = "Update procedures", Category = "Procedures", IsActive = true },
+                new { Id = 28, Name = "delete", Description = "Delete procedures", Category = "Procedures", IsActive = true },
 
                 //Permisos para Nonconformities
-                new { Id = 30, Name = "read", Description = "Read nonconformities", Category = "NonConformities", IsActive = true },
-                new { Id = 31, Name = "create", Description = "Create nonconformities", Category = "NonConformities", IsActive = true },
-                new { Id = 32, Name = "update", Description = "Update nonconformities", Category = "NonConformities", IsActive = true },
-                new { Id = 33, Name = "delete", Description = "Delete nonconformities", Category = "NonConformities", IsActive = true },
+                new { Id = 29, Name = "read", Description = "Read nonconformities", Category = "NonConformities", IsActive = true },
+                new { Id = 30, Name = "create", Description = "Create nonconformities", Category = "NonConformities", IsActive = true },
+                new { Id = 31, Name = "update", Description = "Update nonconformities", Category = "NonConformities", IsActive = true },
+                new { Id = 32, Name = "delete", Description = "Delete nonconformities", Category = "NonConformities", IsActive = true },
 
                 //Permisos para Reference standards
-                new { Id = 34, Name = "read", Description = "Read reference standards", Category = "ReferenceStandards", IsActive = true },
-                new { Id = 35, Name = "create", Description = "Create reference standards", Category = "ReferenceStandards", IsActive = true },
-                new { Id = 36, Name = "update", Description = "Update reference standards", Category = "ReferenceStandards", IsActive = true },
-                new { Id = 37, Name = "delete", Description = "Delete reference standards", Category = "ReferenceStandards", IsActive = true },
+                new { Id = 33, Name = "read", Description = "Read reference standards", Category = "ReferenceStandards", IsActive = true },
+                new { Id = 34, Name = "create", Description = "Create reference standards", Category = "ReferenceStandards", IsActive = true },
+                new { Id = 35, Name = "update", Description = "Update reference standards", Category = "ReferenceStandards", IsActive = true },
+                new { Id = 36, Name = "delete", Description = "Delete reference standards", Category = "ReferenceStandards", IsActive = true },
 
                 //Permisos para Instrument status history
-                new { Id = 38, Name = "read", Description = "Read instrument status history", Category = "InstrumentStatusHistory", IsActive = true },
-                new { Id = 39, Name = "create", Description = "Create instrument status history", Category = "InstrumentStatusHistory", IsActive = true },
-                new { Id = 40, Name = "update", Description = "Update instrument status history", Category = "InstrumentStatusHistory", IsActive = true },
-                new { Id = 41, Name = "delete", Description = "Delete instrument status history", Category = "InstrumentStatusHistory", IsActive = true },
+                new { Id = 37, Name = "read", Description = "Read instrument status history", Category = "InstrumentStatusHistory", IsActive = true },
+                new { Id = 38, Name = "create", Description = "Create instrument status history", Category = "InstrumentStatusHistory", IsActive = true },
+                new { Id = 39, Name = "update", Description = "Update instrument status history", Category = "InstrumentStatusHistory", IsActive = true },
+                new { Id = 40, Name = "delete", Description = "Delete instrument status history", Category = "InstrumentStatusHistory", IsActive = true },
 
                 //Permisos para Calibration Measurements
-                new { Id = 42, Name = "read", Description = "Read calibration measurements", Category = "CalibrationMeasurements", IsActive = true },
-                new { Id = 43, Name = "create", Description = "Create calibration measurements", Category = "CalibrationMeasurements", IsActive = true },
-                new { Id = 44, Name = "update", Description = "Update calibration measurements", Category = "CalibrationMeasurements", IsActive = true },
-                new { Id = 45, Name = "delete", Description = "Delete calibration measurements", Category = "CalibrationMeasurements", IsActive = true }
+                new { Id = 41, Name = "read", Description = "Read calibration measurements", Category = "CalibrationMeasurements", IsActive = true },
+                new { Id = 42, Name = "create", Description = "Create calibration measurements", Category = "CalibrationMeasurements", IsActive = true },
+                new { Id = 43, Name = "update", Description = "Update calibration measurements", Category = "CalibrationMeasurements", IsActive = true },
+                new { Id = 44, Name = "delete", Description = "Delete calibration measurements", Category = "CalibrationMeasurements", IsActive = true }
                 );
 
             modelBuilder.Entity<PermissionGroup>().HasData(
@@ -527,7 +526,7 @@ namespace Data
 
                         var operatorPermissions = allPermissions.Where(
                             p => (p.Category == "Instruments") || 
-                                 (p.Category == "Calibrations" && (p.Name == "read" || p.Name == "create" || p.Name == "update" || p.Name == "delete")) ||
+                                 (p.Category == "Calibrations" && (p.Name == "read" || p.Name == "create")) ||
                                  (p.Category == "CalibrationMeasurements") ||
                                  (p.Category == "NonConformities")
                         ).ToList();

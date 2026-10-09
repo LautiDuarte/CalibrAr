@@ -138,5 +138,28 @@ namespace API.Clients
                 throw new Exception($"Request timed out while updating calibration with ID {calibration.Id}: {ex.Message}.", ex);
             }
         }
+
+        public async Task ApproveAsync(int id, int approverUserId)
+        {
+            try
+            {
+                using var client = await CreateHttpClientAsync();
+                HttpResponseMessage response = await client.PutAsync($"calibrations/{id}/approve/{approverUserId}", null);
+                if (!response.IsSuccessStatusCode)
+                {
+                    ThrowIfUnauthorized(response);
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Failed to approve calibration with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new Exception($"An error occurred while approving calibration with ID {id}: {ex.Message}.", ex);
+            }
+            catch (TaskCanceledException ex)
+            {
+                throw new Exception($"Request timed out while approving calibration with ID {id}: {ex.Message}.", ex);
+            }
+        }
     }
 }

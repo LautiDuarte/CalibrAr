@@ -138,16 +138,15 @@ namespace WindowsForms
                 {
                     DisableControls();
                     await locationApiClient.DeleteAsync(location.Id);
-                    await LoadLocations();
-
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Error deleting location: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
                 }
                 finally
                 {
-                    EnableControls();
+                    await LoadLocations();
                 }
             }
         }

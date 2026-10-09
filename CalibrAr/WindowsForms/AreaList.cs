@@ -144,7 +144,7 @@ namespace WindowsForms
                 {
                     DisableControls();
                     await areaApiClient.DeleteAsync(area.Id);
-                    await LoadAreas();
+                    
 
                 }
                 catch (Exception ex)
@@ -153,7 +153,7 @@ namespace WindowsForms
                 }
                 finally
                 {
-                    EnableControls();
+                    await LoadAreas();
                 }
             }
         }

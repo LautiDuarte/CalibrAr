@@ -104,6 +104,11 @@ namespace Application.Services
             await EnsureUserExistsAsync(dto.PerformedByUserId);
             await EnsureUserExistsAsync(dto.ApprovedByUserId);
 
+            if (dto.ApprovedByUserId.HasValue && (dto.ApprovedByUserId != existing.ApprovedByUserId || dto.PerformedByUserId != existing.PerformedByUserId))
+            {
+                await ValidateApproverAsync(dto.ApprovedByUserId.Value, dto.PerformedByUserId);
+            }
+
             if (dto.CalibrationDate.Date > DateTime.Today)
                 throw new ArgumentException("The calibration date cannot be in the future.", nameof(dto.CalibrationDate));
 
@@ -126,14 +131,55 @@ namespace Application.Services
             return true;
         }
 
+        public async Task<bool> ApproveAsync(int id, int approverUserId)
+        {
+            var existing = await calibrationRepository.GetAsync(id);
+            if (existing == null)
+                return false;
+
+            if (existing.ApprovedByUserId.HasValue)
+                throw new InvalidOperationException("The calibration is already approved.");
+
+            await ValidateApproverAsync(approverUserId, existing.PerformedByUserId);
+
+            var calibration = new Calibration(existing.Id, existing.CalibrationDate, existing.InterventionType, existing.IsExternal,
+                existing.ExternalLab, existing.CertificateNumber, existing.Result, existing.RestrictionDetail, existing.Notes,
+                existing.CreatedAt, existing.InstrumentId, existing.ProcedureId, existing.PerformedByUserId, approverUserId);
+
+            // Las mediciones se conservan como están guardadas: aprobar no recalcula tolerancias
+            calibration.SetMeasurements(existing.Measurements.Select(m =>
+                new CalibrationMeasurement(m.Id, m.NominalValue, m.MeasuredValue, m.Error, m.IsWithinTolerance, m.Notes, existing.Id)));
+
+            return await calibrationRepository.UpdateAsync(calibration);
+        }
+
+        // Reglas para aprobar: el aprobador debe ser Administrador o Responsable,
+        // y solo un Administrador puede aprobar una calibración que él mismo realizó
+        private async Task ValidateApproverAsync(int approverUserId, int? performedByUserId)
+        {
+            var approver = await userRepository.GetAsync(approverUserId);
+            if (approver == null)
+                throw new KeyNotFoundException($"There is no user with id {approverUserId}.");
+
+            if (approver.Role != UserRole.Administrador && approver.Role != UserRole.Responsable)
+                throw new ArgumentException("The user does not have permission to approve calibrations.");
+
+            if (approver.Id == performedByUserId && approver.Role != UserRole.Administrador)
+                throw new ArgumentException("Only an administrator can approve a calibration that they performed.");
+        }
+
         // La última calibración real (fecha máxima) manda; InstrumentService aplica la regla de fechas
         private async Task RefreshInstrumentCalibrationDatesAsync(int instrumentId)
         {
             var latest = await calibrationRepository.GetLatestByInstrumentAsync(instrumentId);
             if (latest == null)
-                return; // sin calibraciones: no pisar lo que ya tenga el instrumento
-
-            await instrumentService.RecalculateCalibrationScheduleAsync(instrumentId, latest.CalibrationDate);
+            {
+                await instrumentService.RecalculateCalibrationScheduleAsync(instrumentId, null);
+            }
+            else
+            {
+                await instrumentService.RecalculateCalibrationScheduleAsync(instrumentId, latest.CalibrationDate);
+            }
         }
 
         private async Task<Instrument> GetInstrumentOrThrowAsync(int instrumentId)

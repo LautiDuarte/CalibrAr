@@ -169,8 +169,6 @@ namespace WindowsForms
                 {
                     DisableControls();
                     await procedureApiClient.DeleteAsync(procedure.Id);
-                    await LoadProcedures();
-
                 }
                 catch (Exception ex)
                 {
@@ -178,7 +176,7 @@ namespace WindowsForms
                 }
                 finally
                 {
-                    EnableControls();
+                    await LoadProcedures();
                 }
             }
         }

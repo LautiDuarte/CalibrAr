@@ -16,11 +16,14 @@ namespace WindowsForms
     public partial class CalibrationList : Form
     {
         private readonly CalibrationApiClient calibrationApiClient = new(AuthServiceProvider.Instance);
+        private readonly UserApiClient userApiClient = new(AuthServiceProvider.Instance);
+        private UserDTO? currentUser;
 
         public CalibrationList()
         {
             InitializeComponent();
             ConfigureColumns();
+
         }
 
         private void ConfigureColumns()
@@ -140,12 +143,96 @@ namespace WindowsForms
                 Width = 150,
                 DefaultCellStyle = { Format = "dd/MM/yyyy HH:mm:ss" }
             });
+            this.calibrationsDataGridView.Columns.Add(new DataGridViewButtonColumn
+            {
+                Name = "Approve",
+                HeaderText = string.Empty,
+                Text = "Approve",
+                UseColumnTextForButtonValue = true,
+                Width = 80
+            });
         }
 
         private async void CalibrationList_Load(object sender, EventArgs e)
         {
             ConfigureButtonPermissions();
+            await LoadCurrentUser();
             await LoadCalibrations();
+        }
+
+        private async Task LoadCurrentUser()
+        {
+            try
+            {
+                string? sessionEmail = AuthServiceProvider.Instance.GetEmail();
+                var users = await userApiClient.GetAllAsync();
+                currentUser = users.FirstOrDefault(u => u.Email == sessionEmail);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading current user: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private bool CanApprove(CalibrationDTO calibration)
+        {
+            if (calibration.ApprovedByUserId.HasValue || currentUser == null)
+                return false;
+
+            if (!AuthServiceProvider.Instance.HasPermission("Calibrations.update"))
+                return false;
+
+            string role = currentUser.Role.ToString();
+            bool isAdmin = role == "Administrador";
+
+            if (!isAdmin && role != "Responsable")
+                return false;
+
+            // Solo un administrador puede aprobar lo que él mismo realizó
+            return isAdmin || calibration.PerformedByUserId != currentUser.Id;
+        }
+
+        private void calibrationsDataGridView_CellPainting(object? sender, DataGridViewCellPaintingEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+            if (calibrationsDataGridView.Columns[e.ColumnIndex].Name != "Approve") return;
+
+            // El DataGridView no permite ocultar el botón por fila: si no se puede aprobar, se pinta la celda vacía
+            if (calibrationsDataGridView.Rows[e.RowIndex].DataBoundItem is CalibrationDTO calibration && !CanApprove(calibration))
+            {
+                e.PaintBackground(e.ClipBounds, (e.State & DataGridViewElementStates.Selected) != 0);
+                e.Handled = true;
+            }
+        }
+
+        private async void calibrationsDataGridView_CellContentClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+            if (calibrationsDataGridView.Columns[e.ColumnIndex].Name != "Approve") return;
+            if (calibrationsDataGridView.Rows[e.RowIndex].DataBoundItem is not CalibrationDTO calibration) return;
+            if (!CanApprove(calibration)) return;
+
+            var result = MessageBox.Show(
+                $"Are you sure you want to approve this calibration: {calibration.InstrumentCode} {calibration.CalibrationDate:dd/MM/yyyy}?",
+                "Confirm approval",
+                MessageBoxButtons.OKCancel,
+                MessageBoxIcon.Question);
+
+            if (result != DialogResult.OK) return;
+
+            try
+            {
+                DisableControls();
+                await calibrationApiClient.ApproveAsync(calibration.Id, currentUser!.Id);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error approving calibration: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                await LoadCalibrations();
+            }
         }
 
         private void ConfigureButtonPermissions()
@@ -161,6 +248,7 @@ namespace WindowsForms
             createButton.Visible = canCreate;
             updateButton.Visible = canUpdate;
             deleteButton.Visible = canDelete;
+            calibrationsDataGridView.Columns["Approve"].Visible = canUpdate;
 
             // Guardar permisos en Tag para uso posterior
             createButton.Tag = canCreate;
@@ -215,8 +303,6 @@ namespace WindowsForms
                 {
                     DisableControls();
                     await calibrationApiClient.DeleteAsync(calibration.Id);
-                    await LoadCalibrations();
-
                 }
                 catch (Exception ex)
                 {
@@ -224,7 +310,7 @@ namespace WindowsForms
                 }
                 finally
                 {
-                    EnableControls();
+                    await LoadCalibrations();
                 }
             }
         }

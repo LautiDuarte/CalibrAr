@@ -225,7 +225,7 @@ namespace WindowsForms
             InstrumentDTO? instrument = this.SelectedItem();
             if (instrument == null) return;
 
-            var result = MessageBox.Show($"¿Are you sure you want to delete this item: {instrument.Code}{instrument.Name}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = MessageBox.Show($"Calibrations associated will be also deleted ¿Are you sure you want to delete this item: {instrument.Code}{instrument.Name}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
             {
@@ -233,8 +233,6 @@ namespace WindowsForms
                 {
                     DisableControls();
                     await instrumentApiClient.DeleteAsync(instrument.Id);
-                    await LoadInstruments();
-
                 }
                 catch (Exception ex)
                 {
@@ -242,7 +240,7 @@ namespace WindowsForms
                 }
                 finally
                 {
-                    EnableControls();
+                    await LoadInstruments();
                 }
             }
         }

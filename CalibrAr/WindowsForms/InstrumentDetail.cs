@@ -98,8 +98,16 @@ namespace WindowsForms
         private async Task LoadAreas()
         {
             var areas = await areaApiClient.GetAllAsync();
-            areaComboBox.DataSource = areas.ToList();
-            areaComboBox.DisplayMember = "Name";
+
+            areaComboBox.DataSource = areas
+                .Select(a => new
+                {
+                    a.Id,
+                    DisplayName = $"{a.Name} ({a.LocationName})"
+                })
+                .ToList();
+
+            areaComboBox.DisplayMember = "DisplayName";
             areaComboBox.ValueMember = "Id";
             areaComboBox.SelectedIndex = -1;
         }

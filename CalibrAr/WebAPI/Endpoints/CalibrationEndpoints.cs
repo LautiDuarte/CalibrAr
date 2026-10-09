@@ -103,6 +103,34 @@ namespace WebAPI
             .Produces(StatusCodes.Status404NotFound)
             .WithOpenApi()
             .RequireAuthorization("CalibrationsDelete");
+
+            app.MapPut("/calibrations/{id}/approve/{approverUserId}", async (int id, int approverUserId, ICalibrationService calibrationService) =>
+            {
+                try
+                {
+                    var approved = await calibrationService.ApproveAsync(id, approverUserId);
+                    return approved ? Results.NoContent() : Results.NotFound();
+                }
+                catch (ArgumentException ex)
+                {
+                    return Results.BadRequest(new { error = ex.Message });
+                }
+                catch (KeyNotFoundException ex)
+                {
+                    return Results.NotFound(new { error = ex.Message });
+                }
+                catch (InvalidOperationException ex)
+                {
+                    return Results.Conflict(new { error = ex.Message });
+                }
+            })
+            .WithName("ApproveCalibration")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status409Conflict)
+            .WithOpenApi()
+            .RequireAuthorization("CalibrationsUpdate");
         }
     }
 }

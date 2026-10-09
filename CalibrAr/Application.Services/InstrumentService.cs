@@ -108,15 +108,22 @@ namespace Application.Services
         }
 
         // Lo llama CalibrationService cuando cambia la �ltima calibraci�n del instrumento
-        public async Task RecalculateCalibrationScheduleAsync(int instrumentId, DateTime? lastCalibrationDate)
+        public async Task RecalculateCalibrationScheduleAsync(int instrumentId, DateTime? lastCalibrationDate = null)
         {
             var instrument = await instrumentRepository.GetAsync(instrumentId);
             if (instrument == null)
                 return;
 
             var effectiveFrequency = await ResolveFrequencyMonthsAsync(instrument.CalibrationFrequencyMonths, instrument.InstrumentTypeId);
-            var nextCalibrationDate = Instrument.CalculateNextCalibrationDate(lastCalibrationDate, effectiveFrequency);
-
+            var nextCalibrationDate = (DateTime?)null;
+            if (lastCalibrationDate == null)
+            {
+                nextCalibrationDate = null;
+            }
+            else
+            {
+                nextCalibrationDate = Instrument.CalculateNextCalibrationDate(lastCalibrationDate, effectiveFrequency);
+            }
             instrument.SetLastCalibrationDate(lastCalibrationDate);
             instrument.SetNextCalibrationDate(nextCalibrationDate);
 
