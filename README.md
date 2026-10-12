@@ -4,7 +4,7 @@ CalibrAr es un sistema de gestión de recursos de seguimiento y medición, dise�
 
 ##Integrantes
 
-- Cardone, Juan Ignacio - Legajo: 50791 - Mail: "juancardone8@gmail.com" <juancardone8@gmail.com>
+- Cardone, Juan Ignacio - Legajo: 50791 - Mail: "juancardone8@gmail.com"
 - Donzino, Yamila - Legajo: 51004 - Mail: yamiladonzino51@gmail.com
 - Duarte, Lautaro - Legajo: 51555 - Mail: lautaroduarte@outlook.es
 
