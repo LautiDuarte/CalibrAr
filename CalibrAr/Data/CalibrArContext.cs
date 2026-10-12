@@ -29,14 +29,10 @@ namespace Data
 
         public CalibrArContext(DbContextOptions<CalibrArContext> options) : base(options)
         {
-            this.Database.EnsureCreated();
-            SeedInitialData();
         }
 
         internal CalibrArContext()
         {
-            this.Database.EnsureCreated();
-            SeedInitialData();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -471,7 +467,7 @@ namespace Data
                 );
         }
 
-        private void SeedInitialData()
+        public void SeedInitialData()
         {
             try
             {
@@ -506,7 +502,9 @@ namespace Data
 
                         var responsiblePermissions = allPermissions.Where(
                             
-                            p => (p.Category == "Locations") || 
+                            p => (p.Category == "Locations") ||
+                                 (p.Category == "Procedures" && p.Name == "read") ||
+                                 (p.Category == "Users" && p.Name == "read") ||
                                  (p.Category == "Areas") || 
                                  (p.Category == "InstrumentTypes") || 
                                  (p.Category == "Instruments") || 
@@ -526,7 +524,10 @@ namespace Data
 
                         var operatorPermissions = allPermissions.Where(
                             p => (p.Category == "Instruments") || 
+                                 (p.Category == "Procedures" && p.Name == "read") ||
                                  (p.Category == "Calibrations" && (p.Name == "read" || p.Name == "create")) ||
+                                 (p.Category == "InstrumentTypes" && p.Name == "read") ||
+                                 (p.Category == "Areas" && p.Name == "read") ||
                                  (p.Category == "CalibrationMeasurements") ||
                                  (p.Category == "NonConformities")
                         ).ToList();

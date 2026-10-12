@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -146,7 +146,7 @@ namespace Application.Services
                 existing.ExternalLab, existing.CertificateNumber, existing.Result, existing.RestrictionDetail, existing.Notes,
                 existing.CreatedAt, existing.InstrumentId, existing.ProcedureId, existing.PerformedByUserId, approverUserId);
 
-            // Las mediciones se conservan como están guardadas: aprobar no recalcula tolerancias
+            // Las mediciones se conservan como estÃ¡n guardadas: aprobar no recalcula tolerancias
             calibration.SetMeasurements(existing.Measurements.Select(m =>
                 new CalibrationMeasurement(m.Id, m.NominalValue, m.MeasuredValue, m.Error, m.IsWithinTolerance, m.Notes, existing.Id)));
 
@@ -154,7 +154,7 @@ namespace Application.Services
         }
 
         // Reglas para aprobar: el aprobador debe ser Administrador o Responsable,
-        // y solo un Administrador puede aprobar una calibración que él mismo realizó
+        // y solo un Administrador puede aprobar una calibraciÃ³n que Ã©l mismo realizÃ³
         private async Task ValidateApproverAsync(int approverUserId, int? performedByUserId)
         {
             var approver = await userRepository.GetAsync(approverUserId);
@@ -168,7 +168,7 @@ namespace Application.Services
                 throw new ArgumentException("Only an administrator can approve a calibration that they performed.");
         }
 
-        // La última calibración real (fecha máxima) manda; InstrumentService aplica la regla de fechas
+        // La Ãºltima calibraciÃ³n real (fecha mÃ¡xima) manda; InstrumentService aplica la regla de fechas
         private async Task RefreshInstrumentCalibrationDatesAsync(int instrumentId)
         {
             var latest = await calibrationRepository.GetLatestByInstrumentAsync(instrumentId);
@@ -190,7 +190,7 @@ namespace Application.Services
             return instrument;
         }
 
-        // El error del instrumento sobreescribe el del tipo si está definido
+        // El error del instrumento sobreescribe el del tipo si estÃ¡ definido
         private async Task<decimal?> ResolveMaxAllowedErrorAsync(Instrument instrument)
         {
             if (instrument.MaxAllowedError.HasValue)

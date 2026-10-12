@@ -31,7 +31,8 @@ namespace WindowsForms
                 Name = "Id",
                 HeaderText = "Id",
                 DataPropertyName = "Id",
-                Width = 80
+                Width = 80,
+                Visible = false
             });
             this.areasDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -108,7 +109,7 @@ namespace WindowsForms
 
         private async void updateButton_Click(object sender, EventArgs e)
         {
-            AreaDTO selected = this.SelectedItem();
+            AreaDTO? selected = this.SelectedItem();
             if (selected == null) return;
             try
             {
@@ -133,7 +134,7 @@ namespace WindowsForms
 
         private async void deleteButton_Click(object sender, EventArgs e)
         {
-            AreaDTO area = this.SelectedItem();
+            AreaDTO? area = this.SelectedItem();
             if(area == null) return;
 
             var result = MessageBox.Show($"¿Are you sure you want to delete this item:{area.Name}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -199,7 +200,6 @@ namespace WindowsForms
 
         private AreaDTO? SelectedItem()
         {
-            AreaDTO area;
             if (areasDataGridView.SelectedRows.Count == 0)
             {
                 MessageBox.Show("Please select an area first.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);

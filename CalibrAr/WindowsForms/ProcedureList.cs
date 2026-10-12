@@ -33,7 +33,8 @@ namespace WindowsForms
                 Name = "Id",
                 HeaderText = "Id",
                 DataPropertyName = "Id",
-                Width = 80
+                Width = 80,
+                Visible = false
             });
 
             this.proceduresDataGridView.Columns.Add(new DataGridViewTextBoxColumn

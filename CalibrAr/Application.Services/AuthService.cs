@@ -43,7 +43,9 @@ namespace Application.Services
             {
                 Token = token,
                 ExpiresAt = expiresAt,
-                Email = user.Email
+                Email = user.Email,
+                UserId = user.Id,
+                Role = user.Role.ToString()
             };
         }
 

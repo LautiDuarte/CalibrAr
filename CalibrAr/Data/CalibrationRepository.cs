@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -104,7 +104,7 @@ namespace Data
         {
             var incomingIds = incoming.Where(m => m.Id != 0).Select(m => m.Id).ToHashSet();
 
-            // Borrar los que ya no est�n
+            // Borrar los que ya no están
             foreach (var removed in existing.Measurements.Where(m => !incomingIds.Contains(m.Id)).ToList())
                 context.CalibrationMeasurements.Remove(removed);
 

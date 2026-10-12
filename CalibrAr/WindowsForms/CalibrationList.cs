@@ -16,8 +16,6 @@ namespace WindowsForms
     public partial class CalibrationList : Form
     {
         private readonly CalibrationApiClient calibrationApiClient = new(AuthServiceProvider.Instance);
-        private readonly UserApiClient userApiClient = new(AuthServiceProvider.Instance);
-        private UserDTO? currentUser;
 
         public CalibrationList()
         {
@@ -35,7 +33,8 @@ namespace WindowsForms
                 Name = "Id",
                 HeaderText = "Id",
                 DataPropertyName = "Id",
-                Width = 80
+                Width = 80,
+                Visible = false
             });
 
             this.calibrationsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
@@ -156,40 +155,28 @@ namespace WindowsForms
         private async void CalibrationList_Load(object sender, EventArgs e)
         {
             ConfigureButtonPermissions();
-            await LoadCurrentUser();
             await LoadCalibrations();
         }
 
-        private async Task LoadCurrentUser()
-        {
-            try
-            {
-                string? sessionEmail = AuthServiceProvider.Instance.GetEmail();
-                var users = await userApiClient.GetAllAsync();
-                currentUser = users.FirstOrDefault(u => u.Email == sessionEmail);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error loading current user: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
 
         private bool CanApprove(CalibrationDTO calibration)
         {
-            if (calibration.ApprovedByUserId.HasValue || currentUser == null)
+            if (calibration.ApprovedByUserId.HasValue)
                 return false;
 
-            if (!AuthServiceProvider.Instance.HasPermission("Calibrations.update"))
+            var authService = AuthServiceProvider.Instance;
+
+            if (!authService.HasPermission("Calibrations.update"))
                 return false;
 
-            string role = currentUser.Role.ToString();
+            string? role = authService.GetRole();
             bool isAdmin = role == "Administrador";
 
             if (!isAdmin && role != "Responsable")
                 return false;
 
             // Solo un administrador puede aprobar lo que él mismo realizó
-            return isAdmin || calibration.PerformedByUserId != currentUser.Id;
+            return isAdmin || calibration.PerformedByUserId != authService.GetUserId();
         }
 
         private void calibrationsDataGridView_CellPainting(object? sender, DataGridViewCellPaintingEventArgs e)
@@ -212,6 +199,8 @@ namespace WindowsForms
             if (calibrationsDataGridView.Rows[e.RowIndex].DataBoundItem is not CalibrationDTO calibration) return;
             if (!CanApprove(calibration)) return;
 
+            int? approverId = AuthServiceProvider.Instance.GetUserId();
+            if (approverId == null) return;
             var result = MessageBox.Show(
                 $"Are you sure you want to approve this calibration: {calibration.InstrumentCode} {calibration.CalibrationDate:dd/MM/yyyy}?",
                 "Confirm approval",
@@ -223,7 +212,7 @@ namespace WindowsForms
             try
             {
                 DisableControls();
-                await calibrationApiClient.ApproveAsync(calibration.Id, currentUser!.Id);
+                await calibrationApiClient.ApproveAsync(calibration.Id, approverId.Value);
             }
             catch (Exception ex)
             {
@@ -354,9 +343,9 @@ namespace WindowsForms
             }
         }
 
-        private CalibrationDTO SelectedItem()
+        private CalibrationDTO? SelectedItem()
         {
-            CalibrationDTO calibration;
+            CalibrationDTO? calibration;
             if (calibrationsDataGridView.SelectedRows.Count == 0)
             {
                 MessageBox.Show("Please select an calibration first.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);

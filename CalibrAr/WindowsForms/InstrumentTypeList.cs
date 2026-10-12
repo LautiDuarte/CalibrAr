@@ -31,7 +31,8 @@ namespace WindowsForms
                 Name = "Id",
                 HeaderText = "Id",
                 DataPropertyName = "Id",
-                Width = 80
+                Width = 80,
+                Visible = false
             });
 
             this.instrumentTypesDataGridView.Columns.Add(new DataGridViewTextBoxColumn
@@ -156,7 +157,7 @@ namespace WindowsForms
 
         private async void deleteButton_Click(object sender, EventArgs e)
         {
-            InstrumentTypeDTO instrumentType = this.SelectedItem();
+            InstrumentTypeDTO? instrumentType = this.SelectedItem();
             if (instrumentType == null) return;
 
             var result = MessageBox.Show($"¿Are you sure you want to delete this item: {instrumentType.Name}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -221,7 +222,6 @@ namespace WindowsForms
 
         private InstrumentTypeDTO? SelectedItem()
         {
-            InstrumentTypeDTO instrumentType;
             if(instrumentTypesDataGridView.SelectedRows.Count == 0)
             {
                 MessageBox.Show("Please select an instrument type first.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);

@@ -23,8 +23,8 @@ namespace WindowsForms
         private static readonly string[] rolesThatCanPerform = { "Administrador", "Responsable", "Operador" };
         private static readonly string[] rolesThatCanApprove = { "Administrador", "Responsable" };
 
-        private CalibrationDTO calibration;
-        private UserDTO? currentUser;
+        private CalibrationDTO calibration = new CalibrationDTO();
+        private int? currentUserId;
         private FormMode mode;
         private List<ProcedureDTO> allProcedures = new List<ProcedureDTO>();
         private List<UserDTO> allUsers = new List<UserDTO>();
@@ -67,6 +67,7 @@ namespace WindowsForms
             try
             {
                 DisableControls();
+                this.Calibration = calibration;
                 this.Mode = mode;
 
                 ConfigureColumns();
@@ -76,6 +77,7 @@ namespace WindowsForms
                 await LoadInstrumentTypes();
                 await LoadInstruments();
                 await LoadProcedures();
+
                 await LoadUsers();
 
                 
@@ -200,19 +202,19 @@ namespace WindowsForms
 
         private async Task LoadUsers()
         {
-            allUsers = (await userApiClient.GetAllAsync()).ToList();
-
             if (this.Mode == FormMode.Create)
             {
-                string? sessionEmail = AuthServiceProvider.Instance.GetEmail();
-                currentUser = allUsers.FirstOrDefault(u => u.Email == sessionEmail);
+                currentUserId = AuthServiceProvider.Instance.GetUserId();
 
-                if (currentUser == null)
+                if (currentUserId == null)
                 {
                     MessageBox.Show("Current user not found. Please check your session.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     this.Close();
                 }
+                return;
             }
+
+            allUsers = (await userApiClient.GetAllAsync()).ToList();
         }
 
         private void instrumentComboBox_SelectedIndex(object sender, EventArgs e)
@@ -253,15 +255,17 @@ namespace WindowsForms
                 {
                     DisableControls();
 
-                    this.Calibration.InterventionType = interventionTypeComboBox.SelectedItem.ToString();
+                    this.Calibration.InterventionType = interventionTypeComboBox.SelectedItem?.ToString() ?? string.Empty;
                     this.Calibration.IsExternal = isExternalCheckBox.Checked;
                     this.Calibration.ExternalLab = externalLabTextBox.Text;
                     this.Calibration.CertificateNumber = certificateNumberTextBox.Text;
-                    this.Calibration.Result = resultComboBox.SelectedItem.ToString();
+                    this.Calibration.Result = resultComboBox.SelectedItem?.ToString() ?? string.Empty;
                     this.Calibration.RestrictionDetail = restrictionDetailTextBox.Text;
                     this.Calibration.Notes = notesTextBox.Text;
                     this.Calibration.CalibrationDate = this.Mode == FormMode.Create ? DateTime.Now : calibrationDateTimePicker.Value;
-                    this.Calibration.InstrumentId = (int)instrumentComboBox.SelectedValue;
+                    this.Calibration.InstrumentId = instrumentComboBox.SelectedValue is int instrumentId
+                        ? instrumentId
+                        : throw new InvalidOperationException("Instrumento no seleccionado.");
                     this.Calibration.Measurements = measurementsLocales.ToList();
 
                     this.Calibration.ProcedureId = procedureComboBox.SelectedValue == null
@@ -270,7 +274,7 @@ namespace WindowsForms
 
                     if (this.Mode == FormMode.Create)
                     {
-                        this.Calibration.PerformedByUserId = currentUser?.Id;
+                        this.Calibration.PerformedByUserId = currentUserId;
                         this.Calibration.ApprovedByUserId = null;
                     }
                     else
@@ -282,8 +286,14 @@ namespace WindowsForms
                         // Solo si el combo está visible (calibración aprobada). "(None)" = 0 => desaprobar
                         if (approvedByUserComboBox.Visible)
                         {
-                            int approvedId = (int)approvedByUserComboBox.SelectedValue;
-                            this.Calibration.ApprovedByUserId = approvedId == 0 ? null : approvedId;
+                            if (approvedByUserComboBox.SelectedValue is int approvedId)
+                            {
+                                this.Calibration.ApprovedByUserId = approvedId == 0 ? null : approvedId;
+                            }
+                            else
+                            {
+                                this.Calibration.ApprovedByUserId = null;
+                            }
                         }
                     }
 

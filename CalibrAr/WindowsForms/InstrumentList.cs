@@ -32,7 +32,8 @@ namespace WindowsForms
                 Name = "Id",
                 HeaderText = "Id",
                 DataPropertyName = "Id",
-                Width = 80
+                Width = 80,
+                Visible = false
             });
 
             this.instrumentsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
@@ -286,7 +287,6 @@ namespace WindowsForms
 
         private InstrumentDTO? SelectedItem()
         {
-            InstrumentDTO instrument;
             if (instrumentsDataGridView.SelectedRows.Count == 0)
             {
                 MessageBox.Show("Please select an instrument first.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Information);

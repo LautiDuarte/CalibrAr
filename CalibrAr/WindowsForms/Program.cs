@@ -1,4 +1,4 @@
-using API.Clients;
+Ôªøusing API.Clients;
 using API.Auth.WindowsForms;
 
 namespace WindowsForms
@@ -29,7 +29,7 @@ namespace WindowsForms
             var authService = new WindowsFormsAuthService();
             AuthServiceProvider.Register(authService);
 
-            // Loop principal de autenticaciÛn
+            // Loop principal de autenticaci√≥n
             while (true)
             {
 
@@ -38,7 +38,7 @@ namespace WindowsForms
                     var loginForm = new LoginForm();
                     if (loginForm.ShowDialog() != DialogResult.OK)
                     {
-                        // Usuario cancelÛ login, cerrar aplicaciÛn
+                        // Usuario cancel√≥ login, cerrar aplicaci√≥n
                         return;
                     }
                 }
@@ -48,16 +48,16 @@ namespace WindowsForms
                     Application.Run(new Home());
                     if (authService.IsAuthenticated())
                     {
-                        break; // CerrÛ la ventana estando logueado -> salir de la app
+                        break; // Cerr√≥ la ventana estando logueado -> salir de la app
                     }
                     // Si no: hizo logout -> el while sigue y vuelve a mostrar el LoginForm
                 }
                 catch (UnauthorizedAccessException ex)
                 {
-                    // SesiÛn expirada, mostrar mensaje y volver al login
+                    // Sesi√≥n expirada, mostrar mensaje y volver al login
                     MessageBox.Show(ex.Message, "Session expired",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    // El loop continuar· y volver· a mostrar login
+                    // El loop continuar√° y volver√° a mostrar login
                 }
             }
         }
@@ -66,16 +66,16 @@ namespace WindowsForms
         {
             if (e.Exception is UnauthorizedAccessException)
             {
-                // SesiÛn expirada
+                // Sesi√≥n expirada
                 MessageBox.Show("Session has expired. You need to re-authenticate.", "Session Expired",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
-                // Reiniciar la aplicaciÛn para volver al login
+                // Reiniciar la aplicaci√≥n para volver al login
                 Application.Restart();
             }
             else
             {
-                // Otras excepciones, mostrar error genÈrico
+                // Otras excepciones, mostrar error gen√©rico
                 MessageBox.Show($"Unexpected error: {e.Exception.Message}", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }

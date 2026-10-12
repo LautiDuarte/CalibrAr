@@ -31,7 +31,8 @@ namespace WindowsForms
                 Name = "Id",
                 HeaderText = "Id",
                 DataPropertyName = "Id",
-                Width = 80
+                Width = 80,
+                Visible = false
             });
             this.locationsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -193,7 +194,6 @@ namespace WindowsForms
 
         private LocationDTO? SelectedItem()
         {
-            LocationDTO location;
             if (locationsDataGridView.SelectedRows.Count == 0)
             {
                 MessageBox.Show("Please select a location first.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
