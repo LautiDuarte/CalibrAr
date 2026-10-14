@@ -54,9 +54,8 @@ namespace WebAPI
             .WithOpenApi()
             .RequireAuthorization("ReferenceStandardsCreate");
 
-            app.MapPut("/referencestandards/{id}", async (int id, ReferenceStandardDTO dto, IReferenceStandardService referenceStandardService) =>
+            app.MapPut("/referencestandards", async (ReferenceStandardDTO dto, IReferenceStandardService referenceStandardService) =>
             {
-                dto.Id = id;
                 try
                 {
                     var updated = await referenceStandardService.UpdateAsync(dto);
@@ -82,18 +81,26 @@ namespace WebAPI
 
             app.MapDelete("/referencestandards/{id}", async (int id, IReferenceStandardService referenceStandardService) =>
             {
-                var deleted = await referenceStandardService.DeleteAsync(id);
-
-                if (!deleted)
+                try
                 {
-                    return Results.NotFound();
-                }
+                    var deleted = await referenceStandardService.DeleteAsync(id);
 
-                return Results.NoContent();
+                    if (!deleted)
+                    {
+                        return Results.NotFound();
+                    }
+
+                    return Results.NoContent();
+                }
+                catch (InvalidOperationException ex)
+                { 
+                    return Results.Conflict(new { error = ex.Message }); 
+                }
             })
             .WithName("DeleteReferenceStandard")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status409Conflict)
             .WithOpenApi()
             .RequireAuthorization("ReferenceStandardsDelete");
         }

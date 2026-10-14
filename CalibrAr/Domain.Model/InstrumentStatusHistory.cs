@@ -11,11 +11,10 @@ namespace Domain.Model
         public int Id { get; private set; }
         public InstrumentStatus PreviousStatus { get; private set; }
         public InstrumentStatus NewStatus { get; private set; }
-        public string? Reason { get; private set; }
         public DateTime ChangedAt { get; private set; }
-        private int _changedByUserId;
+        private int? _changedByUserId;
         private User? _changedByUser;
-        public int ChangedByUserId
+        public int? ChangedByUserId
         {
             get => _changedByUser?.Id ?? _changedByUserId;
             private set => _changedByUserId = value;
@@ -45,13 +44,12 @@ namespace Domain.Model
                 _instrumentId = value?.Id ?? _instrumentId;
             }
         }
-        public InstrumentStatusHistory(int id, int instrumentId, InstrumentStatus previousStatus, InstrumentStatus newStatus, string? reason, int changedByUserId, DateTime changedAt)
+        public InstrumentStatusHistory(int id, int instrumentId, InstrumentStatus previousStatus, InstrumentStatus newStatus, int? changedByUserId, DateTime changedAt)
         {
             SetId(id);
             SetPreviousStatus(previousStatus);
             SetNewStatus(newStatus);
             SetInstrumentId(instrumentId);
-            SetReason(reason);
             SetChangedByUserId(changedByUserId);
             SetChangedAt(changedAt);
 
@@ -74,11 +72,6 @@ namespace Domain.Model
             NewStatus = newStatus;
         }
 
-        public void SetReason(string? reason)
-        {
-            Reason = reason;
-        }
-
         public void SetChangedAt(DateTime changedAt)
         {
             if (changedAt == default)
@@ -86,12 +79,12 @@ namespace Domain.Model
             ChangedAt = changedAt;
         }
 
-        public void SetChangedByUserId(int changedByUserId)
+        public void SetChangedByUserId(int? changedByUserId)
         {
-            if (changedByUserId < 0)
+            if (changedByUserId.HasValue && changedByUserId <= 0)
                 throw new ArgumentException("The Id from the user who made the change must be greater than 0.", nameof(changedByUserId));
             if (_changedByUser != null && _changedByUser.Id != changedByUserId)
-                ChangedByUser = null; 
+                ChangedByUser = null;
             ChangedByUserId = changedByUserId;
         }
 

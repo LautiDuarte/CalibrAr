@@ -30,7 +30,7 @@ namespace Application.Services
             var changedAt = DateTime.Now;
             var previousStatus = ParseEnum<InstrumentStatus>(dto.PreviousStatus, nameof(dto.PreviousStatus));
             var newStatus = ParseEnum<InstrumentStatus>(dto.NewStatus, nameof(dto.NewStatus));
-            InstrumentStatusHistory instrumentStatusHistory = new InstrumentStatusHistory(0, dto.InstrumentId, previousStatus, newStatus, dto.Reason, dto.ChangedByUserId, changedAt);
+            InstrumentStatusHistory instrumentStatusHistory = new InstrumentStatusHistory(0, dto.InstrumentId, previousStatus, newStatus, dto.ChangedByUserId, changedAt);
 
             await instrumentStatusHistoryRepository.AddAsync(instrumentStatusHistory);
 
@@ -73,7 +73,7 @@ namespace Application.Services
 
             var previousStatus = ParseEnum<InstrumentStatus>(dto.PreviousStatus, nameof(dto.PreviousStatus));
             var newStatus = ParseEnum<InstrumentStatus>(dto.NewStatus, nameof(dto.NewStatus));
-            InstrumentStatusHistory instrumentStatusHistory = new InstrumentStatusHistory(dto.Id, dto.InstrumentId, previousStatus, newStatus, dto.Reason, dto.ChangedByUserId, existing.ChangedAt);
+            InstrumentStatusHistory instrumentStatusHistory = new InstrumentStatusHistory(dto.Id, dto.InstrumentId, previousStatus, newStatus, dto.ChangedByUserId, existing.ChangedAt);
             return await instrumentStatusHistoryRepository.UpdateAsync(instrumentStatusHistory);
         }
 
@@ -84,9 +84,11 @@ namespace Application.Services
                 throw new KeyNotFoundException($"There is no instrument with id {instrumentId}.");
         }
 
-        private async Task EnsureUserExistsAsync(int userId)
+        private async Task EnsureUserExistsAsync(int? userId)
         {
-            var user = await userRepository.GetAsync(userId);
+            if (userId == null)
+                return;
+            var user = await userRepository.GetAsync(userId.Value);
             if (user == null)
                 throw new KeyNotFoundException($"There is no user with id {userId}.");
         }
@@ -111,7 +113,6 @@ namespace Application.Services
                 Id = instrumentStatusHistory.Id,
                 PreviousStatus = instrumentStatusHistory.PreviousStatus.ToString(),
                 NewStatus = instrumentStatusHistory.NewStatus.ToString(),
-                Reason = instrumentStatusHistory.Reason,
                 ChangedAt = instrumentStatusHistory.ChangedAt,
                 InstrumentId = instrumentStatusHistory.InstrumentId,
                 ChangedByUserId = instrumentStatusHistory.ChangedByUserId

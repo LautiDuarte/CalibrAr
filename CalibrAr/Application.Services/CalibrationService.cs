@@ -16,7 +16,9 @@ namespace Application.Services
         private readonly IInstrumentTypeRepository instrumentTypeRepository;
         private readonly IProcedureRepository procedureRepository;
         private readonly IUserRepository userRepository;
+        private readonly IReferenceStandardRepository referenceStandardRepository;
         private readonly IInstrumentService instrumentService;
+        
 
         public CalibrationService(
             ICalibrationRepository calibrationRepository,
@@ -24,6 +26,7 @@ namespace Application.Services
             IInstrumentTypeRepository instrumentTypeRepository,
             IProcedureRepository procedureRepository,
             IUserRepository userRepository,
+            IReferenceStandardRepository referenceStandardRepository,
             IInstrumentService instrumentService)
         {
             this.calibrationRepository = calibrationRepository;
@@ -31,6 +34,7 @@ namespace Application.Services
             this.instrumentTypeRepository = instrumentTypeRepository;
             this.procedureRepository = procedureRepository;
             this.userRepository = userRepository;
+            this.referenceStandardRepository = referenceStandardRepository;
             this.instrumentService = instrumentService;
         }
 
@@ -49,6 +53,7 @@ namespace Application.Services
 
             var maxAllowedError = await ResolveMaxAllowedErrorAsync(instrument);
             calibration.SetMeasurements(BuildMeasurements(dto.Measurements, 0, maxAllowedError, resetIds: true));
+            calibration.SetReferenceStandards(await GetReferenceStandardsAsync(dto));
 
             await calibrationRepository.AddAsync(calibration);
             await RefreshInstrumentCalibrationDatesAsync(dto.InstrumentId);
@@ -57,6 +62,7 @@ namespace Application.Services
             dto.CalibrationDate = calibration.CalibrationDate;
             dto.CreatedAt = calibration.CreatedAt;
             dto.Measurements = calibration.Measurements.Select(MapMeasurementToDto).ToList();
+            dto.ReferenceStandardIds = calibration.ReferenceStandards.Select(r => r.Id).ToList();
             FillNavigationNames(dto, calibration);
 
             return dto;
@@ -119,6 +125,7 @@ namespace Application.Services
 
             var maxAllowedError = await ResolveMaxAllowedErrorAsync(instrument);
             calibration.SetMeasurements(BuildMeasurements(dto.Measurements, dto.Id, maxAllowedError, resetIds: false));
+            calibration.SetReferenceStandards(await GetReferenceStandardsAsync(dto));
 
             var updated = await calibrationRepository.UpdateAsync(calibration);
             if (!updated)
@@ -150,6 +157,8 @@ namespace Application.Services
             calibration.SetMeasurements(existing.Measurements.Select(m =>
                 new CalibrationMeasurement(m.Id, m.NominalValue, m.MeasuredValue, m.Error, m.IsWithinTolerance, m.Notes, existing.Id)));
 
+            calibration.SetReferenceStandards(existing.ReferenceStandards);
+
             return await calibrationRepository.UpdateAsync(calibration);
         }
 
@@ -180,6 +189,22 @@ namespace Application.Services
             {
                 await instrumentService.RecalculateCalibrationScheduleAsync(instrumentId, latest.CalibrationDate);
             }
+        }
+
+        // Los patrones aplican solo a calibraciones internas (trazabilidad metrológica)
+        private async Task<List<ReferenceStandard>> GetReferenceStandardsAsync(CalibrationDTO dto)
+        {
+            var result = new List<ReferenceStandard>();
+            if (dto.IsExternal)
+                return result;
+
+            foreach (var id in dto.ReferenceStandardIds.Distinct())
+            {
+                var standard = await referenceStandardRepository.GetAsync(id)
+                    ?? throw new KeyNotFoundException($"There is no reference standard with id {id}.");
+                result.Add(standard);
+            }
+            return result;
         }
 
         private async Task<Instrument> GetInstrumentOrThrowAsync(int instrumentId)
@@ -280,8 +305,8 @@ namespace Application.Services
                 ProcedureId = calibration.ProcedureId,
                 PerformedByUserId = calibration.PerformedByUserId,
                 ApprovedByUserId = calibration.ApprovedByUserId,
-                Measurements = calibration.Measurements?.Select(MapMeasurementToDto).ToList()
-                               ?? new List<CalibrationMeasurementDTO>()
+                Measurements = calibration.Measurements?.Select(MapMeasurementToDto).ToList() ?? new List<CalibrationMeasurementDTO>(),
+                ReferenceStandardIds = calibration.ReferenceStandards?.Select(r => r.Id).ToList() ?? new List<int>(),
             };
             FillNavigationNames(dto, calibration);
             return dto;

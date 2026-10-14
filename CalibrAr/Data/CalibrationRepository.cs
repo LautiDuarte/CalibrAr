@@ -43,6 +43,7 @@ namespace Data
         {
             return await context.Calibrations
                 .Include(c => c.Measurements)
+                .Include(c => c.ReferenceStandards)
                 .Include(c => c.Instrument)
                 .Include(c => c.Procedure)
                 .Include(c => c.PerformedByUser)
@@ -54,6 +55,7 @@ namespace Data
         {
             return await context.Calibrations
                 .Include(c => c.Measurements)
+                .Include(c => c.ReferenceStandards)
                 .Include(c => c.Instrument)
                 .Include(c => c.Procedure)
                 .Include(c => c.PerformedByUser)
@@ -66,6 +68,7 @@ namespace Data
         {
             var existing = await context.Calibrations
                 .Include(c => c.Measurements)
+                .Include(c => c.ReferenceStandards)
                 .FirstOrDefaultAsync(c => c.Id == calibration.Id);
             if (existing != null)
             {
@@ -81,6 +84,11 @@ namespace Data
                 existing.SetProcedureId(calibration.ProcedureId);
                 existing.SetPerformedByUserId(calibration.PerformedByUserId);
                 existing.SetApprovedByUserId(calibration.ApprovedByUserId);
+
+                var incomingStandards = calibration.ReferenceStandards.ToList();
+                existing.ReferenceStandards.Clear();
+                foreach (var standard in incomingStandards)
+                    existing.ReferenceStandards.Add(standard);
 
                 SyncMeasurements(existing, calibration.Measurements);
 

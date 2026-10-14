@@ -58,9 +58,8 @@ namespace WebAPI
             .WithOpenApi()
             .RequireAuthorization("NonConformitiesCreate");
 
-            app.MapPut("/nonconformities/{id}", async (int id, NonConformityDTO dto, INonConformityService nonConformityService) =>
+            app.MapPut("/nonconformities", async (NonConformityDTO dto, INonConformityService nonConformityService) =>
             {
-                dto.Id = id;
                 try
                 {
                     var updated = await nonConformityService.UpdateAsync(dto);
@@ -85,6 +84,25 @@ namespace WebAPI
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
+            .WithOpenApi()
+            .RequireAuthorization("NonConformitiesUpdate");
+
+            app.MapPut("/nonconformities/{id}/close/{closerUserId}", async (int id, int closerUserId, INonConformityService nonConformityService) =>
+            {
+                try
+                {
+                    var closed = await nonConformityService.CloseAsync(id, closerUserId);
+                    return closed ? Results.NoContent() : Results.NotFound();
+                }
+                catch (ArgumentException ex) { return Results.BadRequest(new { error = ex.Message }); }
+                catch (KeyNotFoundException ex) { return Results.NotFound(new { error = ex.Message }); }
+                catch (InvalidOperationException ex) { return Results.Conflict(new { error = ex.Message }); }
+            })
+            .WithName("CloseNonConformity")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status409Conflict)
             .WithOpenApi()
             .RequireAuthorization("NonConformitiesUpdate");
 

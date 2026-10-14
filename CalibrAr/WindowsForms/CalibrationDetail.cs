@@ -15,6 +15,7 @@ namespace WindowsForms
 {
     public partial class CalibrationDetail : Form
     {
+        private readonly ReferenceStandardApiClient referenceStandardApiClient = new(AuthServiceProvider.Instance);
         private readonly CalibrationApiClient calibrationApiClient = new(AuthServiceProvider.Instance);
         private readonly InstrumentApiClient instrumentApiClient = new(AuthServiceProvider.Instance);
         private readonly InstrumentTypeApiClient instrumentTypeApiClient = new(AuthServiceProvider.Instance);
@@ -79,8 +80,9 @@ namespace WindowsForms
                 await LoadProcedures();
 
                 await LoadUsers();
+                await LoadReferenceStandards();
 
-                
+
                 this.Calibration = calibration;
             }
             catch (Exception ex)
@@ -217,6 +219,14 @@ namespace WindowsForms
             allUsers = (await userApiClient.GetAllAsync()).ToList();
         }
 
+        private async Task LoadReferenceStandards()
+        {
+            var standards = await referenceStandardApiClient.GetAllAsync();
+            referenceStandardsCheckedListBox.DataSource = standards.ToList();
+            referenceStandardsCheckedListBox.DisplayMember = "Description";
+            referenceStandardsCheckedListBox.ValueMember = "Id";
+        }
+
         private void instrumentComboBox_SelectedIndex(object sender, EventArgs e)
         {
             FilterProcedures();
@@ -229,6 +239,13 @@ namespace WindowsForms
             if (!isExternalCheckBox.Checked)
             {
                 externalLabTextBox.Text = string.Empty;
+            }
+
+            referenceStandardsCheckedListBox.Enabled = !isExternalCheckBox.Checked;
+            if (isExternalCheckBox.Checked)
+            {
+                foreach (int i in referenceStandardsCheckedListBox.CheckedIndices.Cast<int>().ToList())
+                    referenceStandardsCheckedListBox.SetItemChecked(i, false);
             }
         }
 
@@ -267,7 +284,7 @@ namespace WindowsForms
                         ? instrumentId
                         : throw new InvalidOperationException("Instrumento no seleccionado.");
                     this.Calibration.Measurements = measurementsLocales.ToList();
-
+                    this.Calibration.ReferenceStandardIds = referenceStandardsCheckedListBox.CheckedItems.Cast<ReferenceStandardDTO>().Select(r => r.Id).ToList();
                     this.Calibration.ProcedureId = procedureComboBox.SelectedValue == null
                         ? null
                         : (int?)(int)procedureComboBox.SelectedValue;
@@ -515,6 +532,13 @@ namespace WindowsForms
                     Notes = measurement.Notes
                 }).ToList();
 
+            var usedIds = this.Calibration.ReferenceStandardIds ?? new List<int>();
+            for (int i = 0; i < referenceStandardsCheckedListBox.Items.Count; i++)
+            {
+                var standard = (ReferenceStandardDTO)referenceStandardsCheckedListBox.Items[i];
+                referenceStandardsCheckedListBox.SetItemChecked(i, usedIds.Contains(standard.Id));
+            }
+
             RefreshMeasurementsGrid();
         }
 
@@ -598,6 +622,7 @@ namespace WindowsForms
             performedByUserComboBox.Enabled = false;
             approvedByUserComboBox.Enabled = false;
             notesTextBox.Enabled = false;
+            referenceStandardsCheckedListBox.Enabled = false;
             addMeasurementButton.Enabled = false;
             updateMeasurementButton.Enabled = false;
             deleteMeasurementButton.Enabled = false;
@@ -611,6 +636,7 @@ namespace WindowsForms
             interventionTypeComboBox.Enabled = true;
             isExternalCheckBox.Enabled = true;
             externalLabTextBox.Enabled = isExternalCheckBox.Checked;
+            referenceStandardsCheckedListBox.Enabled = !isExternalCheckBox.Checked;
             certificateNumberTextBox.Enabled = true;
             resultComboBox.Enabled = true;
             restrictionDetailTextBox.Enabled = true;

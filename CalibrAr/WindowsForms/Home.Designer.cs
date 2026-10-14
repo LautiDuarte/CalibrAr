@@ -35,46 +35,50 @@ namespace WindowsForms
             areasToolStripMenuItem = new ToolStripMenuItem();
             proceduresToolStripMenuItem = new ToolStripMenuItem();
             calibrationsToolStripMenuItem = new ToolStripMenuItem();
+            nonConformitiesToolStripMenuItem = new ToolStripMenuItem();
+            referenceStandardsToolStripMenuItem = new ToolStripMenuItem();
+            instrumentStatusHistoryToolStripMenuItem = new ToolStripMenuItem();
             logoutToolStripMenuItem = new ToolStripMenuItem();
+            usersToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
             // 
             menuStrip1.ImageScalingSize = new Size(20, 20);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { instrumentsToolStripMenuItem, instrumentTypesToolStripMenuItem, locationsToolStripMenuItem, areasToolStripMenuItem, proceduresToolStripMenuItem, calibrationsToolStripMenuItem, logoutToolStripMenuItem});
+            menuStrip1.Items.AddRange(new ToolStripItem[] { usersToolStripMenuItem, instrumentsToolStripMenuItem, instrumentTypesToolStripMenuItem, locationsToolStripMenuItem, areasToolStripMenuItem, proceduresToolStripMenuItem, calibrationsToolStripMenuItem, nonConformitiesToolStripMenuItem, referenceStandardsToolStripMenuItem, instrumentStatusHistoryToolStripMenuItem, logoutToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Padding = new Padding(7, 3, 0, 3);
-            menuStrip1.Size = new Size(914, 30);
+            menuStrip1.Size = new Size(1013, 24);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
+            menuStrip1.ItemClicked += menuStrip1_ItemClicked;
             // 
             // instrumentsToolStripMenuItem
             // 
             instrumentsToolStripMenuItem.Name = "instrumentsToolStripMenuItem";
-            instrumentsToolStripMenuItem.Size = new Size(99, 24);
+            instrumentsToolStripMenuItem.Size = new Size(82, 20);
             instrumentsToolStripMenuItem.Text = "Instruments";
             instrumentsToolStripMenuItem.Click += instrumentsToolStripMenuItem_Click;
             // 
             // instrumentTypesToolStripMenuItem
             // 
             instrumentTypesToolStripMenuItem.Name = "instrumentTypesToolStripMenuItem";
-            instrumentTypesToolStripMenuItem.Size = new Size(132, 24);
+            instrumentTypesToolStripMenuItem.Size = new Size(108, 20);
             instrumentTypesToolStripMenuItem.Text = "Instrument types";
             instrumentTypesToolStripMenuItem.Click += instrumentTypesToolStripMenuItem_Click;
             // 
             // locationsToolStripMenuItem
             // 
             locationsToolStripMenuItem.Name = "locationsToolStripMenuItem";
-            locationsToolStripMenuItem.Size = new Size(86, 24);
+            locationsToolStripMenuItem.Size = new Size(70, 20);
             locationsToolStripMenuItem.Text = "Locations";
             locationsToolStripMenuItem.Click += locationsToolStripMenuItem_Click;
             // 
             // areasToolStripMenuItem
             // 
             areasToolStripMenuItem.Name = "areasToolStripMenuItem";
-            areasToolStripMenuItem.Size = new Size(60, 24);
+            areasToolStripMenuItem.Size = new Size(48, 20);
             areasToolStripMenuItem.Text = "Areas";
             areasToolStripMenuItem.Click += areasToolStripMenuItem_Click;
             // 
@@ -92,21 +96,48 @@ namespace WindowsForms
             calibrationsToolStripMenuItem.Text = "Calibrations";
             calibrationsToolStripMenuItem.Click += calibrationsToolStripMenuItem_Click;
             // 
+            // nonConformitiesToolStripMenuItem
+            // 
+            nonConformitiesToolStripMenuItem.Name = "nonConformitiesToolStripMenuItem";
+            nonConformitiesToolStripMenuItem.Size = new Size(112, 20);
+            nonConformitiesToolStripMenuItem.Text = "Non conformities";
+            nonConformitiesToolStripMenuItem.Click += nonConformitiesToolStripMenuItem_Click;
+            // 
+            // referenceStandardsToolStripMenuItem
+            // 
+            referenceStandardsToolStripMenuItem.Name = "referenceStandardsToolStripMenuItem";
+            referenceStandardsToolStripMenuItem.Size = new Size(125, 20);
+            referenceStandardsToolStripMenuItem.Text = "Reference standards";
+            referenceStandardsToolStripMenuItem.Click += referenceStandardsToolStripMenuItem_Click;
+            // 
+            // instrumentStatusHistoryToolStripMenuItem
+            // 
+            instrumentStatusHistoryToolStripMenuItem.Name = "instrumentStatusHistoryToolStripMenuItem";
+            instrumentStatusHistoryToolStripMenuItem.Size = new Size(90, 20);
+            instrumentStatusHistoryToolStripMenuItem.Text = "Status history";
+            instrumentStatusHistoryToolStripMenuItem.Click += instrumentStatusHistoryToolStripMenuItem_Click;
+            // 
             // logoutToolStripMenuItem
             // 
             logoutToolStripMenuItem.Name = "logoutToolStripMenuItem";
-            logoutToolStripMenuItem.Size = new Size(108, 24);
+            logoutToolStripMenuItem.Size = new Size(87, 20);
             logoutToolStripMenuItem.Text = "Cerrar sesión";
             logoutToolStripMenuItem.Click += logoutToolStripMenuItem_Click;
             // 
+            // usersToolStripMenuItem
+            // 
+            usersToolStripMenuItem.Name = "usersToolStripMenuItem";
+            usersToolStripMenuItem.Size = new Size(47, 20);
+            usersToolStripMenuItem.Text = "Users";
+            usersToolStripMenuItem.Click += usersToolStripMenuItem_Click;
+            // 
             // Home
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(914, 600);
+            ClientSize = new Size(1013, 450);
             Controls.Add(menuStrip1);
             MainMenuStrip = menuStrip1;
-            Margin = new Padding(3, 4, 3, 4);
             Name = "Home";
             Text = "Home";
             Load += Home_Load;
@@ -126,5 +157,9 @@ namespace WindowsForms
         private ToolStripMenuItem proceduresToolStripMenuItem;
         private ToolStripMenuItem calibrationsToolStripMenuItem;
         private ToolStripMenuItem logoutToolStripMenuItem;
+        private ToolStripMenuItem nonConformitiesToolStripMenuItem;
+        private ToolStripMenuItem referenceStandardsToolStripMenuItem;
+        private ToolStripMenuItem instrumentStatusHistoryToolStripMenuItem;
+        private ToolStripMenuItem usersToolStripMenuItem;
     }
 }

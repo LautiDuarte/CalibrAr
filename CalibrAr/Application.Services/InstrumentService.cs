@@ -15,13 +15,15 @@ namespace Application.Services
     {
         private readonly IInstrumentRepository instrumentRepository;
         private readonly IInstrumentTypeRepository instrumentTypeRepository;
+        private readonly IInstrumentStatusHistoryRepository instrumentStatusHistoryRepository;
         private readonly IAreaRepository areaRepository;
 
-        public InstrumentService(IInstrumentRepository instrumentRepository, IInstrumentTypeRepository instrumentTypeRepository, IAreaRepository areaRepository)
+        public InstrumentService(IInstrumentRepository instrumentRepository, IInstrumentTypeRepository instrumentTypeRepository, IAreaRepository areaRepository, IInstrumentStatusHistoryRepository instrumentStatusHistoryRepository)
         {
             this.instrumentRepository = instrumentRepository;
             this.instrumentTypeRepository = instrumentTypeRepository;
             this.areaRepository = areaRepository;
+            this.instrumentStatusHistoryRepository = instrumentStatusHistoryRepository;
         }
 
         public async Task<InstrumentDTO> AddAsync(InstrumentDTO dto)
@@ -82,6 +84,8 @@ namespace Application.Services
             if (existing == null)
                 return false;
 
+            var previousStatus = existing.Status;
+
             if (dto.InstrumentTypeId != existing.InstrumentTypeId)
                 throw new InvalidOperationException("The instrument type cannot be changed after creation.");
 
@@ -104,7 +108,10 @@ namespace Application.Services
 
             Instrument instrument = new Instrument(dto.Id, dto.Code, dto.Name, dto.SerialNumber, dto.Brand, dto.Model, status, dto.MaxAllowedError, dto.CalibrationFrequencyMonths, lastCalibrationDate, nextCalibrationDate, dto.IsActive, existing.CreatedAt, DateTime.Now, dto.InstrumentTypeId, dto.AreaId);
             Instrument instrumentUpToDate = await IsActiveCheck(instrument);
-            return await instrumentRepository.UpdateAsync(instrumentUpToDate);
+            var updated = await instrumentRepository.UpdateAsync(instrumentUpToDate);
+            if (updated && previousStatus != status)
+                await RegisterStatusChangeAsync(dto.Id, previousStatus, status, dto.ChangedByUserId);
+            return updated;
         }
 
         // Lo llama CalibrationService cuando cambia la �ltima calibraci�n del instrumento
@@ -113,7 +120,7 @@ namespace Application.Services
             var instrument = await instrumentRepository.GetAsync(instrumentId);
             if (instrument == null)
                 return;
-
+            var previousStatus = instrument.Status;
             var effectiveFrequency = await ResolveFrequencyMonthsAsync(instrument.CalibrationFrequencyMonths, instrument.InstrumentTypeId);
             var nextCalibrationDate = (DateTime?)null;
             if (lastCalibrationDate == null)
@@ -134,6 +141,8 @@ namespace Application.Services
             }
 
             await instrumentRepository.UpdateAsync(instrument);
+            if (previousStatus != instrument.Status)
+                await RegisterStatusChangeAsync(instrument.Id, previousStatus, instrument.Status, null);
         }
 
         // Lo llama InstrumentTypeService cuando cambia la frecuencia del tipo
@@ -177,12 +186,20 @@ namespace Application.Services
             {
                 if (instrument.Status == InstrumentStatus.Active && instrument.NextCalibrationDate.HasValue && instrument.NextCalibrationDate.Value < DateTime.Now)
                 {
+                    var previousStatus = instrument.Status;
                     instrument.SetStatus(InstrumentStatus.CalibrationExpired);
                     InstrumentDTO instrumentDto = MapToDto(instrument);
                     await this.UpdateAsync(instrumentDto);
+                    await RegisterStatusChangeAsync(instrument.Id, previousStatus, InstrumentStatus.CalibrationExpired, null);
                 }
             }
             return instruments;
+        }
+
+        private async Task RegisterStatusChangeAsync(int instrumentId, InstrumentStatus previous, InstrumentStatus next, int? changedByUserId)
+        {
+            var history = new InstrumentStatusHistory(0, instrumentId, previous, next, changedByUserId, DateTime.Now);
+            await instrumentStatusHistoryRepository.AddAsync(history);
         }
 
         private async Task EnsureInstrumentTypeExistsAsync(int instrumentTypeId)

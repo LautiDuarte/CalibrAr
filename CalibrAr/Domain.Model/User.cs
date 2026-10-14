@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,14 +48,19 @@ namespace Domain.Model
         {
             if (string.IsNullOrWhiteSpace(fullname))
                 throw new ArgumentException("The name cannot be null or empty.", nameof(fullname));
-            FullName = fullname;
+            if (fullname.Length > 100)
+                throw new ArgumentException("The name cannot exceed 100 characters.", nameof(fullname));
+            FullName = fullname.Trim();
         }
 
         public void SetEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
                 throw new ArgumentException("The email cannot be null or empty.", nameof(email));
-            if (!email.Contains('@'))
+            email = email.Trim();
+            if (email.Length > 100)
+                throw new ArgumentException("The email cannot exceed 100 characters.", nameof(email));
+            if (!MailAddress.TryCreate(email, out var address) || address.Address != email || !address.Host.Contains('.'))
                 throw new ArgumentException("The email format is not valid.", nameof(email));
             Email = email;
         }
@@ -63,6 +69,8 @@ namespace Domain.Model
         {
             if (string.IsNullOrWhiteSpace(passwordHash))
                 throw new ArgumentException("The password hash cannot be null or empty.", nameof(passwordHash));
+            if (passwordHash.Length > 30)
+                throw new ArgumentException("The password cannot exceed 30 characters.", nameof(passwordHash));
             Salt = GenerateSalt();
             PasswordHash = HashPassword(passwordHash, Salt);
         }

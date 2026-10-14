@@ -142,9 +142,8 @@ namespace Data
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
                 entity.Property(e => e.InstrumentId).IsRequired().HasField("_instrumentId");
                 entity.Navigation(e => e.Instrument).HasField("_instrument");
-                entity.Property(e => e.ChangedByUserId).IsRequired().HasField("_changedByUserId");
+                entity.Property(e => e.ChangedByUserId).HasField("_changedByUserId");
                 entity.Navigation(e => e.ChangedByUser).HasField("_changedByUser");
-                entity.Property(e => e.Reason).HasMaxLength(200);
                 entity.Property(e => e.ChangedAt).IsRequired();
                 entity.Property(e => e.PreviousStatus).IsRequired();
                 entity.Property(e => e.NewStatus).IsRequired();
@@ -155,7 +154,7 @@ namespace Data
                 entity.HasOne(e => e.Instrument)
                       .WithMany()
                       .HasForeignKey(e => e.InstrumentId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<User>(entity =>
@@ -511,6 +510,7 @@ namespace Data
                                  (p.Category == "Calibrations") ||
                                  (p.Category == "CalibrationMeasurements") ||
                                  (p.Category == "NonConformities") ||
+                                 (p.Category == "InstrumentStatusHistory" && p.Name == "read") ||
                                  (p.Category == "ReferenceStandards")
                         ).ToList();
 
@@ -525,11 +525,12 @@ namespace Data
                         var operatorPermissions = allPermissions.Where(
                             p => (p.Category == "Instruments") || 
                                  (p.Category == "Procedures" && p.Name == "read") ||
+                                 (p.Category == "ReferenceStandards" && p.Name == "read") ||
                                  (p.Category == "Calibrations" && (p.Name == "read" || p.Name == "create")) ||
                                  (p.Category == "InstrumentTypes" && p.Name == "read") ||
                                  (p.Category == "Areas" && p.Name == "read") ||
                                  (p.Category == "CalibrationMeasurements") ||
-                                 (p.Category == "NonConformities")
+                                 (p.Category == "NonConformities" && (p.Name == "read" || p.Name == "create"))
                         ).ToList();
 
                         foreach (var permission in operatorPermissions)

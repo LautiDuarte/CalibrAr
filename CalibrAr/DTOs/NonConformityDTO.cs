@@ -19,11 +19,11 @@ namespace DTOs
         public DateTime CreatedAt { get; set; }
         public int InstrumentId { get; set; }
         public string? InstrumentCode { get; set; }
-        public int CalibrationId { get; set; }
+        public int? CalibrationId { get; set; }
         public string? CalibrationCertificateNumber { get; set; }
         public int DetectedByUserId { get; set; }
         public string? DetectedByUserName { get; set; }
-        public int ClosedByUserId { get; set; }
+        public int? ClosedByUserId { get; set; }
         public string? ClosedByUserName { get; set; }
     }
 }

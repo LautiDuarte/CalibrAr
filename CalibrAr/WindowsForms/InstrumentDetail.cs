@@ -166,6 +166,7 @@ namespace WindowsForms
 
                     this.Instrument.InstrumentTypeId = (int)instrumentTypeComboBox.SelectedValue;
                     this.Instrument.AreaId = (int)areaComboBox.SelectedValue;
+                    this.Instrument.ChangedByUserId = AuthServiceProvider.Instance.GetUserId();
                     if (this.Mode == FormMode.Update)
                     {
                         await instrumentApiClient.UpdateAsync(this.Instrument);
