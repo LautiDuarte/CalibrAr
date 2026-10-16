@@ -3,6 +3,8 @@
 <EditForm Model="Model" OnValidSubmit="OnValidSubmit" class="form-narrow">
     <DataAnnotationsValidator />
 
+    <h2 class="form-section">Identificación</h2>
+
     <div class="row g-3 mb-3">
         <div class="col-sm-5">
             <label for="code" class="form-label">Código</label>
@@ -21,6 +23,9 @@
         <InputText id="serialNumber" class="form-control" @bind-Value="Model.SerialNumber" />
         <ValidationMessage For="() => Model.SerialNumber" />
     </div>
+
+    <h2 class="form-section">Clasificación</h2>
+
 
     <div class="row g-3 mb-3">
         <div class="col-sm-6">
@@ -75,6 +80,9 @@
             </InputSelect>
         </div>
     }
+
+    <h2 class="form-section">Calibración</h2>
+
 
     <div class="row g-3 mb-4">
         <div class="col-sm-6">

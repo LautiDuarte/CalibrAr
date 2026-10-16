@@ -3,10 +3,15 @@
 @inject AreaApiClient AreaApiClient
 @inject LocationApiClient LocationApiClient
 @inject NavigationManager NavigationManager
+@inject FlashService Flash
 
 <PageTitle>Editar área - CalibrAr</PageTitle>
 
-<h1 class="h3 mb-3">Editar área</h1>
+<PageHeader Title="Editar área">
+    <Actions>
+        <a href="areas" class="btn btn-sm btn-outline-secondary">← Volver</a>
+    </Actions>
+</PageHeader>
 
 @if (errorMessage != null)
 {
@@ -18,10 +23,6 @@
     @if (errorMessage == null)
     {
         <p class="text-secondary">Cargando...</p>
-    }
-    else
-    {
-        <a href="areas" class="btn btn-outline-secondary">Volver</a>
     }
 }
 else
@@ -78,6 +79,7 @@ else
                 IsActive = model.IsActive,
                 CreatedAt = createdAt
             });
+            Flash.Success("Área actualizada.");
             NavigationManager.NavigateTo("areas");
         }
         catch (UnauthorizedAccessException)

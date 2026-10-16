@@ -2,10 +2,15 @@
 @attribute [Authorize(Policy = "LocationsCreate")]
 @inject LocationApiClient LocationApiClient
 @inject NavigationManager NavigationManager
+@inject FlashService Flash
 
 <PageTitle>Nueva ubicación - CalibrAr</PageTitle>
 
-<h1 class="h3 mb-3">Nueva ubicación</h1>
+<PageHeader Title="Nueva ubicación">
+    <Actions>
+        <a href="locations" class="btn btn-sm btn-outline-secondary">← Volver</a>
+    </Actions>
+</PageHeader>
 
 @if (errorMessage != null)
 {
@@ -30,6 +35,7 @@
                 Address = model.Address,
                 IsActive = model.IsActive
             });
+            Flash.Success("Ubicación creada.");
             NavigationManager.NavigateTo("locations");
         }
         catch (UnauthorizedAccessException)

@@ -2,10 +2,15 @@
 @attribute [Authorize(Policy = "InstrumentTypesCreate")]
 @inject InstrumentTypeApiClient InstrumentTypeApiClient
 @inject NavigationManager NavigationManager
+@inject FlashService Flash
 
 <PageTitle>Nuevo tipo de instrumento - CalibrAr</PageTitle>
 
-<h1 class="h3 mb-3">Nuevo tipo de instrumento</h1>
+<PageHeader Title="Nuevo tipo de instrumento">
+    <Actions>
+        <a href="instrument-types" class="btn btn-sm btn-outline-secondary">← Volver</a>
+    </Actions>
+</PageHeader>
 
 @if (errorMessage != null)
 {
@@ -33,6 +38,7 @@
                 CalibrationFrequencyMonths = model.CalibrationFrequencyMonths,
                 IsActive = model.IsActive
             });
+            Flash.Success("Tipo de instrumento creado.");
             NavigationManager.NavigateTo("instrument-types");
         }
         catch (UnauthorizedAccessException)

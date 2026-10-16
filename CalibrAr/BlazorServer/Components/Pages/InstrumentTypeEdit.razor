@@ -2,10 +2,15 @@
 @attribute [Authorize(Policy = "InstrumentTypesUpdate")]
 @inject InstrumentTypeApiClient InstrumentTypeApiClient
 @inject NavigationManager NavigationManager
+@inject FlashService Flash
 
 <PageTitle>Editar tipo de instrumento - CalibrAr</PageTitle>
 
-<h1 class="h3 mb-3">Editar tipo de instrumento</h1>
+<PageHeader Title="Editar tipo de instrumento">
+    <Actions>
+        <a href="instrument-types" class="btn btn-sm btn-outline-secondary">← Volver</a>
+    </Actions>
+</PageHeader>
 
 @if (errorMessage != null)
 {
@@ -17,10 +22,6 @@
     @if (errorMessage == null)
     {
         <p class="text-secondary">Cargando...</p>
-    }
-    else
-    {
-        <a href="instrument-types" class="btn btn-outline-secondary">Volver</a>
     }
 }
 else
@@ -79,6 +80,7 @@ else
                 IsActive = model.IsActive,
                 CreatedAt = createdAt
             });
+            Flash.Success("Tipo de instrumento actualizado.");
             NavigationManager.NavigateTo("instrument-types");
         }
         catch (UnauthorizedAccessException)

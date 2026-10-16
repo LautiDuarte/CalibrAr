@@ -1,4 +1,5 @@
 using API.Clients;
+using BlazorServer;
 using BlazorServer.Auth;
 using BlazorServer.Components;
 using Microsoft.AspNetCore.Antiforgery;
@@ -57,6 +58,9 @@ builder.Services.AddScoped<LocationApiClient>();
 builder.Services.AddScoped<AreaApiClient>();
 builder.Services.AddScoped<InstrumentTypeApiClient>();
 builder.Services.AddScoped<InstrumentApiClient>();
+
+// Mensaje de "guardado" entre pantallas, uno por usuario.
+builder.Services.AddScoped<FlashService>();
 
 var app = builder.Build();
 

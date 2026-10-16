@@ -2,10 +2,15 @@
 @attribute [Authorize(Policy = "LocationsUpdate")]
 @inject LocationApiClient LocationApiClient
 @inject NavigationManager NavigationManager
+@inject FlashService Flash
 
 <PageTitle>Editar ubicación - CalibrAr</PageTitle>
 
-<h1 class="h3 mb-3">Editar ubicación</h1>
+<PageHeader Title="Editar ubicación">
+    <Actions>
+        <a href="locations" class="btn btn-sm btn-outline-secondary">← Volver</a>
+    </Actions>
+</PageHeader>
 
 @if (errorMessage != null)
 {
@@ -17,10 +22,6 @@
     @if (errorMessage == null)
     {
         <p class="text-secondary">Cargando...</p>
-    }
-    else
-    {
-        <a href="locations" class="btn btn-outline-secondary">Volver</a>
     }
 }
 else
@@ -73,6 +74,7 @@ else
                 IsActive = model.IsActive,
                 CreatedAt = createdAt
             });
+            Flash.Success("Ubicación actualizada.");
             NavigationManager.NavigateTo("locations");
         }
         catch (UnauthorizedAccessException)

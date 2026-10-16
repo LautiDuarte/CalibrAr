@@ -4,10 +4,15 @@
 @inject InstrumentTypeApiClient InstrumentTypeApiClient
 @inject AreaApiClient AreaApiClient
 @inject NavigationManager NavigationManager
+@inject FlashService Flash
 
 <PageTitle>Editar instrumento - CalibrAr</PageTitle>
 
-<h1 class="h3 mb-3">Editar instrumento</h1>
+<PageHeader Title="Editar instrumento">
+    <Actions>
+        <a href="instruments" class="btn btn-sm btn-outline-secondary">← Volver</a>
+    </Actions>
+</PageHeader>
 
 @if (errorMessage != null)
 {
@@ -19,10 +24,6 @@
     @if (errorMessage == null)
     {
         <p class="text-secondary">Cargando...</p>
-    }
-    else
-    {
-        <a href="instruments" class="btn btn-outline-secondary">Volver</a>
     }
 }
 else
@@ -93,6 +94,7 @@ else
                 AreaId = model.AreaId,
                 AreaName = string.Empty
             });
+            Flash.Success("Instrumento actualizado.");
             NavigationManager.NavigateTo("instruments");
         }
         catch (UnauthorizedAccessException)

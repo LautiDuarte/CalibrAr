@@ -2,16 +2,20 @@
 @attribute [Authorize(Policy = "InstrumentsRead")]
 @inject InstrumentApiClient InstrumentApiClient
 @inject NavigationManager NavigationManager
+@inject FlashService Flash
 @inject IJSRuntime JS
 
 <PageTitle>Instrumentos - CalibrAr</PageTitle>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 m-0">Instrumentos</h1>
-    <AuthorizeView Policy="InstrumentsCreate">
-        <a href="instruments/new" class="btn btn-primary">Nuevo instrumento</a>
-    </AuthorizeView>
-</div>
+<PageHeader Title="Instrumentos" Count="instruments?.Count">
+    <Actions>
+        <AuthorizeView Policy="InstrumentsCreate">
+            <a href="instruments/new" class="btn btn-primary">Nuevo instrumento</a>
+        </AuthorizeView>
+    </Actions>
+</PageHeader>
+
+<FlashBanner />
 
 @if (errorMessage != null)
 {
@@ -50,7 +54,7 @@ else
                         <td>@instrument.InstrumentTypeName</td>
                         <td>@instrument.AreaName</td>
                         <td>
-                            <span class="badge @StatusBadge(instrument.Status)">@InstrumentForm.StatusText(instrument.Status)</span>
+                            <StatusBadge Text="@InstrumentForm.StatusText(instrument.Status)" Kind="@StatusKind(instrument.Status)" />
                         </td>
                         <td>@(instrument.NextCalibrationDate?.ToString("dd/MM/yyyy") ?? "-")</td>
                         <td class="text-end text-nowrap">
@@ -77,12 +81,12 @@ else
         await LoadInstruments();
     }
 
-    private static string StatusBadge(string status) => status switch
+    private static string StatusKind(string status) => status switch
     {
-        "Active" => "text-bg-success",
-        "CalibrationExpired" => "text-bg-danger",
-        "Decommissioned" => "text-bg-secondary",
-        _ => "text-bg-warning"
+        "Active" => "success",
+        "CalibrationExpired" => "danger",
+        "Decommissioned" => "secondary",
+        _ => "warning"
     };
 
     private async Task LoadInstruments()
@@ -113,6 +117,7 @@ else
             await InstrumentApiClient.DeleteAsync(instrument.Id);
             errorMessage = null;
             await LoadInstruments();
+            Flash.Success($"Instrumento \"{instrument.Code}\" eliminado.");
         }
         catch (UnauthorizedAccessException)
         {
