@@ -216,7 +216,7 @@
             areaComboBox.FormattingEnabled = true;
             areaComboBox.Location = new Point(77, 246);
             areaComboBox.Name = "areaComboBox";
-            areaComboBox.Size = new Size(121, 23);
+            areaComboBox.Size = new Size(182, 23);
             areaComboBox.TabIndex = 24;
             // 
             // cancelButton
@@ -250,7 +250,7 @@
             InstrumentTypeWarningLabel.ForeColor = Color.Red;
             InstrumentTypeWarningLabel.Location = new Point(40, 308);
             InstrumentTypeWarningLabel.Name = "InstrumentTypeWarningLabel";
-            InstrumentTypeWarningLabel.Size = new Size(121, 11);
+            InstrumentTypeWarningLabel.Size = new Size(177, 11);
             InstrumentTypeWarningLabel.TabIndex = 27;
             InstrumentTypeWarningLabel.Text = "Instrument type cannot be changed after creation.";
             // 

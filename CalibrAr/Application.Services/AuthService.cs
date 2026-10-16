@@ -33,8 +33,10 @@ namespace Application.Services
 
             var user = await userRepository.GetByEmailAsync(request.Email);
 
-            if (user == null || !user.ValidatePassword(request.Password))
+            if (user == null || !user.IsActive || !user.ValidatePassword(request.Password))
                 return null;
+
+            await userRepository.UpdateLastLoginAsync(user.Id, DateTime.Now);
 
             var token = GenerateJwtToken(user);
             var expiresAt = DateTime.UtcNow.AddMinutes(GetExpirationMinutes());
@@ -43,7 +45,9 @@ namespace Application.Services
             {
                 Token = token,
                 ExpiresAt = expiresAt,
-                Email = user.Email
+                Email = user.Email,
+                UserId = user.Id,
+                Role = user.Role.ToString()
             };
         }
 

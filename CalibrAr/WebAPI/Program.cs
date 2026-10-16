@@ -51,7 +51,6 @@ builder.Services.AddScoped<IInstrumentRepository, InstrumentRepository>();
 builder.Services.AddScoped<IProcedureRepository, ProcedureRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICalibrationRepository, CalibrationRepository>();
-builder.Services.AddScoped<ICalibrationMeasurementRepository, CalibrationMeasurementRepository>();
 builder.Services.AddScoped<INonConformityRepository, NonConformityRepository>();
 builder.Services.AddScoped<IInstrumentStatusHistoryRepository, InstrumentStatusHistoryRepository>();
 
@@ -62,7 +61,6 @@ builder.Services.AddScoped<IReferenceStandardService, ReferenceStandardService>(
 builder.Services.AddScoped<IInstrumentService, InstrumentService>();
 builder.Services.AddScoped<IProcedureService, ProcedureService>();
 builder.Services.AddScoped<ICalibrationService, CalibrationService>();
-builder.Services.AddScoped<ICalibrationMeasurementService, CalibrationMeasurementService>();
 builder.Services.AddScoped<INonConformityService, NonConformityService>();
 builder.Services.AddScoped<IInstrumentStatusHistoryService, InstrumentStatusHistoryService>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -116,6 +114,13 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<CalibrArContext>();
+    context.Database.EnsureCreated();
+    context.SeedInitialData();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -139,7 +144,6 @@ app.MapReferenceStandardEndpoints();
 app.MapInstrumentEndpoints();
 app.MapProcedureEndpoints();
 app.MapCalibrationEndpoints();
-app.MapCalibrationMeasurementEndpoints();
 app.MapNonConformityEndpoints();
 app.MapInstrumentStatusHistoryEndpoints();
 app.MapUserEndpoints();

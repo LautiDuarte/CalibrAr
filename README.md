@@ -2,6 +2,12 @@
 
 CalibrAr es un sistema de gestión de recursos de seguimiento y medición, diseñado para empresas del sector manufacturero que necesitan dar cumplimiento a los requisitos de la norma ISO 9001:2015, cláusula 7.1.5 (Recursos de seguimiento y medición).
 
+##Integrantes
+
+- Cardone, Juan Ignacio - Legajo: 50791 - Mail: juancardone8@gmail.com
+- Donzino, Yamila - Legajo: 51004 - Mail: yamiladonzino51@gmail.com
+- Duarte, Lautaro - Legajo: 51555 - Mail: lautaroduarte@outlook.es
+
 ## Requisitos
 
 - .NET 8 SDK

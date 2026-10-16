@@ -13,6 +13,8 @@ namespace API.Clients
         bool IsAuthenticated();
         string? GetToken();
         string? GetEmail();
+        int? GetUserId();
+        string? GetRole();
         Task<bool> LoginAsync(string email, string password);
         Task LogoutAsync();
         Task CheckTokenExpirationAsync();

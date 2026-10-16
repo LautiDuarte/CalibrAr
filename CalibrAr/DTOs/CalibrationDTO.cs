@@ -27,5 +27,6 @@ namespace DTOs
         public int? ApprovedByUserId { get; set; }
         public string? ApprovedByUserName { get; set; }
         public List<CalibrationMeasurementDTO> Measurements { get; set; } = new List<CalibrationMeasurementDTO>();
+        public List<int> ReferenceStandardIds { get; set; } = new List<int>();
     }
 }

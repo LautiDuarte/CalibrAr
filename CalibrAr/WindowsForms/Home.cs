@@ -64,7 +64,17 @@ namespace WindowsForms
             bool canViewCalibrations = authService.HasPermission("Calibrations.read");
             calibrationsToolStripMenuItem.Visible = canViewCalibrations;
 
+            bool canViewNonConformities = authService.HasPermission("NonConformities.read");
+            nonConformitiesToolStripMenuItem.Visible = canViewNonConformities;
 
+            bool canViewReferenceStandards = authService.HasPermission("ReferenceStandards.read");
+            referenceStandardsToolStripMenuItem.Visible = canViewReferenceStandards;
+
+            bool canViewInstrumentStatusHistory = authService.HasPermission("InstrumentStatusHistory.read");
+            instrumentStatusHistoryToolStripMenuItem.Visible = canViewInstrumentStatusHistory;
+
+            bool canViewUsers = authService.HasPermission("Users.read");
+            usersToolStripMenuItem.Visible = canViewUsers;
         }
 
         private void instrumentsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -97,6 +107,25 @@ namespace WindowsForms
             OpenMdiChild<CalibrationList>();
         }
 
+        private void referenceStandardsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenMdiChild<ReferenceStandardList>();
+        }
+
+        private void nonConformitiesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenMdiChild<NonConformityList>();
+        }
+
+        private void instrumentStatusHistoryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenMdiChild<InstrumentStatusHistoryList>();
+        }
+
+        private void usersToolStripMenuItem_Click(object sender, EventArgs e) 
+        { 
+            OpenMdiChild<UserList>(); 
+        }
         private void Home_Load(object sender, EventArgs e)
         {
 
@@ -107,5 +136,12 @@ namespace WindowsForms
             await AuthServiceProvider.Instance.LogoutAsync();
             this.Close();
         }
+
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
+
+
     }
 }

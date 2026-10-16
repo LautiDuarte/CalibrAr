@@ -15,17 +15,23 @@ namespace WindowsForms
 {
     public partial class CalibrationDetail : Form
     {
+        private readonly ReferenceStandardApiClient referenceStandardApiClient = new(AuthServiceProvider.Instance);
         private readonly CalibrationApiClient calibrationApiClient = new(AuthServiceProvider.Instance);
         private readonly InstrumentApiClient instrumentApiClient = new(AuthServiceProvider.Instance);
         private readonly InstrumentTypeApiClient instrumentTypeApiClient = new(AuthServiceProvider.Instance);
         private readonly ProcedureApiClient procedureApiClient = new(AuthServiceProvider.Instance);
         private readonly UserApiClient userApiClient = new(AuthServiceProvider.Instance);
+        private static readonly string[] rolesThatCanPerform = { "Administrador", "Responsable", "Operador" };
+        private static readonly string[] rolesThatCanApprove = { "Administrador", "Responsable" };
 
-        private CalibrationDTO calibration;
+        private CalibrationDTO calibration = new CalibrationDTO();
+        private int? currentUserId;
         private FormMode mode;
         private List<ProcedureDTO> allProcedures = new List<ProcedureDTO>();
+        private List<UserDTO> allUsers = new List<UserDTO>();
         private List<InstrumentTypeDTO> instrumentTypes = new List<InstrumentTypeDTO>();
         private List<CalibrationMeasurementDTO> measurementsLocales = new List<CalibrationMeasurementDTO>();
+
 
         public CalibrationDTO Calibration
         {
@@ -62,6 +68,8 @@ namespace WindowsForms
             try
             {
                 DisableControls();
+                this.Calibration = calibration;
+                this.Mode = mode;
 
                 ConfigureColumns();
                 measurementsLocales = new List<CalibrationMeasurementDTO>();
@@ -70,9 +78,11 @@ namespace WindowsForms
                 await LoadInstrumentTypes();
                 await LoadInstruments();
                 await LoadProcedures();
-                await LoadUsers();
 
-                this.Mode = mode;
+                await LoadUsers();
+                await LoadReferenceStandards();
+
+
                 this.Calibration = calibration;
             }
             catch (Exception ex)
@@ -194,17 +204,27 @@ namespace WindowsForms
 
         private async Task LoadUsers()
         {
-            var performedByUsers = await userApiClient.GetAllAsync();
-            performedByUserComboBox.DataSource = performedByUsers.ToList();
-            performedByUserComboBox.DisplayMember = "FullName";
-            performedByUserComboBox.ValueMember = "Id";
-            performedByUserComboBox.SelectedIndex = -1;
+            if (this.Mode == FormMode.Create)
+            {
+                currentUserId = AuthServiceProvider.Instance.GetUserId();
 
-            var approvedByUsers = await userApiClient.GetAllAsync();
-            approvedByUserComboBox.DataSource = approvedByUsers.ToList();
-            approvedByUserComboBox.DisplayMember = "FullName";
-            approvedByUserComboBox.ValueMember = "Id";
-            approvedByUserComboBox.SelectedIndex = -1;
+                if (currentUserId == null)
+                {
+                    MessageBox.Show("Current user not found. Please check your session.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    this.Close();
+                }
+                return;
+            }
+
+            allUsers = (await userApiClient.GetAllAsync()).ToList();
+        }
+
+        private async Task LoadReferenceStandards()
+        {
+            var standards = await referenceStandardApiClient.GetAllAsync();
+            referenceStandardsCheckedListBox.DataSource = standards.ToList();
+            referenceStandardsCheckedListBox.DisplayMember = "Description";
+            referenceStandardsCheckedListBox.ValueMember = "Id";
         }
 
         private void instrumentComboBox_SelectedIndex(object sender, EventArgs e)
@@ -219,6 +239,13 @@ namespace WindowsForms
             if (!isExternalCheckBox.Checked)
             {
                 externalLabTextBox.Text = string.Empty;
+            }
+
+            referenceStandardsCheckedListBox.Enabled = !isExternalCheckBox.Checked;
+            if (isExternalCheckBox.Checked)
+            {
+                foreach (int i in referenceStandardsCheckedListBox.CheckedIndices.Cast<int>().ToList())
+                    referenceStandardsCheckedListBox.SetItemChecked(i, false);
             }
         }
 
@@ -245,27 +272,47 @@ namespace WindowsForms
                 {
                     DisableControls();
 
-                    this.Calibration.InterventionType = interventionTypeComboBox.SelectedItem.ToString();
+                    this.Calibration.InterventionType = interventionTypeComboBox.SelectedItem?.ToString() ?? string.Empty;
                     this.Calibration.IsExternal = isExternalCheckBox.Checked;
                     this.Calibration.ExternalLab = externalLabTextBox.Text;
                     this.Calibration.CertificateNumber = certificateNumberTextBox.Text;
-                    this.Calibration.Result = resultComboBox.SelectedItem.ToString();
+                    this.Calibration.Result = resultComboBox.SelectedItem?.ToString() ?? string.Empty;
                     this.Calibration.RestrictionDetail = restrictionDetailTextBox.Text;
                     this.Calibration.Notes = notesTextBox.Text;
                     this.Calibration.CalibrationDate = this.Mode == FormMode.Create ? DateTime.Now : calibrationDateTimePicker.Value;
-                    this.Calibration.InstrumentId = (int)instrumentComboBox.SelectedValue;
+                    this.Calibration.InstrumentId = instrumentComboBox.SelectedValue is int instrumentId
+                        ? instrumentId
+                        : throw new InvalidOperationException("Instrumento no seleccionado.");
                     this.Calibration.Measurements = measurementsLocales.ToList();
-
-                    // ProcedureId, PerformedByUserId y ApprovedByUserId: si no hay selección -> null
+                    this.Calibration.ReferenceStandardIds = referenceStandardsCheckedListBox.CheckedItems.Cast<ReferenceStandardDTO>().Select(r => r.Id).ToList();
                     this.Calibration.ProcedureId = procedureComboBox.SelectedValue == null
                         ? null
                         : (int?)(int)procedureComboBox.SelectedValue;
-                    this.Calibration.PerformedByUserId = performedByUserComboBox.SelectedValue == null
-                        ? null
-                        : (int?)(int)performedByUserComboBox.SelectedValue;
-                    this.Calibration.ApprovedByUserId = approvedByUserComboBox.SelectedValue == null
-                        ? null
-                        : (int?)(int)approvedByUserComboBox.SelectedValue;
+
+                    if (this.Mode == FormMode.Create)
+                    {
+                        this.Calibration.PerformedByUserId = currentUserId;
+                        this.Calibration.ApprovedByUserId = null;
+                    }
+                    else
+                    {
+                        this.Calibration.PerformedByUserId = performedByUserComboBox.SelectedValue == null
+                            ? null
+                            : (int?)(int)performedByUserComboBox.SelectedValue;
+
+                        // Solo si el combo está visible (calibración aprobada). "(None)" = 0 => desaprobar
+                        if (approvedByUserComboBox.Visible)
+                        {
+                            if (approvedByUserComboBox.SelectedValue is int approvedId)
+                            {
+                                this.Calibration.ApprovedByUserId = approvedId == 0 ? null : approvedId;
+                            }
+                            else
+                            {
+                                this.Calibration.ApprovedByUserId = null;
+                            }
+                        }
+                    }
 
                     if (this.Mode == FormMode.Update)
                     {
@@ -440,14 +487,36 @@ namespace WindowsForms
                 this.procedureComboBox.SelectedValue = this.Calibration.ProcedureId.Value;
             }
 
-            if (this.Calibration.PerformedByUserId.HasValue)
+            if (this.Mode == FormMode.Update)
             {
-                this.performedByUserComboBox.SelectedValue = this.Calibration.PerformedByUserId.Value;
-            }
+                int? performedById = this.Calibration.PerformedByUserId;
+                int? approvedById = this.Calibration.ApprovedByUserId;
 
-            if (this.Calibration.ApprovedByUserId.HasValue)
-            {
-                this.approvedByUserComboBox.SelectedValue = this.Calibration.ApprovedByUserId.Value;
+                // Performed by: usuarios que pueden crear (más el actual, por si cambió de rol)
+                performedByUserComboBox.DataSource = allUsers
+                    .Where(u => rolesThatCanPerform.Contains(u.Role.ToString()) || u.Id == performedById)
+                    .ToList();
+                performedByUserComboBox.DisplayMember = "FullName";
+                performedByUserComboBox.ValueMember = "Id";
+                performedByUserComboBox.SelectedValue = performedById ?? -1;
+
+                // Approved by: usuarios que pueden aprobar, sin quien realizó la calibración,
+                // más el aprobador actual, y "(None)" para desaprobar
+                var approvers = allUsers
+                    .Where(u => (rolesThatCanApprove.Contains(u.Role.ToString())
+                                 && (u.Id != performedById || u.Role.ToString() == "Administrador"))
+                                || u.Id == approvedById)
+                    .ToList();
+                approvers.Insert(0, new UserDTO { Id = 0, FullName = "(None)" });
+
+                approvedByUserComboBox.DataSource = approvers;
+                approvedByUserComboBox.DisplayMember = "FullName";
+                approvedByUserComboBox.ValueMember = "Id";
+                approvedByUserComboBox.SelectedValue = approvedById ?? 0;
+
+                bool isApproved = approvedById.HasValue;
+                approvedByUserLabel.Visible = isApproved;
+                approvedByUserComboBox.Visible = isApproved;
             }
 
             // Clonar measurements para modelo local
@@ -463,6 +532,13 @@ namespace WindowsForms
                     Notes = measurement.Notes
                 }).ToList();
 
+            var usedIds = this.Calibration.ReferenceStandardIds ?? new List<int>();
+            for (int i = 0; i < referenceStandardsCheckedListBox.Items.Count; i++)
+            {
+                var standard = (ReferenceStandardDTO)referenceStandardsCheckedListBox.Items[i];
+                referenceStandardsCheckedListBox.SetItemChecked(i, usedIds.Contains(standard.Id));
+            }
+
             RefreshMeasurementsGrid();
         }
 
@@ -473,10 +549,18 @@ namespace WindowsForms
             {
                 calibrationDateTimePicker.Visible = true;
                 calibrationDateLabel.Visible = true;
+                performedByUserComboBox.Visible = true;
+                performedByUserLabel.Visible = true;
+                approvedByUserComboBox.Visible = true;
+                approvedByUserLabel.Visible = true;
             } else
             {
                 calibrationDateTimePicker.Visible = false;
                 calibrationDateLabel.Visible = false;
+                performedByUserComboBox.Visible = false;
+                performedByUserLabel.Visible = false;
+                approvedByUserComboBox.Visible = false;
+                approvedByUserLabel.Visible = false;
             }
         }
 
@@ -538,6 +622,7 @@ namespace WindowsForms
             performedByUserComboBox.Enabled = false;
             approvedByUserComboBox.Enabled = false;
             notesTextBox.Enabled = false;
+            referenceStandardsCheckedListBox.Enabled = false;
             addMeasurementButton.Enabled = false;
             updateMeasurementButton.Enabled = false;
             deleteMeasurementButton.Enabled = false;
@@ -551,6 +636,7 @@ namespace WindowsForms
             interventionTypeComboBox.Enabled = true;
             isExternalCheckBox.Enabled = true;
             externalLabTextBox.Enabled = isExternalCheckBox.Checked;
+            referenceStandardsCheckedListBox.Enabled = !isExternalCheckBox.Checked;
             certificateNumberTextBox.Enabled = true;
             resultComboBox.Enabled = true;
             restrictionDetailTextBox.Enabled = true;

@@ -98,8 +98,16 @@ namespace WindowsForms
         private async Task LoadAreas()
         {
             var areas = await areaApiClient.GetAllAsync();
-            areaComboBox.DataSource = areas.ToList();
-            areaComboBox.DisplayMember = "Name";
+
+            areaComboBox.DataSource = areas
+                .Select(a => new
+                {
+                    a.Id,
+                    DisplayName = $"{a.Name} ({a.LocationName})"
+                })
+                .ToList();
+
+            areaComboBox.DisplayMember = "DisplayName";
             areaComboBox.ValueMember = "Id";
             areaComboBox.SelectedIndex = -1;
         }
@@ -158,6 +166,7 @@ namespace WindowsForms
 
                     this.Instrument.InstrumentTypeId = (int)instrumentTypeComboBox.SelectedValue;
                     this.Instrument.AreaId = (int)areaComboBox.SelectedValue;
+                    this.Instrument.ChangedByUserId = AuthServiceProvider.Instance.GetUserId();
                     if (this.Mode == FormMode.Update)
                     {
                         await instrumentApiClient.UpdateAsync(this.Instrument);

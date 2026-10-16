@@ -33,7 +33,8 @@ namespace WindowsForms
                 Name = "Id",
                 HeaderText = "Id",
                 DataPropertyName = "Id",
-                Width = 80
+                Width = 80,
+                Visible = false
             });
 
             this.proceduresDataGridView.Columns.Add(new DataGridViewTextBoxColumn
@@ -169,8 +170,6 @@ namespace WindowsForms
                 {
                     DisableControls();
                     await procedureApiClient.DeleteAsync(procedure.Id);
-                    await LoadProcedures();
-
                 }
                 catch (Exception ex)
                 {
@@ -178,7 +177,7 @@ namespace WindowsForms
                 }
                 finally
                 {
-                    EnableControls();
+                    await LoadProcedures();
                 }
             }
         }

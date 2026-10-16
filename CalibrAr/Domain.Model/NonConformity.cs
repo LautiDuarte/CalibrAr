@@ -1,4 +1,4 @@
-﻿using System;
+﻿    using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,9 +18,9 @@ namespace Domain.Model
         public DateTime? ClosedAt { get; private set; }
         public DateTime CreatedAt { get; private set; }
         private int _instrumentId;
-        private int _calibrationId;
+        private int? _calibrationId;
         private int _detectedByUserId;
-        private int _closedByUserId;
+        private int? _closedByUserId;
         private Instrument? _instrument;
         private Calibration? _calibration;
         private User? _detectedByUser;
@@ -31,7 +31,7 @@ namespace Domain.Model
             get => _instrument?.Id ?? _instrumentId;
             private set => _instrumentId = value;
         }
-        public int CalibrationId
+        public int? CalibrationId
         {
             get => _calibration?.Id ?? _calibrationId;
             private set => _calibrationId = value;
@@ -41,7 +41,7 @@ namespace Domain.Model
             get => _detectedByUser?.Id ?? _detectedByUserId;
             private set => _detectedByUserId = value;
         }
-        public int ClosedByUserId
+        public int? ClosedByUserId
         {
             get => _closedByUser?.Id ?? _closedByUserId;
             private set => _closedByUserId = value;
@@ -83,7 +83,7 @@ namespace Domain.Model
             }
         }
 
-        public NonConformity(int id, string code, string description, Origin origin, NonConformityStatus status, string? correctiveAction, DateTime openedAt, DateTime? closedAt, DateTime createdAt, int instrumentId, int calibrationId, int detectedByUserId, int closedByUserId)
+        public NonConformity(int id, string code, string description, Origin origin, NonConformityStatus status, string? correctiveAction, DateTime openedAt, DateTime? closedAt, DateTime createdAt, int instrumentId, int? calibrationId, int detectedByUserId, int? closedByUserId)
         {
             SetId(id);
             SetCode(code);
@@ -145,6 +145,8 @@ namespace Domain.Model
 
         public void SetClosedAt(DateTime? closedAt)
         {
+            if (closedAt.HasValue && closedAt.Value < OpenedAt)
+                throw new ArgumentException("The closing date cannot be earlier than the opening date.", nameof(closedAt));
             ClosedAt = closedAt;
         }
 
@@ -164,9 +166,9 @@ namespace Domain.Model
             InstrumentId = instrumentId;
         }
 
-        public void SetCalibrationId(int calibrationId)
+        public void SetCalibrationId(int? calibrationId)
         {
-            if (calibrationId <= 0)
+            if (calibrationId.HasValue && calibrationId <= 0)
                 throw new ArgumentException("Calibration Id must be greater than 0.", nameof(calibrationId));
             if (_calibration != null && _calibration.Id != calibrationId)
                 Calibration = null;
@@ -182,9 +184,9 @@ namespace Domain.Model
             DetectedByUserId = detectedByUserId;
         }
 
-        public void SetClosedByUserId(int closedByUserId)
+        public void SetClosedByUserId(int? closedByUserId)
         {
-            if (closedByUserId <= 0)
+            if (closedByUserId.HasValue && closedByUserId <= 0)
                 throw new ArgumentException("The id from the user who closed the non conformity must be greater than 0.", nameof(closedByUserId));
             if (_closedByUser != null && _closedByUser.Id != closedByUserId)
                 ClosedByUser = null;

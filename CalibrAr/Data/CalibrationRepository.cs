@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -43,6 +43,7 @@ namespace Data
         {
             return await context.Calibrations
                 .Include(c => c.Measurements)
+                .Include(c => c.ReferenceStandards)
                 .Include(c => c.Instrument)
                 .Include(c => c.Procedure)
                 .Include(c => c.PerformedByUser)
@@ -54,6 +55,7 @@ namespace Data
         {
             return await context.Calibrations
                 .Include(c => c.Measurements)
+                .Include(c => c.ReferenceStandards)
                 .Include(c => c.Instrument)
                 .Include(c => c.Procedure)
                 .Include(c => c.PerformedByUser)
@@ -66,6 +68,7 @@ namespace Data
         {
             var existing = await context.Calibrations
                 .Include(c => c.Measurements)
+                .Include(c => c.ReferenceStandards)
                 .FirstOrDefaultAsync(c => c.Id == calibration.Id);
             if (existing != null)
             {
@@ -81,6 +84,11 @@ namespace Data
                 existing.SetProcedureId(calibration.ProcedureId);
                 existing.SetPerformedByUserId(calibration.PerformedByUserId);
                 existing.SetApprovedByUserId(calibration.ApprovedByUserId);
+
+                var incomingStandards = calibration.ReferenceStandards.ToList();
+                existing.ReferenceStandards.Clear();
+                foreach (var standard in incomingStandards)
+                    existing.ReferenceStandards.Add(standard);
 
                 SyncMeasurements(existing, calibration.Measurements);
 
@@ -104,7 +112,7 @@ namespace Data
         {
             var incomingIds = incoming.Where(m => m.Id != 0).Select(m => m.Id).ToHashSet();
 
-            // Borrar los que ya no est�n
+            // Borrar los que ya no están
             foreach (var removed in existing.Measurements.Where(m => !incomingIds.Contains(m.Id)).ToList())
                 context.CalibrationMeasurements.Remove(removed);
 

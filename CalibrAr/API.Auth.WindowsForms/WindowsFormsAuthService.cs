@@ -10,6 +10,8 @@ namespace API.Auth.WindowsForms
         private static string? _currentToken;
         private static DateTime _tokenExpiration;
         private static string? _currentEmail;
+        private static int? _currentUserId;
+        private static string? _currentRole;
 
         public event Action<bool>? AuthenticationStateChanged;
 
@@ -38,6 +40,9 @@ namespace API.Auth.WindowsForms
             return isAuth ? _currentEmail : null;
         }
 
+        public int? GetUserId() => IsAuthenticated() ? _currentUserId : null;
+        public string? GetRole() => IsAuthenticated() ? _currentRole : null;
+
         public async Task<bool> LoginAsync(string email, string password)
         {
             var request = new LoginRequest
@@ -54,6 +59,8 @@ namespace API.Auth.WindowsForms
                 _currentToken = response.Token;
                 _tokenExpiration = response.ExpiresAt;
                 _currentEmail = response.Email;
+                _currentUserId = response.UserId;
+                _currentRole = response.Role;
 
                 AuthenticationStateChanged?.Invoke(true);
                 return true;
@@ -67,6 +74,8 @@ namespace API.Auth.WindowsForms
             _currentToken = null;
             _tokenExpiration = default;
             _currentEmail = null;
+            _currentUserId = null;
+            _currentRole = null;
 
             AuthenticationStateChanged?.Invoke(false);
             return Task.CompletedTask;

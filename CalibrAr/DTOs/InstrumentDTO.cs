@@ -26,5 +26,6 @@ namespace DTOs
         public string InstrumentTypeName { get; set; }
         public int AreaId { get; set; }
         public string AreaName { get; set; }
+        public int? ChangedByUserId { get; set; }
     }
 }

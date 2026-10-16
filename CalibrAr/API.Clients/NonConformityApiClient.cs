@@ -138,5 +138,28 @@ namespace API.Clients
                 throw new Exception($"Request timed out while updating non conformity with ID {nonConformity.Id}: {ex.Message}.", ex);
             }
         }
+
+        public async Task CloseAsync(int id, int closerUserId)
+        {
+            try
+            {
+                using var client = await CreateHttpClientAsync();
+                HttpResponseMessage response = await client.PutAsync($"nonConformities/{id}/close/{closerUserId}", null);
+                if (!response.IsSuccessStatusCode)
+                {
+                    ThrowIfUnauthorized(response);
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Failed to close non conformity with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new Exception($"An error occurred while closing non conformity with ID {id}: {ex.Message}.", ex);
+            }
+            catch (TaskCanceledException ex)
+            {
+                throw new Exception($"Request timed out while closing non conformity with ID {id}: {ex.Message}.", ex);
+            }
+        }
     }
 }

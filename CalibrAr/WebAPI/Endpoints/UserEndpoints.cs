@@ -47,10 +47,20 @@ namespace WebAPI
                 {
                     return Results.BadRequest(new { error = ex.Message });
                 }
+                catch (KeyNotFoundException ex)
+                { 
+                    return Results.NotFound(new { error = ex.Message }); 
+                }
+                catch (InvalidOperationException ex) 
+                { 
+                    return Results.Conflict(new { error = ex.Message }); 
+                }
             })
             .WithName("AddUser")
             .Produces<UserDTO>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status409Conflict)
             .WithOpenApi()
             .RequireAuthorization("UsersCreate");
 
@@ -71,28 +81,38 @@ namespace WebAPI
                 {
                     return Results.BadRequest(new { error = ex.Message });
                 }
+                catch (KeyNotFoundException ex)
+                {
+                    return Results.NotFound(new { error = ex.Message });
+                }
+                catch (InvalidOperationException ex)
+                {
+                    return Results.Conflict(new { error = ex.Message });
+                }
             })
             .WithName("UpdateUser")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status409Conflict)
             .WithOpenApi()
             .RequireAuthorization("UsersUpdate");
 
-            app.MapDelete("/users/{id}", async (int id, IUserService userService) =>
+            app.MapDelete("/users/{id}", async (int id, int? requesterUserId, IUserService userService) =>
             {
-                var deleted = await userService.DeleteAsync(id);
-
-                if (!deleted)
+                try
                 {
-                    return Results.NotFound();
+                    var deleted = await userService.DeleteAsync(id, requesterUserId);
+                    return deleted ? Results.NoContent() : Results.NotFound();
                 }
-
-                return Results.NoContent();
+                catch (ArgumentException ex) { return Results.BadRequest(new { error = ex.Message }); }
+                catch (InvalidOperationException ex) { return Results.Conflict(new { error = ex.Message }); }
             })
             .WithName("DeleteUser")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status409Conflict)
             .WithOpenApi()
             .RequireAuthorization("UsersDelete");
         }

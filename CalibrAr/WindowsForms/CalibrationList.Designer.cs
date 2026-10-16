@@ -44,6 +44,8 @@
             calibrationsDataGridView.Size = new Size(1442, 472);
             calibrationsDataGridView.TabIndex = 0;
             calibrationsDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            calibrationsDataGridView.CellPainting += calibrationsDataGridView_CellPainting;
+            calibrationsDataGridView.CellContentClick += calibrationsDataGridView_CellContentClick;
             // 
             // createButton
             // 

@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -76,8 +76,8 @@ namespace Application.Services
             if (!updated)
                 return false;
 
-            // Si cambió la frecuencia del tipo, los instrumentos que la heredan (frecuencia null)
-            // tienen que recalcular su próxima fecha de calibración
+            // Si cambiÃ³ la frecuencia del tipo, los instrumentos que la heredan (frecuencia null)
+            // tienen que recalcular su prÃ³xima fecha de calibraciÃ³n
             if (previousFrequencyMonths != dto.CalibrationFrequencyMonths)
                 await instrumentService.RecalculateScheduleForTypeAsync(dto.Id);
 

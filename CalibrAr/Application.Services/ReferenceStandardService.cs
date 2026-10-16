@@ -35,6 +35,9 @@ namespace Application.Services
 
         public async Task<bool> DeleteAsync(int id)
         {
+            if (await referenceStandardRepository.IsUsedAsync(id))
+                throw new InvalidOperationException("The reference standard is used in one or more calibrations and cannot be deleted.");
+
             return await referenceStandardRepository.DeleteAsync(id);
         }
 

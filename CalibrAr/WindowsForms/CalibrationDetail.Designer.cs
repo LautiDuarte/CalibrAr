@@ -61,6 +61,8 @@
             deleteMeasurementButton = new Button();
             totalMeasurementsLabel = new Label();
             outOfToleranceLabel = new Label();
+            referenceStandardsLabel = new Label();
+            referenceStandardsCheckedListBox = new CheckedListBox();
             errorProvider = new ErrorProvider(components);
             ((System.ComponentModel.ISupportInitialize)measurementsDataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)errorProvider).BeginInit();
@@ -262,7 +264,7 @@
             // 
             // cancelButton
             // 
-            cancelButton.Location = new Point(405, 616);
+            cancelButton.Location = new Point(404, 710);
             cancelButton.Name = "cancelButton";
             cancelButton.Size = new Size(75, 23);
             cancelButton.TabIndex = 25;
@@ -272,7 +274,7 @@
             // 
             // saveButton
             // 
-            saveButton.Location = new Point(324, 616);
+            saveButton.Location = new Point(323, 710);
             saveButton.Name = "saveButton";
             saveButton.Size = new Size(75, 23);
             saveButton.TabIndex = 26;
@@ -284,7 +286,7 @@
             // 
             measurementsLabel.AutoSize = true;
             measurementsLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            measurementsLabel.Location = new Point(40, 366);
+            measurementsLabel.Location = new Point(40, 471);
             measurementsLabel.Name = "measurementsLabel";
             measurementsLabel.Size = new Size(90, 15);
             measurementsLabel.TabIndex = 27;
@@ -295,7 +297,7 @@
             measurementsDataGridView.AllowUserToAddRows = false;
             measurementsDataGridView.AllowUserToDeleteRows = false;
             measurementsDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            measurementsDataGridView.Location = new Point(40, 391);
+            measurementsDataGridView.Location = new Point(40, 489);
             measurementsDataGridView.MultiSelect = false;
             measurementsDataGridView.Name = "measurementsDataGridView";
             measurementsDataGridView.ReadOnly = true;
@@ -305,7 +307,7 @@
             // 
             // addMeasurementButton
             // 
-            addMeasurementButton.Location = new Point(205, 558);
+            addMeasurementButton.Location = new Point(205, 656);
             addMeasurementButton.Name = "addMeasurementButton";
             addMeasurementButton.Size = new Size(75, 23);
             addMeasurementButton.TabIndex = 29;
@@ -315,7 +317,7 @@
             // 
             // updateMeasurementButton
             // 
-            updateMeasurementButton.Location = new Point(286, 558);
+            updateMeasurementButton.Location = new Point(286, 656);
             updateMeasurementButton.Name = "updateMeasurementButton";
             updateMeasurementButton.Size = new Size(75, 23);
             updateMeasurementButton.TabIndex = 30;
@@ -325,7 +327,7 @@
             // 
             // deleteMeasurementButton
             // 
-            deleteMeasurementButton.Location = new Point(367, 558);
+            deleteMeasurementButton.Location = new Point(367, 656);
             deleteMeasurementButton.Name = "deleteMeasurementButton";
             deleteMeasurementButton.Size = new Size(75, 23);
             deleteMeasurementButton.TabIndex = 31;
@@ -337,7 +339,7 @@
             // 
             totalMeasurementsLabel.AutoSize = true;
             totalMeasurementsLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            totalMeasurementsLabel.Location = new Point(40, 558);
+            totalMeasurementsLabel.Location = new Point(40, 656);
             totalMeasurementsLabel.Name = "totalMeasurementsLabel";
             totalMeasurementsLabel.Size = new Size(123, 15);
             totalMeasurementsLabel.TabIndex = 32;
@@ -347,11 +349,29 @@
             // 
             outOfToleranceLabel.AutoSize = true;
             outOfToleranceLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            outOfToleranceLabel.Location = new Point(40, 581);
+            outOfToleranceLabel.Location = new Point(40, 679);
             outOfToleranceLabel.Name = "outOfToleranceLabel";
             outOfToleranceLabel.Size = new Size(102, 15);
             outOfToleranceLabel.TabIndex = 33;
             outOfToleranceLabel.Text = "Out of tolerance:";
+            // 
+            // referenceStandardsLabel
+            // 
+            referenceStandardsLabel.AutoSize = true;
+            referenceStandardsLabel.Location = new Point(40, 363);
+            referenceStandardsLabel.Name = "referenceStandardsLabel";
+            referenceStandardsLabel.Size = new Size(114, 15);
+            referenceStandardsLabel.TabIndex = 34;
+            referenceStandardsLabel.Text = "Reference Standards";
+            // 
+            // referenceStandardsCheckedListBox
+            // 
+            referenceStandardsCheckedListBox.CheckOnClick = true;
+            referenceStandardsCheckedListBox.FormattingEnabled = true;
+            referenceStandardsCheckedListBox.Location = new Point(200, 363);
+            referenceStandardsCheckedListBox.Name = "referenceStandardsCheckedListBox";
+            referenceStandardsCheckedListBox.Size = new Size(260, 94);
+            referenceStandardsCheckedListBox.TabIndex = 35;
             // 
             // errorProvider
             // 
@@ -361,7 +381,9 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(491, 644);
+            ClientSize = new Size(491, 745);
+            Controls.Add(referenceStandardsCheckedListBox);
+            Controls.Add(referenceStandardsLabel);
             Controls.Add(saveButton);
             Controls.Add(cancelButton);
             Controls.Add(notesTextBox);
@@ -406,6 +428,9 @@
 
         #endregion
 
+
+        private Label referenceStandardsLabel;
+        private CheckedListBox referenceStandardsCheckedListBox;
         private Label instrumentLabel;
         private ComboBox instrumentComboBox;
         private Label procedureLabel;

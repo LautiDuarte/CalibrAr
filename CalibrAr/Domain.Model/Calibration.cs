@@ -229,5 +229,11 @@ namespace Domain.Model
             ArgumentNullException.ThrowIfNull(measurements);
             Measurements = measurements.ToList();
         }
+
+        public void SetReferenceStandards(IEnumerable<ReferenceStandard> referenceStandards)
+        {
+            ArgumentNullException.ThrowIfNull(referenceStandards);
+            ReferenceStandards = referenceStandards.ToList();
+        }
     }
 }

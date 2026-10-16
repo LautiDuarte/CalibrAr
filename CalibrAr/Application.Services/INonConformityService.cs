@@ -14,5 +14,6 @@ namespace Application.Services
         Task<NonConformityDTO?> GetAsync(int id);
         Task<IEnumerable<NonConformityDTO>> GetAllAsync();
         Task<bool> UpdateAsync(NonConformityDTO dto);
+        Task<bool> CloseAsync(int id, int closerUserId);
     }
 }
