@@ -1,0 +1,101 @@
+@page "/reference-standards/{Id:int}/edit"
+@attribute [Authorize(Policy = "ReferenceStandardsUpdate")]
+@inject ReferenceStandardApiClient ReferenceStandardApiClient
+@inject NavigationManager NavigationManager
+@inject FlashService Flash
+
+<PageTitle>Editar patrón de referencia - CalibrAr</PageTitle>
+
+<PageHeader Title="Editar patrón de referencia">
+    <Actions>
+        <a href="reference-standards" class="btn btn-sm btn-outline-secondary">← Volver</a>
+    </Actions>
+</PageHeader>
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger form-narrow">@errorMessage</div>
+}
+
+@if (model == null)
+{
+    @if (errorMessage == null)
+    {
+        <p class="text-secondary">Cargando...</p>
+    }
+}
+else
+{
+    <ReferenceStandardForm Model="model" OnValidSubmit="SaveAsync" Saving="saving" />
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private ReferenceStandardForm.ReferenceStandardFormModel? model;
+    private bool isActive;
+    private DateTime createdAt;
+    private string? errorMessage;
+    private bool saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            ReferenceStandardDTO standard = await ReferenceStandardApiClient.GetAsync(Id);
+            isActive = standard.IsActive;
+            createdAt = standard.CreatedAt;
+            model = new ReferenceStandardForm.ReferenceStandardFormModel
+            {
+                Description = standard.Description,
+                CertifyingBody = standard.CertifyingBody,
+                CertificateNumber = standard.CertificateNumber,
+                CertificateIssuedAt = standard.CertificateIssuedAt.Date,
+                CertificateExpiresAt = standard.CertificateExpiresAt.Date
+            };
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        saving = true;
+        try
+        {
+            // El formulario no edita "activo" (igual que WinForms): se conserva el valor que ya tenía.
+            await ReferenceStandardApiClient.UpdateAsync(new ReferenceStandardDTO
+            {
+                Id = Id,
+                Description = model!.Description.Trim(),
+                CertifyingBody = model.CertifyingBody.Trim(),
+                CertificateNumber = model.CertificateNumber.Trim(),
+                CertificateIssuedAt = model.CertificateIssuedAt.Date,
+                CertificateExpiresAt = model.CertificateExpiresAt.Date,
+                IsActive = isActive,
+                CreatedAt = createdAt
+            });
+            Flash.Success("Patrón de referencia actualizado.");
+            NavigationManager.NavigateTo("reference-standards");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}
