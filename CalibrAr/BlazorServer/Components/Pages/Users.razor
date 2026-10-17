@@ -1,0 +1,135 @@
+@page "/users"
+@attribute [Authorize(Policy = "UsersRead")]
+@inject UserApiClient UserApiClient
+@inject CurrentUser CurrentUser
+@inject NavigationManager NavigationManager
+@inject FlashService Flash
+@inject IJSRuntime JS
+
+<PageTitle>Usuarios - CalibrAr</PageTitle>
+
+<PageHeader Title="Usuarios" Count="users?.Count">
+    <Actions>
+        <AuthorizeView Policy="UsersCreate">
+            <a href="users/new" class="btn btn-primary">Nuevo usuario</a>
+        </AuthorizeView>
+    </Actions>
+</PageHeader>
+
+<FlashBanner />
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+@if (users == null)
+{
+    <p class="text-secondary">Cargando...</p>
+}
+else if (users.Count == 0)
+{
+    <p class="text-secondary">No hay usuarios cargados.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Activo</th>
+                    <th>Último acceso</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in users)
+                {
+                    <tr>
+                        <td>
+                            @user.FullName
+                            @if (user.Id == currentUserId)
+                            {
+                                <span class="text-secondary small">(vos)</span>
+                            }
+                        </td>
+                        <td>@user.Email</td>
+                        <td>@user.Role</td>
+                        <td>
+                            <StatusBadge Text="@(user.IsActive ? "Sí" : "No")" Kind="@(user.IsActive ? "success" : "secondary")" />
+                        </td>
+                        <td>@(user.LastLoginAt?.ToString("dd/MM/yyyy HH:mm") ?? "Nunca")</td>
+                        <td class="text-end text-nowrap">
+                            <AuthorizeView Policy="UsersUpdate">
+                                <a href="users/@user.Id/edit" class="btn btn-sm btn-outline-primary">Editar</a>
+                            </AuthorizeView>
+                            @* Tu propio usuario no se puede borrar (la API también lo rechaza). *@
+                            @if (user.Id != currentUserId)
+                            {
+                                <AuthorizeView Policy="UsersDelete">
+                                    <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteAsync(user)">Eliminar</button>
+                                </AuthorizeView>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<UserDTO>? users;
+    private int? currentUserId;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUserId = await CurrentUser.GetIdAsync();
+        await LoadUsers();
+    }
+
+    private async Task LoadUsers()
+    {
+        try
+        {
+            users = await UserApiClient.GetAllAsync();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+            users = new List<UserDTO>();
+        }
+    }
+
+    private async Task DeleteAsync(UserDTO user)
+    {
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"¿Eliminar al usuario \"{user.FullName}\"?");
+        if (!confirmed)
+            return;
+
+        try
+        {
+            // La API necesita saber quién pide el borrado para aplicar sus reglas de autoprotección.
+            await UserApiClient.DeleteAsync(user.Id, currentUserId);
+            errorMessage = null;
+            await LoadUsers();
+            Flash.Success($"Usuario \"{user.FullName}\" eliminado.");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+}

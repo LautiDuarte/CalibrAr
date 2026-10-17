@@ -30,7 +30,7 @@ builder.Services.AddAuthorization(options =>
 {
     // Mismo esquema que la WebAPI: la política "LocationsRead" exige el claim permission "Locations.read".
     // Solo las entidades que tienen pantalla en Blazor.
-    string[] categories = ["Locations", "Areas", "Instruments", "InstrumentTypes", "Procedures", "ReferenceStandards", "InstrumentStatusHistory"];
+    string[] categories = ["Locations", "Areas", "Instruments", "InstrumentTypes", "Procedures", "ReferenceStandards", "InstrumentStatusHistory", "Users"];
     (string Suffix, string Action)[] actions =
     [
         ("Read", "read"), ("Create", "create"), ("Update", "update"), ("Delete", "delete")
@@ -61,6 +61,7 @@ builder.Services.AddScoped<InstrumentApiClient>();
 builder.Services.AddScoped<ProcedureApiClient>();
 builder.Services.AddScoped<ReferenceStandardApiClient>();
 builder.Services.AddScoped<InstrumentStatusHistoryApiClient>();
+builder.Services.AddScoped<UserApiClient>();
 
 // Mensaje de "guardado" entre pantallas, uno por usuario.
 builder.Services.AddScoped<FlashService>();

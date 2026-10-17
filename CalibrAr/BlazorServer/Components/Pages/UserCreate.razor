@@ -1,0 +1,56 @@
+@page "/users/new"
+@attribute [Authorize(Policy = "UsersCreate")]
+@inject UserApiClient UserApiClient
+@inject NavigationManager NavigationManager
+@inject FlashService Flash
+
+<PageTitle>Nuevo usuario - CalibrAr</PageTitle>
+
+<PageHeader Title="Nuevo usuario">
+    <Actions>
+        <a href="users" class="btn btn-sm btn-outline-secondary">← Volver</a>
+    </Actions>
+</PageHeader>
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger form-narrow">@errorMessage</div>
+}
+
+<UserForm Model="model" OnValidSubmit="SaveAsync" Saving="saving" />
+
+@code {
+    private UserForm.UserFormModel model = new() { IsNew = true };
+    private string? errorMessage;
+    private bool saving;
+
+    private async Task SaveAsync()
+    {
+        saving = true;
+        try
+        {
+            // El servicio crea el usuario activo y le asigna el grupo de permisos según el rol.
+            await UserApiClient.AddAsync(new UserDTO
+            {
+                FullName = model.FullName.Trim(),
+                Email = model.Email.Trim(),
+                Role = model.Role,
+                Password = model.Password
+            });
+            Flash.Success("Usuario creado.");
+            NavigationManager.NavigateTo("users");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace BlazorServer
 {
@@ -15,7 +16,7 @@ namespace BlazorServer
                 {
                     using var json = JsonDocument.Parse(ex.Message[start..]);
                     if (json.RootElement.TryGetProperty("error", out var error) && error.GetString() is string text)
-                        return text;
+                        return RemoveParameterSuffix(text);
                 }
                 catch (JsonException)
                 {
@@ -27,5 +28,10 @@ namespace BlazorServer
 
             return ex.Message;
         }
+
+        // Los ArgumentException del dominio terminan con " (Parameter 'email')": útil para quien programa,
+        // pero no para quien usa la pantalla.
+        private static string RemoveParameterSuffix(string text) =>
+            Regex.Replace(text, @"\s*\(Parameter '[^']*'\)\s*$", string.Empty);
     }
 }
