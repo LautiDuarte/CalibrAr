@@ -8,7 +8,13 @@
 
 <PageTitle>Calibraciones - CalibrAr</PageTitle>
 
-<PageHeader Title="Calibraciones" Count="calibrations?.Count" Subtitle="@FilterSubtitle" />
+<PageHeader Title="Calibraciones" Count="calibrations?.Count" Subtitle="@FilterSubtitle">
+    <Actions>
+        <AuthorizeView Policy="CalibrationsCreate">
+            <a href="calibrations/new" class="btn btn-primary">Nueva calibración</a>
+        </AuthorizeView>
+    </Actions>
+</PageHeader>
 
 <FlashBanner />
 
@@ -126,6 +132,17 @@ else
                                 }
                             </td>
                             <td class="text-end text-nowrap">
+                                @* Una calibración aprobada se abre en solo lectura. *@
+                                <AuthorizeView Policy="CalibrationsUpdate">
+                                    @if (calibration.ApprovedByUserId.HasValue)
+                                    {
+                                        <a href="calibrations/@calibration.Id/edit" class="btn btn-sm btn-outline-secondary">Ver</a>
+                                    }
+                                    else
+                                    {
+                                        <a href="calibrations/@calibration.Id/edit" class="btn btn-sm btn-outline-primary">Editar</a>
+                                    }
+                                </AuthorizeView>
                                 @if (CanApprove(calibration))
                                 {
                                     <AuthorizeView Policy="CalibrationsUpdate">

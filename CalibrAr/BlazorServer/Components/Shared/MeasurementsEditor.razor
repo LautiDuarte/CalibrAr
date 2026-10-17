@@ -1,0 +1,236 @@
+<h2 class="form-section">Mediciones</h2>
+
+@if (!ReadOnly)
+{
+    @if (MaxAllowedError == null)
+    {
+        <div class="alert alert-warning">
+            Ni el instrumento ni su tipo definen un error máximo permitido, así que no se pueden cargar mediciones.
+            Elegí un instrumento o definí el error máximo en el instrumento o en su tipo.
+        </div>
+    }
+    else
+    {
+        <p class="text-secondary small">Error máximo permitido: @MaxAllowedError.Value.ToString("0.####")</p>
+    }
+}
+
+@if (Measurements.Count == 0)
+{
+    <p class="text-secondary">No hay mediciones cargadas.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm align-middle">
+            <thead>
+                <tr>
+                    <th class="text-end">Nominal</th>
+                    <th class="text-end">Medido</th>
+                    <th class="text-end">Error</th>
+                    <th>Tolerancia</th>
+                    <th>Notas</th>
+                    @if (!ReadOnly)
+                    {
+                        <th></th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Measurements.Count; i++)
+                {
+                    var index = i;
+                    var measurement = Measurements[i];
+                    var error = measurement.MeasuredValue - measurement.NominalValue;
+
+                    <tr class="@(editingIndex == index ? "table-active" : string.Empty)">
+                        <td class="text-end">@measurement.NominalValue.ToString("0.####")</td>
+                        <td class="text-end">@measurement.MeasuredValue.ToString("0.####")</td>
+                        <td class="text-end">@error.ToString("0.####")</td>
+                        <td>
+                            @if (ReadOnly || MaxAllowedError != null)
+                            {
+                                <StatusBadge Text="@(WithinTolerance(measurement, error) ? "Dentro" : "Fuera")"
+                                             Kind="@(WithinTolerance(measurement, error) ? "success" : "danger")" />
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                        <td>@measurement.Notes</td>
+                        @if (!ReadOnly)
+                        {
+                            <td class="text-end text-nowrap">
+                                <button type="button" class="btn btn-sm btn-outline-primary" @onclick="() => Edit(index)">Editar</button>
+                                <button type="button" class="btn btn-sm btn-outline-danger" @onclick="() => Remove(index)">Quitar</button>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@if (!ReadOnly && MaxAllowedError != null)
+{
+    @* Estos campos no están dentro de un <form>: así Enter agrega la medición y no envía la calibración. *@
+    <div class="card card-body bg-body-tertiary" @onkeydown="OnKeyDown">
+        <div class="fw-semibold mb-2">@(editingIndex.HasValue ? "Editar medición" : "Agregar medición")</div>
+
+        <div class="row g-2">
+            <div class="col-sm-3">
+                <label for="nominal" class="form-label small">Valor nominal</label>
+                <input id="nominal" type="number" step="any" class="form-control" @bind="nominal" @bind:event="oninput" />
+            </div>
+            <div class="col-sm-3">
+                <label for="measured" class="form-label small">Valor medido</label>
+                <input id="measured" type="number" step="any" class="form-control" @bind="measured" @bind:event="oninput" />
+            </div>
+            <div class="col-sm-6">
+                <label for="measurementNotes" class="form-label small">Notas (opcional)</label>
+                <input id="measurementNotes" type="text" maxlength="500" class="form-control" @bind="notes" />
+            </div>
+        </div>
+
+        @if (nominal.HasValue && measured.HasValue)
+        {
+            var previewError = measured.Value - nominal.Value;
+            <div class="small mt-2">
+                Error: @previewError.ToString("0.####") -
+                @if (Math.Abs(previewError) <= MaxAllowedError.Value)
+                {
+                    <span class="text-success">dentro de la tolerancia</span>
+                }
+                else
+                {
+                    <span class="text-danger">fuera de la tolerancia</span>
+                }
+            </div>
+        }
+
+        @if (validationMessage != null)
+        {
+            <div class="validation-message small mt-2">@validationMessage</div>
+        }
+
+        <div class="mt-3">
+            <button type="button" class="btn btn-sm btn-primary" @onclick="Save">@(editingIndex.HasValue ? "Guardar cambios" : "Agregar medición")</button>
+            @if (editingIndex.HasValue)
+            {
+                <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="Reset">Cancelar</button>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    // La lista es de quien lo usa: acá se agregan, cambian y quitan filas, y recién se guardan con la calibración.
+    [Parameter, EditorRequired]
+    public List<CalibrationMeasurementDTO> Measurements { get; set; } = default!;
+
+    // El del instrumento, o el de su tipo si el instrumento no define uno.
+    [Parameter]
+    public decimal? MaxAllowedError { get; set; }
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    private decimal? nominal;
+    private decimal? measured;
+    private string? notes;
+    private int? editingIndex;
+    private string? validationMessage;
+
+    // Solo lectura: se muestra lo que quedó guardado. Si se edita, se evalúa con el error máximo actual.
+    private bool WithinTolerance(CalibrationMeasurementDTO measurement, decimal error) =>
+        ReadOnly ? measurement.IsWithinTolerance : Math.Abs(error) <= MaxAllowedError!.Value;
+
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            Save();
+    }
+
+    private void Save()
+    {
+        validationMessage = null;
+
+        if (nominal is null || nominal <= 0)
+        {
+            validationMessage = "El valor nominal debe ser mayor a 0.";
+            return;
+        }
+
+        if (measured is null || measured <= 0)
+        {
+            validationMessage = "El valor medido debe ser mayor a 0.";
+            return;
+        }
+
+        // La base guarda 4 decimales: se avisa en lugar de redondear sin que se note.
+        if (decimal.Round(nominal.Value, 4) != nominal.Value || decimal.Round(measured.Value, 4) != measured.Value)
+        {
+            validationMessage = "Los valores pueden tener hasta 4 decimales.";
+            return;
+        }
+
+        decimal error = measured.Value - nominal.Value;
+        bool within = Math.Abs(error) <= MaxAllowedError!.Value;
+        string? cleanNotes = string.IsNullOrWhiteSpace(notes) ? null : notes.Trim();
+
+        if (editingIndex is int index)
+        {
+            // Se conserva el Id: la API usa el Id para saber qué medición se está modificando.
+            var existing = Measurements[index];
+            existing.NominalValue = nominal.Value;
+            existing.MeasuredValue = measured.Value;
+            existing.Error = error;
+            existing.IsWithinTolerance = within;
+            existing.Notes = cleanNotes;
+        }
+        else
+        {
+            Measurements.Add(new CalibrationMeasurementDTO
+            {
+                NominalValue = nominal.Value,
+                MeasuredValue = measured.Value,
+                Error = error,
+                IsWithinTolerance = within,
+                Notes = cleanNotes
+            });
+        }
+
+        Reset();
+    }
+
+    private void Edit(int index)
+    {
+        var measurement = Measurements[index];
+        nominal = measurement.NominalValue;
+        measured = measurement.MeasuredValue;
+        notes = measurement.Notes;
+        editingIndex = index;
+        validationMessage = null;
+    }
+
+    private void Remove(int index)
+    {
+        Measurements.RemoveAt(index);
+
+        if (editingIndex == index)
+            Reset();
+        else if (editingIndex > index)
+            editingIndex--;
+    }
+
+    private void Reset()
+    {
+        nominal = null;
+        measured = null;
+        notes = null;
+        editingIndex = null;
+        validationMessage = null;
+    }
+}
