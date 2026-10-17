@@ -1,0 +1,106 @@
+@page "/instruments/{Id:int}"
+@attribute [Authorize(Policy = "InstrumentsRead")]
+@inject InstrumentApiClient InstrumentApiClient
+@inject NavigationManager NavigationManager
+
+<PageTitle>Detalle de instrumento - CalibrAr</PageTitle>
+
+<PageHeader Title="@(instrument == null ? "Instrumento" : $"{instrument.Code} - {instrument.Name}")">
+    <Actions>
+        <a href="instruments" class="btn btn-sm btn-outline-secondary">← Volver</a>
+        <AuthorizeView Policy="InstrumentsUpdate">
+            <a href="instruments/@Id/status" class="btn btn-sm btn-outline-primary">Cambiar estado</a>
+            <a href="instruments/@Id/edit" class="btn btn-sm btn-primary">Editar</a>
+        </AuthorizeView>
+    </Actions>
+</PageHeader>
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+@if (instrument == null)
+{
+    @if (errorMessage == null)
+    {
+        <p class="text-secondary">Cargando...</p>
+    }
+}
+else
+{
+    <dl class="row mb-0">
+        <dt class="col-sm-3">Código</dt>
+        <dd class="col-sm-9 font-monospace">@instrument.Code</dd>
+
+        <dt class="col-sm-3">Nombre</dt>
+        <dd class="col-sm-9">@instrument.Name</dd>
+
+        <dt class="col-sm-3">Marca y modelo</dt>
+        <dd class="col-sm-9">@(JoinOrDash(instrument.Brand, instrument.Model))</dd>
+
+        <dt class="col-sm-3">N° de serie</dt>
+        <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(instrument.SerialNumber) ? "-" : instrument.SerialNumber)</dd>
+
+        <dt class="col-sm-3">Tipo de instrumento</dt>
+        <dd class="col-sm-9">@instrument.InstrumentTypeName</dd>
+
+        <dt class="col-sm-3">Área</dt>
+        <dd class="col-sm-9">@instrument.AreaName</dd>
+
+        <dt class="col-sm-3">Estado actual</dt>
+        <dd class="col-sm-9">
+            <StatusBadge Text="@InstrumentForm.StatusText(instrument.Status)" Kind="@InstrumentForm.StatusKind(instrument.Status)" />
+        </dd>
+
+        <dt class="col-sm-3">Última calibración</dt>
+        <dd class="col-sm-9">@(instrument.LastCalibrationDate?.ToString("dd/MM/yyyy") ?? "Sin calibraciones")</dd>
+
+        <dt class="col-sm-3">Próxima calibración</dt>
+        <dd class="col-sm-9">@(instrument.NextCalibrationDate?.ToString("dd/MM/yyyy") ?? "-")</dd>
+
+        <dt class="col-sm-3">Frecuencia (meses)</dt>
+        <dd class="col-sm-9">@(instrument.CalibrationFrequencyMonths?.ToString() ?? "La del tipo de instrumento")</dd>
+
+        <dt class="col-sm-3">Error máximo</dt>
+        <dd class="col-sm-9">@(instrument.MaxAllowedError?.ToString() ?? "El del tipo de instrumento")</dd>
+
+        <dt class="col-sm-3">Alta en el sistema</dt>
+        <dd class="col-sm-9">@instrument.CreatedAt.ToString("dd/MM/yyyy")</dd>
+    </dl>
+
+    @* El historial lo ven solo quienes tienen ese permiso; el componente recién se crea (y llama a la API) si lo tienen. *@
+    <AuthorizeView Policy="InstrumentStatusHistoryRead">
+        <InstrumentStatusTimeline InstrumentId="Id" CreatedAt="instrument.CreatedAt" CurrentStatus="@instrument.Status" />
+    </AuthorizeView>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private InstrumentDTO? instrument;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            instrument = await InstrumentApiClient.GetAsync(Id);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+
+    private static string JoinOrDash(string? brand, string? model)
+    {
+        var text = string.Join(" ", new[] { brand, model }.Where(s => !string.IsNullOrWhiteSpace(s)));
+        return text == string.Empty ? "-" : text;
+    }
+}

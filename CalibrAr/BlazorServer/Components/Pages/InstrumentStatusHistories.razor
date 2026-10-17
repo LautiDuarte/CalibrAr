@@ -1,0 +1,118 @@
+@page "/instrument-status-history"
+@attribute [Authorize(Policy = "InstrumentStatusHistoryRead")]
+@inject InstrumentStatusHistoryApiClient InstrumentStatusHistoryApiClient
+@inject NavigationManager NavigationManager
+
+<PageTitle>Historial de estados - CalibrAr</PageTitle>
+
+<PageHeader Title="Historial de estados" Count="histories?.Count" Subtitle="@FilterSubtitle" />
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+@if (histories == null)
+{
+    <p class="text-secondary">Cargando...</p>
+}
+else if (histories.Count == 0)
+{
+    <p class="text-secondary">Todavía no hay cambios de estado registrados.</p>
+}
+else
+{
+    var filtered = FilteredHistories;
+
+    <div class="row g-2 mb-3">
+        <div class="col-md-4">
+            <select class="form-select" @bind="instrumentFilter">
+                <option value="">Todos los instrumentos</option>
+                @foreach (var instrument in instruments)
+                {
+                    <option value="@instrument.Id">@instrument.Code</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2 d-grid">
+            @if (instrumentFilter != string.Empty)
+            {
+                <button class="btn btn-outline-secondary" @onclick="ClearFilter">Limpiar</button>
+            }
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Fecha y hora</th>
+                    <th>Instrumento</th>
+                    <th>Estado anterior</th>
+                    <th>Estado nuevo</th>
+                    <th>Cambiado por</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var history in filtered)
+                {
+                    <tr>
+                        <td>@history.ChangedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td><a href="instruments/@history.InstrumentId" class="font-monospace">@history.InstrumentCode</a></td>
+                        <td>
+                            <StatusBadge Text="@InstrumentForm.StatusText(history.PreviousStatus)" Kind="@InstrumentForm.StatusKind(history.PreviousStatus)" />
+                        </td>
+                        <td>
+                            <StatusBadge Text="@InstrumentForm.StatusText(history.NewStatus)" Kind="@InstrumentForm.StatusKind(history.NewStatus)" />
+                        </td>
+                        @* Los cambios que hace una persona llevan su nombre; sin autor es un cambio automático del sistema. *@
+                        <td>@(history.ChangedByUserName ?? "Sistema")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<InstrumentStatusHistoryDTO>? histories;
+    private List<(int Id, string Code)> instruments = new();
+    private string instrumentFilter = string.Empty;
+    private string? errorMessage;
+
+    private List<InstrumentStatusHistoryDTO> FilteredHistories => histories!
+        .Where(h => instrumentFilter == string.Empty || h.InstrumentId.ToString() == instrumentFilter)
+        .ToList();
+
+    private string? FilterSubtitle =>
+        histories != null && instrumentFilter != string.Empty ? $"{FilteredHistories.Count} de {histories.Count} registros" : null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var all = await InstrumentStatusHistoryApiClient.GetAllAsync();
+            histories = all.OrderByDescending(h => h.ChangedAt).ToList();
+
+            instruments = histories
+                .GroupBy(h => h.InstrumentId)
+                .Select(g => (g.Key, g.First().InstrumentCode ?? g.Key.ToString()))
+                .OrderBy(i => i.Item2)
+                .ToList();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+            histories = new List<InstrumentStatusHistoryDTO>();
+        }
+    }
+
+    private void ClearFilter()
+    {
+        instrumentFilter = string.Empty;
+    }
+}

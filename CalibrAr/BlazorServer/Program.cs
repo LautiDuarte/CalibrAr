@@ -30,7 +30,7 @@ builder.Services.AddAuthorization(options =>
 {
     // Mismo esquema que la WebAPI: la política "LocationsRead" exige el claim permission "Locations.read".
     // Solo las entidades que tienen pantalla en Blazor.
-    string[] categories = ["Locations", "Areas", "Instruments", "InstrumentTypes", "Procedures", "ReferenceStandards"];
+    string[] categories = ["Locations", "Areas", "Instruments", "InstrumentTypes", "Procedures", "ReferenceStandards", "InstrumentStatusHistory"];
     (string Suffix, string Action)[] actions =
     [
         ("Read", "read"), ("Create", "create"), ("Update", "update"), ("Delete", "delete")
@@ -60,9 +60,13 @@ builder.Services.AddScoped<InstrumentTypeApiClient>();
 builder.Services.AddScoped<InstrumentApiClient>();
 builder.Services.AddScoped<ProcedureApiClient>();
 builder.Services.AddScoped<ReferenceStandardApiClient>();
+builder.Services.AddScoped<InstrumentStatusHistoryApiClient>();
 
 // Mensaje de "guardado" entre pantallas, uno por usuario.
 builder.Services.AddScoped<FlashService>();
+
+// Id del usuario de la sesión, para las operaciones que la API pide "quién lo hizo".
+builder.Services.AddScoped<CurrentUser>();
 
 var app = builder.Build();
 

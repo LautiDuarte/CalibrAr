@@ -99,12 +99,14 @@ else
                             <td>@instrument.InstrumentTypeName</td>
                             <td>@instrument.AreaName</td>
                             <td>
-                                <StatusBadge Text="@InstrumentForm.StatusText(instrument.Status)" Kind="@StatusKind(instrument.Status)" />
+                                <StatusBadge Text="@InstrumentForm.StatusText(instrument.Status)" Kind="@InstrumentForm.StatusKind(instrument.Status)" />
                             </td>
                             <td>@(instrument.NextCalibrationDate?.ToString("dd/MM/yyyy") ?? "-")</td>
                             <td class="text-end text-nowrap">
+                                <a href="instruments/@instrument.Id" class="btn btn-sm btn-outline-secondary">Ver</a>
                                 <AuthorizeView Policy="InstrumentsUpdate">
                                     <a href="instruments/@instrument.Id/edit" class="btn btn-sm btn-outline-primary">Editar</a>
+                                    <a href="instruments/@instrument.Id/status" class="btn btn-sm btn-outline-primary">Estado</a>
                                 </AuthorizeView>
                                 <AuthorizeView Policy="InstrumentsDelete">
                                     <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteAsync(instrument)">Eliminar</button>
@@ -163,14 +165,6 @@ else
         statusFilter = string.Empty;
         areaFilter = string.Empty;
     }
-
-    private static string StatusKind(string status) => status switch
-    {
-        "Active" => "success",
-        "CalibrationExpired" => "danger",
-        "Decommissioned" => "secondary",
-        _ => "warning"
-    };
 
     private async Task LoadInstruments()
     {

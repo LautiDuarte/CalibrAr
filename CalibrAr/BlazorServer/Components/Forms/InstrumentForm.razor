@@ -71,13 +71,14 @@
     @if (IsEdit)
     {
         <div class="mb-3">
-            <label for="status" class="form-label">Estado</label>
-            <InputSelect id="status" class="form-select" @bind-Value="Model.Status">
-                @foreach (var status in Enum.GetValues<InstrumentStatusDTO>())
+            <label class="form-label">Estado</label>
+            <div>
+                <StatusBadge Text="@StatusText(Model.Status)" Kind="@StatusKind(Model.Status)" />
+                @if (InstrumentId.HasValue)
                 {
-                    <option value="@status">@StatusText(status.ToString())</option>
+                    <a href="instruments/@InstrumentId/status" class="ms-2">Cambiar estado</a>
                 }
-            </InputSelect>
+            </div>
         </div>
     }
 
@@ -118,11 +119,35 @@
     [Parameter]
     public bool IsEdit { get; set; }
 
+    // Para armar el link "Cambiar estado": el estado ya no se edita acá, tiene su propia pantalla.
+    [Parameter]
+    public int? InstrumentId { get; set; }
+
+    // Estados que una persona puede elegir. "Calibración vencida" no está: la pone el sistema solo
+    // cuando pasa la fecha de la próxima calibración y se saca registrando una calibración.
+    public static readonly string[] ManualStatuses =
+    [
+        nameof(InstrumentStatusDTO.Active),
+        nameof(InstrumentStatusDTO.TemporarilyOutOfService),
+        nameof(InstrumentStatusDTO.UnderRepair),
+        nameof(InstrumentStatusDTO.OnLoan),
+        nameof(InstrumentStatusDTO.Decommissioned)
+    ];
+
     [Parameter]
     public EventCallback OnValidSubmit { get; set; }
 
     [Parameter]
     public bool Saving { get; set; }
+
+    // Color de la etiqueta de estado (compartido por la lista de instrumentos y el historial).
+    public static string StatusKind(string status) => status switch
+    {
+        "Active" => "success",
+        "CalibrationExpired" => "danger",
+        "Decommissioned" => "secondary",
+        _ => "warning"
+    };
 
     public static string StatusText(string status) => status switch
     {

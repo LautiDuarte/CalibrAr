@@ -5,6 +5,7 @@
 @inject AreaApiClient AreaApiClient
 @inject NavigationManager NavigationManager
 @inject FlashService Flash
+@inject CurrentUser CurrentUser
 
 <PageTitle>Editar instrumento - CalibrAr</PageTitle>
 
@@ -28,7 +29,7 @@
 }
 else
 {
-    <InstrumentForm Model="model" InstrumentTypes="instrumentTypes" Areas="areas" IsEdit="true" OnValidSubmit="SaveAsync" Saving="saving" />
+    <InstrumentForm Model="model" InstrumentTypes="instrumentTypes" Areas="areas" IsEdit="true" InstrumentId="Id" OnValidSubmit="SaveAsync" Saving="saving" />
 }
 
 @code {
@@ -87,6 +88,7 @@ else
                 Brand = model.Brand,
                 Model = model.Model,
                 Status = model.Status,
+                ChangedByUserId = await CurrentUser.GetIdAsync(),
                 MaxAllowedError = model.MaxAllowedError,
                 CalibrationFrequencyMonths = model.CalibrationFrequencyMonths,
                 InstrumentTypeId = model.InstrumentTypeId,
