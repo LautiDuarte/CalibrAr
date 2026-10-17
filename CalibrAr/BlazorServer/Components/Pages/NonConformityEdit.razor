@@ -1,0 +1,221 @@
+@page "/non-conformities/{Id:int}/edit"
+@attribute [Authorize(Policy = "NonConformitiesUpdate")]
+@inject NonConformityApiClient NonConformityApiClient
+@inject InstrumentApiClient InstrumentApiClient
+@inject CalibrationApiClient CalibrationApiClient
+@inject CurrentUser CurrentUser
+@inject NavigationManager NavigationManager
+@inject FlashService Flash
+@inject IJSRuntime JS
+
+<PageTitle>No conformidad - CalibrAr</PageTitle>
+
+<PageHeader Title="@(nonConformity == null ? "No conformidad" : $"No conformidad {nonConformity.Code}")">
+    <Actions>
+        <a href="non-conformities" class="btn btn-sm btn-outline-secondary">← Volver</a>
+        @if (nonConformity != null && !IsClosed)
+        {
+            <button class="btn btn-sm btn-outline-success" @onclick="CloseAsync" disabled="@saving">Cerrar no conformidad</button>
+        }
+    </Actions>
+</PageHeader>
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+@if (nonConformity == null)
+{
+    @if (errorMessage == null)
+    {
+        <p class="text-secondary">Cargando...</p>
+    }
+}
+else if (IsClosed)
+{
+    @* Cerrada: solo lectura. Para modificarla hay que reabrirla (la API vuelve el estado a "Abierta"). *@
+    <div class="alert alert-secondary">
+        Cerrada el @nonConformity.ClosedAt?.ToString("dd/MM/yyyy HH:mm") por @nonConformity.ClosedByUserName.
+        Para modificarla hay que reabrirla.
+    </div>
+
+    <dl class="row">
+        <dt class="col-sm-3">Código</dt>
+        <dd class="col-sm-9 font-monospace">@nonConformity.Code</dd>
+
+        <dt class="col-sm-3">Instrumento</dt>
+        <dd class="col-sm-9">@nonConformity.InstrumentCode</dd>
+
+        <dt class="col-sm-3">Calibración</dt>
+        <dd class="col-sm-9">@(nonConformity.CalibrationCertificateNumber ?? "-")</dd>
+
+        <dt class="col-sm-3">Origen</dt>
+        <dd class="col-sm-9">@NonConformityForm.OriginText(nonConformity.Origin)</dd>
+
+        <dt class="col-sm-3">Descripción</dt>
+        <dd class="col-sm-9">@nonConformity.Description</dd>
+
+        <dt class="col-sm-3">Acción correctiva</dt>
+        <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(nonConformity.CorrectiveAction) ? "-" : nonConformity.CorrectiveAction)</dd>
+
+        <dt class="col-sm-3">Detectada</dt>
+        <dd class="col-sm-9">@nonConformity.OpenedAt.ToString("dd/MM/yyyy HH:mm") por @nonConformity.DetectedByUserName</dd>
+    </dl>
+
+    <button class="btn btn-outline-primary" @onclick="ReopenAsync" disabled="@saving">Reabrir</button>
+}
+else if (instruments != null && calibrations != null && model != null)
+{
+    <p class="text-secondary">
+        Detectada el @nonConformity.OpenedAt.ToString("dd/MM/yyyy HH:mm") por @nonConformity.DetectedByUserName.
+    </p>
+
+    <NonConformityForm Model="model" Instruments="instruments" Calibrations="calibrations" IsEdit="true" OnValidSubmit="SaveAsync" Saving="saving" />
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private NonConformityDTO? nonConformity;
+    private NonConformityForm.NonConformityFormModel? model;
+    private List<InstrumentDTO>? instruments;
+    private List<CalibrationDTO>? calibrations;
+    private string? errorMessage;
+    private bool saving;
+
+    // En la API, "cerrada" significa que tiene quién la cerró.
+    private bool IsClosed => nonConformity?.ClosedByUserId.HasValue == true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            nonConformity = await NonConformityApiClient.GetAsync(Id);
+
+            // Si está cerrada solo se muestra: no hace falta traer instrumentos ni calibraciones.
+            if (IsClosed)
+                return;
+
+            instruments = await InstrumentApiClient.GetAllAsync();
+            calibrations = await CalibrationApiClient.GetAllAsync();
+            model = new NonConformityForm.NonConformityFormModel
+            {
+                Code = nonConformity.Code,
+                InstrumentId = nonConformity.InstrumentId,
+                CalibrationId = nonConformity.CalibrationId ?? 0,
+                Origin = nonConformity.Origin,
+                Description = nonConformity.Description,
+                CorrectiveAction = nonConformity.CorrectiveAction,
+                Status = nonConformity.Status
+            };
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        saving = true;
+        try
+        {
+            // Se modifica sobre lo que ya había (quién la detectó, fecha de apertura…), que el formulario no edita.
+            nonConformity!.Code = model!.Code.Trim();
+            nonConformity.Description = model.Description.Trim();
+            nonConformity.Origin = model.Origin;
+            nonConformity.CorrectiveAction = string.IsNullOrWhiteSpace(model.CorrectiveAction) ? null : model.CorrectiveAction.Trim();
+            nonConformity.InstrumentId = model.InstrumentId;
+            nonConformity.CalibrationId = model.CalibrationId == 0 ? null : model.CalibrationId;
+            nonConformity.Status = model.Status;
+
+            await NonConformityApiClient.UpdateAsync(nonConformity);
+            Flash.Success("No conformidad actualizada.");
+            NavigationManager.NavigateTo("non-conformities");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private async Task CloseAsync()
+    {
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"¿Cerrar la no conformidad \"{nonConformity!.Code}\"?");
+        if (!confirmed)
+            return;
+
+        int? userId = await CurrentUser.GetIdAsync();
+        if (userId == null)
+        {
+            errorMessage = "No se pudo identificar al usuario de la sesión. Volvé a iniciar sesión.";
+            return;
+        }
+
+        saving = true;
+        try
+        {
+            await NonConformityApiClient.CloseAsync(Id, userId.Value);
+            Flash.Success($"No conformidad \"{nonConformity.Code}\" cerrada.");
+            NavigationManager.NavigateTo("non-conformities");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private async Task ReopenAsync()
+    {
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"¿Reabrir la no conformidad \"{nonConformity!.Code}\"?");
+        if (!confirmed)
+            return;
+
+        saving = true;
+        try
+        {
+            // Sin "cerrada por", la API la considera abierta: limpia la fecha de cierre y el estado vuelve a "Abierta".
+            nonConformity.ClosedByUserId = null;
+            nonConformity.ClosedAt = null;
+            nonConformity.Status = "Open";
+
+            await NonConformityApiClient.UpdateAsync(nonConformity);
+            Flash.Success($"No conformidad \"{nonConformity.Code}\" reabierta.");
+            NavigationManager.NavigateTo("non-conformities");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

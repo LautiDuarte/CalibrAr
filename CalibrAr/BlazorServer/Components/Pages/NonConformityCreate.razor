@@ -1,0 +1,99 @@
+@page "/non-conformities/new"
+@attribute [Authorize(Policy = "NonConformitiesCreate")]
+@inject NonConformityApiClient NonConformityApiClient
+@inject InstrumentApiClient InstrumentApiClient
+@inject CalibrationApiClient CalibrationApiClient
+@inject CurrentUser CurrentUser
+@inject NavigationManager NavigationManager
+@inject FlashService Flash
+
+<PageTitle>Nueva no conformidad - CalibrAr</PageTitle>
+
+<PageHeader Title="Nueva no conformidad">
+    <Actions>
+        <a href="non-conformities" class="btn btn-sm btn-outline-secondary">← Volver</a>
+    </Actions>
+</PageHeader>
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger form-narrow">@errorMessage</div>
+}
+
+@if (instruments == null || calibrations == null)
+{
+    @if (errorMessage == null)
+    {
+        <p class="text-secondary">Cargando...</p>
+    }
+}
+else
+{
+    <NonConformityForm Model="model" Instruments="instruments" Calibrations="calibrations" OnValidSubmit="SaveAsync" Saving="saving" />
+}
+
+@code {
+    private NonConformityForm.NonConformityFormModel model = new();
+    private List<InstrumentDTO>? instruments;
+    private List<CalibrationDTO>? calibrations;
+    private string? errorMessage;
+    private bool saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            instruments = await InstrumentApiClient.GetAllAsync();
+            calibrations = await CalibrationApiClient.GetAllAsync();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        int? userId = await CurrentUser.GetIdAsync();
+        if (userId == null)
+        {
+            errorMessage = "No se pudo identificar al usuario de la sesión. Volvé a iniciar sesión.";
+            return;
+        }
+
+        saving = true;
+        try
+        {
+            // "Detectada por" es quien carga la no conformidad. El servicio la crea "Abierta" con la fecha de hoy.
+            await NonConformityApiClient.AddAsync(new NonConformityDTO
+            {
+                Code = model.Code.Trim(),
+                Description = model.Description.Trim(),
+                Origin = model.Origin,
+                Status = "Open",
+                CorrectiveAction = string.IsNullOrWhiteSpace(model.CorrectiveAction) ? null : model.CorrectiveAction.Trim(),
+                InstrumentId = model.InstrumentId,
+                CalibrationId = model.CalibrationId == 0 ? null : model.CalibrationId,
+                DetectedByUserId = userId.Value
+            });
+            Flash.Success("No conformidad creada.");
+            NavigationManager.NavigateTo("non-conformities");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}
