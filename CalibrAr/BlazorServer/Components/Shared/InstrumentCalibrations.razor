@@ -1,0 +1,90 @@
+@inject CalibrationApiClient CalibrationApiClient
+
+<h2 class="h5 mt-4 mb-3">Calibraciones</h2>
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+@if (calibrations == null)
+{
+    @if (errorMessage == null)
+    {
+        <p class="text-secondary">Cargando...</p>
+    }
+}
+else if (calibrations.Count == 0)
+{
+    <p class="text-secondary">Este instrumento todavía no tiene calibraciones.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Resultado</th>
+                    <th>Origen</th>
+                    <th>Certificado</th>
+                    <th>Aprobación</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var calibration in calibrations)
+                {
+                    <tr>
+                        <td>@calibration.CalibrationDate.ToString("dd/MM/yyyy")</td>
+                        <td>@CalibrationText.InterventionText(calibration.InterventionType)</td>
+                        <td>
+                            <StatusBadge Text="@CalibrationText.ResultText(calibration.Result)" Kind="@CalibrationText.ResultKind(calibration.Result)" />
+                        </td>
+                        <td>@(calibration.IsExternal ? $"Externa - {calibration.ExternalLab}" : "Interna")</td>
+                        <td class="font-monospace">@(string.IsNullOrWhiteSpace(calibration.CertificateNumber) ? "-" : calibration.CertificateNumber)</td>
+                        <td>
+                            @if (calibration.ApprovedByUserId.HasValue)
+                            {
+                                <StatusBadge Text="Aprobada" Kind="success" />
+                            }
+                            else
+                            {
+                                <StatusBadge Text="Pendiente" Kind="warning" />
+                            }
+                        </td>
+                        <td class="text-end">
+                            @* La pantalla de la calibración exige permiso de modificar; quien solo puede leer no tiene el link. *@
+                            <AuthorizeView Policy="CalibrationsUpdate">
+                                <a href="calibrations/@calibration.Id/edit" class="btn btn-sm btn-outline-secondary">@(calibration.ApprovedByUserId.HasValue ? "Ver" : "Editar")</a>
+                            </AuthorizeView>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public int InstrumentId { get; set; }
+
+    private List<CalibrationDTO>? calibrations;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // La API no filtra por instrumento: se traen todas y se queda con las de este.
+            var all = await CalibrationApiClient.GetAllAsync();
+            calibrations = all.Where(c => c.InstrumentId == InstrumentId).OrderByDescending(c => c.CalibrationDate).ToList();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+}

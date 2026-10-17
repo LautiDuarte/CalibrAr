@@ -69,6 +69,11 @@ else
         <dd class="col-sm-9">@instrument.CreatedAt.ToString("dd/MM/yyyy")</dd>
     </dl>
 
+    @* Las calibraciones del instrumento, para quien puede leerlas (el Auditor no). *@
+    <AuthorizeView Policy="CalibrationsRead">
+        <InstrumentCalibrations InstrumentId="Id" />
+    </AuthorizeView>
+
     @* El historial lo ven solo quienes tienen ese permiso; el componente recién se crea (y llama a la API) si lo tienen. *@
     <AuthorizeView Policy="InstrumentStatusHistoryRead">
         <InstrumentStatusTimeline InstrumentId="Id" CreatedAt="instrument.CreatedAt" CurrentStatus="@instrument.Status" />
