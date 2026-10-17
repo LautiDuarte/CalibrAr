@@ -26,8 +26,14 @@ namespace BlazorServer
             if (ex.Message.Contains("Status code: NotFound"))
                 return "El registro solicitado no existe.";
 
+            // Un 500 trae el detalle técnico del servidor: no se le muestra a quien usa la pantalla.
+            if (IsServerError(ex))
+                return "Ocurrió un error inesperado en el servidor. Intentá de nuevo.";
+
             return ex.Message;
         }
+
+        public static bool IsServerError(Exception ex) => ex.Message.Contains("Status code: InternalServerError");
 
         // Los ArgumentException del dominio terminan con " (Parameter 'email')": útil para quien programa,
         // pero no para quien usa la pantalla.

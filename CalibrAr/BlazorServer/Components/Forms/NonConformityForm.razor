@@ -43,7 +43,7 @@
             <option value="0">Ninguna</option>
             @foreach (var calibration in InstrumentCalibrations)
             {
-                <option value="@calibration.Id">@CalibrationText(calibration)</option>
+                <option value="@calibration.Id">@CalibrationOption(calibration)</option>
             }
         </InputSelect>
         @if (Model.InstrumentId == 0)
@@ -143,23 +143,15 @@
         _ => "secondary"
     };
 
-    public static string ResultText(string result) => result switch
-    {
-        "Conformant" => "Conforme",
-        "NonConformant" => "No conforme",
-        "WithRestrictions" => "Con restricciones",
-        _ => result
-    };
-
     private List<CalibrationDTO> InstrumentCalibrations => Calibrations
         .Where(c => c.InstrumentId == Model.InstrumentId)
         .OrderByDescending(c => c.CalibrationDate)
         .ToList();
 
-    private static string CalibrationText(CalibrationDTO calibration)
+    private static string CalibrationOption(CalibrationDTO calibration)
     {
         string certificate = string.IsNullOrWhiteSpace(calibration.CertificateNumber) ? "sin certificado" : calibration.CertificateNumber;
-        return $"#{calibration.Id} - {calibration.CalibrationDate:dd/MM/yyyy} - {certificate} - {ResultText(calibration.Result)}";
+        return $"#{calibration.Id} - {calibration.CalibrationDate:dd/MM/yyyy} - {certificate} - {CalibrationText.ResultText(calibration.Result)}";
     }
 
     private void OnInstrumentChanged(int instrumentId)
