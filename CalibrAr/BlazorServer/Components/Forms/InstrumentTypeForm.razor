@@ -38,6 +38,7 @@
     <div class="form-check mb-4">
         <InputCheckbox id="isActive" class="form-check-input" @bind-Value="Model.IsActive" />
         <label for="isActive" class="form-check-label">Activo</label>
+        <div class="form-text">Si se desmarca, deja de ofrecerse al cargar instrumentos y procedimientos nuevos. Lo ya registrado se conserva.</div>
     </div>
 
     <button type="submit" class="btn btn-primary" disabled="@Saving">Guardar</button>

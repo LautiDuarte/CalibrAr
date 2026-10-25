@@ -29,7 +29,7 @@
         </div>
     </div>
 
-    <div class="mb-4">
+    <div class="@(IsEdit ? "mb-3" : "mb-4")">
         <label for="instrumentType" class="form-label">Tipo de instrumento</label>
         <InputSelect id="instrumentType" class="form-select" @bind-Value="Model.InstrumentTypeId">
             <option value="0">Seleccione un tipo</option>
@@ -42,6 +42,15 @@
         <ValidationMessage For="() => Model.InstrumentTypeId" />
     </div>
 
+    @if (IsEdit)
+    {
+        <div class="form-check mb-4">
+            <InputCheckbox id="isActive" class="form-check-input" @bind-Value="Model.IsActive" />
+            <label for="isActive" class="form-check-label">Activo</label>
+            <div class="form-text">Desmarcalo cuando salga una versión nueva del documento. Las calibraciones anteriores lo conservan.</div>
+        </div>
+    }
+
     <button type="submit" class="btn btn-primary" disabled="@Saving">Guardar</button>
     <a href="procedures" class="btn btn-outline-secondary">Cancelar</a>
 </EditForm>
@@ -52,6 +61,10 @@
 
     [Parameter, EditorRequired]
     public List<InstrumentTypeDTO> InstrumentTypes { get; set; } = default!;
+
+    // El estado "activo" solo se elige al editar (al crear queda activo).
+    [Parameter]
+    public bool IsEdit { get; set; }
 
     [Parameter]
     public EventCallback OnValidSubmit { get; set; }
@@ -77,6 +90,8 @@
 
         [Range(1, int.MaxValue, ErrorMessage = "Seleccione un tipo de instrumento.")]
         public int InstrumentTypeId { get; set; }
+
+        public bool IsActive { get; set; } = true;
 
         // WinForms no deja elegir una fecha de aprobación futura; acá se pide lo mismo.
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

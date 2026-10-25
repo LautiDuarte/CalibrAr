@@ -47,8 +47,9 @@ else
         try
         {
             InstrumentDTO instrument = await InstrumentApiClient.GetAsync(Id);
-            instrumentTypes = await InstrumentTypeApiClient.GetAllAsync();
-            areas = await AreaApiClient.GetAllAsync();
+            // Los inactivos se siguen mostrando solo si son los que el instrumento ya tiene.
+            instrumentTypes = (await InstrumentTypeApiClient.GetAllAsync()).Where(t => t.IsActive || t.Id == instrument.InstrumentTypeId).ToList();
+            areas = (await AreaApiClient.GetAllAsync()).Where(a => a.IsActive || a.Id == instrument.AreaId).ToList();
             model = new InstrumentForm.InstrumentFormModel
             {
                 Code = instrument.Code,

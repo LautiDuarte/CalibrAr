@@ -37,7 +37,8 @@ else
     {
         try
         {
-            locations = await LocationApiClient.GetAllAsync();
+            // Una ubicación inactiva no se ofrece para áreas nuevas.
+            locations = (await LocationApiClient.GetAllAsync()).Where(l => l.IsActive).ToList();
         }
         catch (UnauthorizedAccessException)
         {

@@ -40,7 +40,7 @@ else
     {
         try
         {
-            instrumentTypes = await InstrumentTypeApiClient.GetAllAsync();
+            instrumentTypes = (await InstrumentTypeApiClient.GetAllAsync()).Where(t => t.IsActive).ToList();
         }
         catch (UnauthorizedAccessException)
         {

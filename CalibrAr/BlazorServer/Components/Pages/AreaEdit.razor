@@ -45,7 +45,8 @@ else
         try
         {
             AreaDTO area = await AreaApiClient.GetAsync(Id);
-            locations = await LocationApiClient.GetAllAsync();
+            // La inactiva se sigue mostrando solo si es la que el área ya tiene.
+            locations = (await LocationApiClient.GetAllAsync()).Where(l => l.IsActive || l.Id == area.LocationId).ToList();
             createdAt = area.CreatedAt;
             model = new AreaForm.AreaFormModel
             {

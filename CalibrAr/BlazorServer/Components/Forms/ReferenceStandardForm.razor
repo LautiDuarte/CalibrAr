@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <div class="row g-3 mb-4">
+    <div class="@(IsEdit ? "row g-3 mb-3" : "row g-3 mb-4")">
         <div class="col-sm-6">
             <label for="issuedAt" class="form-label">Fecha de emisión</label>
             <InputDate id="issuedAt" class="form-control" @bind-Value="Model.CertificateIssuedAt" ParsingErrorMessage="La fecha de emisión no es válida." />
@@ -36,6 +36,15 @@
         </div>
     </div>
 
+    @if (IsEdit)
+    {
+        <div class="form-check mb-4">
+            <InputCheckbox id="isActive" class="form-check-input" @bind-Value="Model.IsActive" />
+            <label for="isActive" class="form-check-label">Activo</label>
+            <div class="form-text">Desmarcalo cuando llegue un certificado nuevo o el patrón se retire. Las calibraciones anteriores lo conservan.</div>
+        </div>
+    }
+
     <button type="submit" class="btn btn-primary" disabled="@Saving">Guardar</button>
     <a href="reference-standards" class="btn btn-outline-secondary">Cancelar</a>
 </EditForm>
@@ -43,6 +52,10 @@
 @code {
     [Parameter, EditorRequired]
     public ReferenceStandardFormModel Model { get; set; } = default!;
+
+    // El estado "activo" solo se elige al editar (al crear queda activo).
+    [Parameter]
+    public bool IsEdit { get; set; }
 
     [Parameter]
     public EventCallback OnValidSubmit { get; set; }
@@ -68,6 +81,8 @@
         public DateTime CertificateIssuedAt { get; set; } = DateTime.Today;
 
         public DateTime CertificateExpiresAt { get; set; } = DateTime.Today.AddYears(1);
+
+        public bool IsActive { get; set; } = true;
 
         // Reglas entre campos: el servidor y el dominio las exigen igual, pero así se ven antes de enviar.
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

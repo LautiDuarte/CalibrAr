@@ -55,7 +55,11 @@ else
                         <td>@standard.CertificateIssuedAt.ToString("dd/MM/yyyy")</td>
                         <td>@standard.CertificateExpiresAt.ToString("dd/MM/yyyy")</td>
                         <td>
-                            @if (IsExpired(standard))
+                            @if (!standard.IsActive)
+                            {
+                                <StatusBadge Text="Inactivo" Kind="secondary" />
+                            }
+                            else if (IsExpired(standard))
                             {
                                 <StatusBadge Text="Vencido" Kind="danger" />
                             }
@@ -88,7 +92,7 @@ else
         await LoadStandards();
     }
 
-    // El estado se calcula con la fecha de vencimiento del certificado, no se guarda.
+    // Vencido se calcula con la fecha del certificado, no se guarda. Si además está inactivo, se muestra "Inactivo".
     private static bool IsExpired(ReferenceStandardDTO standard) => standard.CertificateExpiresAt.Date < DateTime.Today;
 
     private async Task LoadStandards()

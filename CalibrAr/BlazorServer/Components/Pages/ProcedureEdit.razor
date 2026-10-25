@@ -27,7 +27,7 @@
 }
 else
 {
-    <ProcedureForm Model="model" InstrumentTypes="instrumentTypes" OnValidSubmit="SaveAsync" Saving="saving" />
+    <ProcedureForm Model="model" InstrumentTypes="instrumentTypes" IsEdit="true" OnValidSubmit="SaveAsync" Saving="saving" />
 }
 
 @code {
@@ -36,7 +36,6 @@ else
 
     private ProcedureForm.ProcedureFormModel? model;
     private List<InstrumentTypeDTO>? instrumentTypes;
-    private bool isActive;
     private DateTime createdAt;
     private string? errorMessage;
     private bool saving;
@@ -46,8 +45,7 @@ else
         try
         {
             ProcedureDTO procedure = await ProcedureApiClient.GetAsync(Id);
-            instrumentTypes = await InstrumentTypeApiClient.GetAllAsync();
-            isActive = procedure.IsActive;
+            instrumentTypes = (await InstrumentTypeApiClient.GetAllAsync()).Where(t => t.IsActive || t.Id == procedure.InstrumentTypeId).ToList();
             createdAt = procedure.CreatedAt;
             model = new ProcedureForm.ProcedureFormModel
             {
@@ -55,7 +53,8 @@ else
                 Name = procedure.Name,
                 VersionNumber = procedure.VersionNumber,
                 ApprovedAt = procedure.ApprovedAt.Date,
-                InstrumentTypeId = procedure.InstrumentTypeId
+                InstrumentTypeId = procedure.InstrumentTypeId,
+                IsActive = procedure.IsActive
             };
         }
         catch (UnauthorizedAccessException)
@@ -73,7 +72,6 @@ else
         saving = true;
         try
         {
-            // El formulario no edita "activo" (igual que WinForms): se conserva el valor que ya tenía.
             await ProcedureApiClient.UpdateAsync(new ProcedureDTO
             {
                 Id = Id,
@@ -81,7 +79,7 @@ else
                 Name = model.Name.Trim(),
                 VersionNumber = model.VersionNumber.Trim(),
                 ApprovedAt = model.ApprovedAt.Date,
-                IsActive = isActive,
+                IsActive = model.IsActive,
                 CreatedAt = createdAt,
                 InstrumentTypeId = model.InstrumentTypeId,
                 InstrumentTypeName = string.Empty

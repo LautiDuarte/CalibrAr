@@ -42,8 +42,9 @@ else
     {
         try
         {
-            instrumentTypes = await InstrumentTypeApiClient.GetAllAsync();
-            areas = await AreaApiClient.GetAllAsync();
+            // Los tipos y áreas inactivos no se ofrecen para instrumentos nuevos.
+            instrumentTypes = (await InstrumentTypeApiClient.GetAllAsync()).Where(t => t.IsActive).ToList();
+            areas = (await AreaApiClient.GetAllAsync()).Where(a => a.IsActive).ToList();
         }
         catch (UnauthorizedAccessException)
         {
