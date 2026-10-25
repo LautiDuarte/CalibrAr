@@ -137,6 +137,10 @@ else
     [Parameter]
     public bool ReadOnly { get; set; }
 
+    // Avisa a quien lo usa cuando se agrega, cambia o quita una medición (por ejemplo para sugerir el resultado).
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
     private decimal? nominal;
     private decimal? measured;
     private string? notes;
@@ -147,13 +151,13 @@ else
     private bool WithinTolerance(CalibrationMeasurementDTO measurement, decimal error) =>
         ReadOnly ? measurement.IsWithinTolerance : Math.Abs(error) <= MaxAllowedError!.Value;
 
-    private void OnKeyDown(KeyboardEventArgs e)
+    private async Task OnKeyDown(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
-            Save();
+            await Save();
     }
 
-    private void Save()
+    private async Task Save()
     {
         validationMessage = null;
 
@@ -203,6 +207,7 @@ else
         }
 
         Reset();
+        await OnChanged.InvokeAsync();
     }
 
     private void Edit(int index)
@@ -215,7 +220,7 @@ else
         validationMessage = null;
     }
 
-    private void Remove(int index)
+    private async Task Remove(int index)
     {
         Measurements.RemoveAt(index);
 
@@ -223,6 +228,8 @@ else
             Reset();
         else if (editingIndex > index)
             editingIndex--;
+
+        await OnChanged.InvokeAsync();
     }
 
     private void Reset()

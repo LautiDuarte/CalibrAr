@@ -16,7 +16,7 @@ namespace BlazorServer
         {
             "Conformant" => "Conforme",
             "NonConformant" => "No conforme",
-            "WithRestrictions" => "Con restricciones",
+            "WithRestrictions" => "Conforme con restricciones",
             _ => result
         };
 
