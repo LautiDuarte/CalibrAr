@@ -1,0 +1,10 @@
+<span class="@($"badge text-bg-{Kind}")">@Text</span>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Text { get; set; } = string.Empty;
+
+    // Color de Bootstrap: success, danger, warning, secondary, info o primary.
+    [Parameter]
+    public string Kind { get; set; } = "secondary";
+}

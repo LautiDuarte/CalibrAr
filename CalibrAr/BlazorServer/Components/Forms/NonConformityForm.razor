@@ -1,0 +1,189 @@
+@using System.ComponentModel.DataAnnotations
+
+<EditForm Model="Model" OnValidSubmit="OnValidSubmit" class="form-narrow">
+    <DataAnnotationsValidator />
+
+    <div class="row g-3 mb-3">
+        <div class="col-sm-4">
+            <label for="code" class="form-label">Código</label>
+            <InputText id="code" class="form-control" @bind-Value="Model.Code" />
+            <ValidationMessage For="() => Model.Code" />
+        </div>
+        <div class="col-sm-8">
+            <label for="origin" class="form-label">Origen</label>
+            <InputSelect id="origin" class="form-select" @bind-Value="Model.Origin">
+                <option value="">Seleccione un origen</option>
+                @foreach (var origin in Origins)
+                {
+                    <option value="@origin">@OriginText(origin)</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="() => Model.Origin" />
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="instrument" class="form-label">Instrumento</label>
+        @* Value + ValueChanged (en lugar de @bind-Value) para poder limpiar la calibración al cambiar de instrumento. *@
+        <InputSelect id="instrument" class="form-select" Value="Model.InstrumentId"
+                     ValueChanged="@((int instrumentId) => OnInstrumentChanged(instrumentId))"
+                     ValueExpression="@(() => Model.InstrumentId)">
+            <option value="0">Seleccione un instrumento</option>
+            @foreach (var instrument in Instruments)
+            {
+                <option value="@instrument.Id">@instrument.Code - @instrument.Name</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="() => Model.InstrumentId" />
+    </div>
+
+    <div class="mb-3">
+        <label for="calibration" class="form-label">Calibración (opcional)</label>
+        <InputSelect id="calibration" class="form-select" @bind-Value="Model.CalibrationId" disabled="@(Model.InstrumentId == 0)">
+            <option value="0">Ninguna</option>
+            @foreach (var calibration in InstrumentCalibrations)
+            {
+                <option value="@calibration.Id">@CalibrationOption(calibration)</option>
+            }
+        </InputSelect>
+        @if (Model.InstrumentId == 0)
+        {
+            <div class="form-text">Elegí primero un instrumento.</div>
+        }
+        else if (InstrumentCalibrations.Count == 0)
+        {
+            <div class="form-text">Este instrumento no tiene calibraciones registradas.</div>
+        }
+    </div>
+
+    @if (IsEdit)
+    {
+        <div class="mb-3">
+            <label for="status" class="form-label">Estado</label>
+            <InputSelect id="status" class="form-select" @bind-Value="Model.Status">
+                @foreach (var status in EditableStatuses)
+                {
+                    <option value="@status">@StatusText(status)</option>
+                }
+            </InputSelect>
+            <div class="form-text">Avanza de Abierta a En análisis y a Con acciones correctivas. Para cerrarla usá el botón "Cerrar no conformidad".</div>
+        </div>
+    }
+
+    <div class="mb-3">
+        <label for="description" class="form-label">Descripción</label>
+        <InputTextArea id="description" class="form-control" rows="3" @bind-Value="Model.Description" />
+        <ValidationMessage For="() => Model.Description" />
+    </div>
+
+    <div class="mb-4">
+        <label for="correctiveAction" class="form-label">Acción correctiva (opcional)</label>
+        <InputTextArea id="correctiveAction" class="form-control" rows="3" @bind-Value="Model.CorrectiveAction" />
+        <ValidationMessage For="() => Model.CorrectiveAction" />
+    </div>
+
+    <button type="submit" class="btn btn-primary" disabled="@Saving">Guardar</button>
+    <a href="non-conformities" class="btn btn-outline-secondary">Cancelar</a>
+</EditForm>
+
+@code {
+    [Parameter, EditorRequired]
+    public NonConformityFormModel Model { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public List<InstrumentDTO> Instruments { get; set; } = default!;
+
+    // Todas las calibraciones; se muestran solo las del instrumento elegido.
+    [Parameter, EditorRequired]
+    public List<CalibrationDTO> Calibrations { get; set; } = default!;
+
+    // El estado solo se elige al editar (al crear queda "Abierta").
+    [Parameter]
+    public bool IsEdit { get; set; }
+
+    [Parameter]
+    public EventCallback OnValidSubmit { get; set; }
+
+    [Parameter]
+    public bool Saving { get; set; }
+
+    public static readonly string[] Origins =
+    [
+        "CalibrationExpired", "NonConformantResult", "PhysicalDamage", "IncorrectUse", "Other"
+    ];
+
+    // "Cerrada" no se elige: se llega con el botón de cerrar.
+    public static readonly string[] EditableStatuses = ["Open", "UnderAnalysis", "WithCorrectiveActions"];
+
+    public static string OriginText(string origin) => origin switch
+    {
+        "CalibrationExpired" => "Calibración vencida",
+        "NonConformantResult" => "Resultado no conforme",
+        "PhysicalDamage" => "Daño físico",
+        "IncorrectUse" => "Uso incorrecto",
+        "Other" => "Otro",
+        _ => origin
+    };
+
+    public static string StatusText(string status) => status switch
+    {
+        "Open" => "Abierta",
+        "UnderAnalysis" => "En análisis",
+        "WithCorrectiveActions" => "Con acciones correctivas",
+        "Closed" => "Cerrada",
+        _ => status
+    };
+
+    public static string StatusKind(string status) => status switch
+    {
+        "Open" => "danger",
+        "UnderAnalysis" => "warning",
+        "WithCorrectiveActions" => "info",
+        "Closed" => "success",
+        _ => "secondary"
+    };
+
+    private List<CalibrationDTO> InstrumentCalibrations => Calibrations
+        .Where(c => c.InstrumentId == Model.InstrumentId)
+        .OrderByDescending(c => c.CalibrationDate)
+        .ToList();
+
+    private static string CalibrationOption(CalibrationDTO calibration)
+    {
+        string certificate = string.IsNullOrWhiteSpace(calibration.CertificateNumber) ? "sin certificado" : calibration.CertificateNumber;
+        return $"#{calibration.Id} - {calibration.CalibrationDate:dd/MM/yyyy} - {certificate} - {CalibrationText.ResultText(calibration.Result)}";
+    }
+
+    private void OnInstrumentChanged(int instrumentId)
+    {
+        Model.InstrumentId = instrumentId;
+
+        // La calibración tiene que ser del instrumento elegido; al cambiarlo se descarta la anterior.
+        Model.CalibrationId = 0;
+    }
+
+    public class NonConformityFormModel
+    {
+        [Required(ErrorMessage = "El código es obligatorio.")]
+        [StringLength(50, ErrorMessage = "El código no puede superar los 50 caracteres.")]
+        public string Code { get; set; } = string.Empty;
+
+        [Range(1, int.MaxValue, ErrorMessage = "Seleccione un instrumento.")]
+        public int InstrumentId { get; set; }
+
+        // 0 = sin calibración asociada.
+        public int CalibrationId { get; set; }
+
+        [Required(ErrorMessage = "Seleccione un origen.")]
+        public string Origin { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La descripción es obligatoria.")]
+        [StringLength(500, ErrorMessage = "La descripción no puede superar los 500 caracteres.")]
+        public string Description { get; set; } = string.Empty;
+
+        [StringLength(500, ErrorMessage = "La acción correctiva no puede superar los 500 caracteres.")]
+        public string? CorrectiveAction { get; set; }
+
+        public string Status { get; set; } = "Open";
+    }
+}

@@ -1,0 +1,292 @@
+@page "/calibrations"
+@attribute [Authorize(Policy = "CalibrationsRead")]
+@inject CalibrationApiClient CalibrationApiClient
+@inject CurrentUser CurrentUser
+@inject NavigationManager NavigationManager
+@inject FlashService Flash
+@inject IJSRuntime JS
+
+<PageTitle>Calibraciones - CalibrAr</PageTitle>
+
+<PageHeader Title="Calibraciones" Count="calibrations?.Count" Subtitle="@FilterSubtitle">
+    <Actions>
+        <AuthorizeView Policy="CalibrationsCreate">
+            <a href="calibrations/new" class="btn btn-primary">Nueva calibración</a>
+        </AuthorizeView>
+    </Actions>
+</PageHeader>
+
+<FlashBanner />
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+@if (calibrations == null)
+{
+    <p class="text-secondary">Cargando...</p>
+}
+else if (calibrations.Count == 0)
+{
+    <p class="text-secondary">No hay calibraciones cargadas.</p>
+}
+else
+{
+    var filtered = FilteredCalibrations;
+
+    <div class="row g-2 mb-3">
+        <div class="col-md-3">
+            <input type="search" class="form-control" placeholder="Buscar por instrumento, certificado o laboratorio"
+                   @bind="searchText" @bind:event="oninput" />
+        </div>
+        <div class="col-md-2">
+            <select class="form-select" @bind="resultFilter">
+                <option value="">Todos los resultados</option>
+                @foreach (var result in new[] { "Conformant", "WithRestrictions", "NonConformant" })
+                {
+                    <option value="@result">@CalibrationText.ResultText(result)</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" @bind="interventionFilter">
+                <option value="">Todos los tipos</option>
+                @foreach (var intervention in new[] { "Calibration", "Verification", "Maintenance", "AdjustmentAndCalibration" })
+                {
+                    <option value="@intervention">@CalibrationText.InterventionText(intervention)</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select class="form-select" @bind="approvalFilter">
+                <option value="">Aprobadas y pendientes</option>
+                <option value="approved">Solo aprobadas</option>
+                <option value="pending">Solo pendientes</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-grid">
+            @if (HasFilters)
+            {
+                <button class="btn btn-outline-secondary" @onclick="ClearFilters">Limpiar</button>
+            }
+        </div>
+    </div>
+
+    @if (filtered.Count == 0)
+    {
+        <p class="text-secondary">Ninguna calibración coincide con los filtros.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Instrumento</th>
+                        <th>Tipo</th>
+                        <th>Resultado</th>
+                        <th>Origen</th>
+                        <th>Certificado</th>
+                        <th>Realizó</th>
+                        <th>Aprobación</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var calibration in filtered)
+                    {
+                        <tr>
+                            <td>@calibration.CalibrationDate.ToString("dd/MM/yyyy")</td>
+                            <td><a href="instruments/@calibration.InstrumentId" class="font-monospace">@calibration.InstrumentCode</a></td>
+                            <td>@CalibrationText.InterventionText(calibration.InterventionType)</td>
+                            <td>
+                                <StatusBadge Text="@CalibrationText.ResultText(calibration.Result)" Kind="@CalibrationText.ResultKind(calibration.Result)" />
+                            </td>
+                            <td>
+                                @if (calibration.IsExternal)
+                                {
+                                    <div>Externa</div>
+                                    @if (!string.IsNullOrWhiteSpace(calibration.ExternalLab))
+                                    {
+                                        <div class="small text-secondary">@calibration.ExternalLab</div>
+                                    }
+                                }
+                                else
+                                {
+                                    <span>Interna</span>
+                                }
+                            </td>
+                            <td class="font-monospace">@(string.IsNullOrWhiteSpace(calibration.CertificateNumber) ? "-" : calibration.CertificateNumber)</td>
+                            <td>@(calibration.PerformedByUserName ?? "-")</td>
+                            <td>
+                                @if (calibration.ApprovedByUserId.HasValue)
+                                {
+                                    <StatusBadge Text="Aprobada" Kind="success" />
+                                    <div class="small text-secondary">@calibration.ApprovedByUserName</div>
+                                }
+                                else
+                                {
+                                    <StatusBadge Text="Pendiente" Kind="warning" />
+                                }
+                            </td>
+                            <td class="text-end text-nowrap">
+                                @* Una calibración aprobada se abre en solo lectura. *@
+                                <AuthorizeView Policy="CalibrationsUpdate">
+                                    @if (calibration.ApprovedByUserId.HasValue)
+                                    {
+                                        <a href="calibrations/@calibration.Id/edit" class="btn btn-sm btn-outline-secondary">Ver</a>
+                                    }
+                                    else
+                                    {
+                                        <a href="calibrations/@calibration.Id/edit" class="btn btn-sm btn-outline-primary">Editar</a>
+                                    }
+                                </AuthorizeView>
+                                @if (CanApprove(calibration))
+                                {
+                                    <AuthorizeView Policy="CalibrationsUpdate">
+                                        <button class="btn btn-sm btn-outline-success" @onclick="() => ApproveAsync(calibration)">Aprobar</button>
+                                    </AuthorizeView>
+                                }
+                                <AuthorizeView Policy="CalibrationsDelete">
+                                    <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteAsync(calibration)">Eliminar</button>
+                                </AuthorizeView>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+}
+
+@code {
+    private List<CalibrationDTO>? calibrations;
+    private int? currentUserId;
+    private bool isAdministrator;
+    private string? errorMessage;
+
+    private string searchText = string.Empty;
+    private string resultFilter = string.Empty;
+    private string interventionFilter = string.Empty;
+    private string approvalFilter = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUserId = await CurrentUser.GetIdAsync();
+        isAdministrator = await CurrentUser.IsAdministratorAsync();
+        await LoadCalibrations();
+    }
+
+    private bool HasFilters =>
+        !string.IsNullOrWhiteSpace(searchText) || resultFilter != string.Empty
+        || interventionFilter != string.Empty || approvalFilter != string.Empty;
+
+    // Los filtros se aplican en memoria sobre la lista ya cargada.
+    private List<CalibrationDTO> FilteredCalibrations => calibrations!
+        .Where(c => (string.IsNullOrWhiteSpace(searchText) || Matches(c, searchText.Trim()))
+                    && (resultFilter == string.Empty || c.Result == resultFilter)
+                    && (interventionFilter == string.Empty || c.InterventionType == interventionFilter)
+                    && (approvalFilter == string.Empty
+                        || (approvalFilter == "approved" && c.ApprovedByUserId.HasValue)
+                        || (approvalFilter == "pending" && !c.ApprovedByUserId.HasValue)))
+        .ToList();
+
+    private string? FilterSubtitle =>
+        calibrations != null && HasFilters ? $"{FilteredCalibrations.Count} de {calibrations.Count} calibraciones" : null;
+
+    private static bool Matches(CalibrationDTO c, string text) =>
+        Contains(c.InstrumentCode, text) || Contains(c.CertificateNumber, text) || Contains(c.ExternalLab, text);
+
+    private static bool Contains(string? value, string text) =>
+        value != null && value.Contains(text, StringComparison.OrdinalIgnoreCase);
+
+    // Misma condición que WinForms: pendiente, y nadie aprueba lo que hizo salvo un administrador.
+    // La API además exige que quien aprueba sea Administrador o Responsable.
+    private bool CanApprove(CalibrationDTO calibration) =>
+        !calibration.ApprovedByUserId.HasValue && (isAdministrator || calibration.PerformedByUserId != currentUserId);
+
+    private void ClearFilters()
+    {
+        searchText = string.Empty;
+        resultFilter = string.Empty;
+        interventionFilter = string.Empty;
+        approvalFilter = string.Empty;
+    }
+
+    private async Task LoadCalibrations()
+    {
+        try
+        {
+            var all = await CalibrationApiClient.GetAllAsync();
+            calibrations = all.OrderByDescending(c => c.CalibrationDate).ToList();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+            calibrations = new List<CalibrationDTO>();
+        }
+    }
+
+    private async Task ApproveAsync(CalibrationDTO calibration)
+    {
+        if (currentUserId == null)
+        {
+            errorMessage = "No se pudo identificar al usuario de la sesión. Volvé a iniciar sesión.";
+            return;
+        }
+
+        bool confirmed = await JS.InvokeAsync<bool>("confirm",
+            $"¿Aprobar la calibración de {calibration.InstrumentCode} del {calibration.CalibrationDate:dd/MM/yyyy}?");
+        if (!confirmed)
+            return;
+
+        try
+        {
+            await CalibrationApiClient.ApproveAsync(calibration.Id, currentUserId.Value);
+            errorMessage = null;
+            await LoadCalibrations();
+            Flash.Success($"Calibración de \"{calibration.InstrumentCode}\" aprobada.");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+
+    private async Task DeleteAsync(CalibrationDTO calibration)
+    {
+        bool confirmed = await JS.InvokeAsync<bool>("confirm",
+            $"¿Eliminar la calibración de {calibration.InstrumentCode} del {calibration.CalibrationDate:dd/MM/yyyy}? También se borran sus mediciones.");
+        if (!confirmed)
+            return;
+
+        try
+        {
+            await CalibrationApiClient.DeleteAsync(calibration.Id);
+            errorMessage = null;
+            await LoadCalibrations();
+            Flash.Success($"Calibración de \"{calibration.InstrumentCode}\" eliminada.");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            // La API todavía no avisa cuando una no conformidad usa la calibración: responde un error genérico del servidor.
+            errorMessage = ApiError.IsServerError(ex)
+                ? "No se pudo eliminar la calibración. Si tiene una no conformidad asociada, eliminá primero esa no conformidad."
+                : ApiError.Message(ex);
+        }
+    }
+}

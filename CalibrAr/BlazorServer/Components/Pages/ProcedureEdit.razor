@@ -1,0 +1,103 @@
+@page "/procedures/{Id:int}/edit"
+@attribute [Authorize(Policy = "ProceduresUpdate")]
+@inject ProcedureApiClient ProcedureApiClient
+@inject InstrumentTypeApiClient InstrumentTypeApiClient
+@inject NavigationManager NavigationManager
+@inject FlashService Flash
+
+<PageTitle>Editar procedimiento - CalibrAr</PageTitle>
+
+<PageHeader Title="Editar procedimiento">
+    <Actions>
+        <a href="procedures" class="btn btn-sm btn-outline-secondary">← Volver</a>
+    </Actions>
+</PageHeader>
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger form-narrow">@errorMessage</div>
+}
+
+@if (model == null || instrumentTypes == null)
+{
+    @if (errorMessage == null)
+    {
+        <p class="text-secondary">Cargando...</p>
+    }
+}
+else
+{
+    <ProcedureForm Model="model" InstrumentTypes="instrumentTypes" IsEdit="true" OnValidSubmit="SaveAsync" Saving="saving" />
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private ProcedureForm.ProcedureFormModel? model;
+    private List<InstrumentTypeDTO>? instrumentTypes;
+    private DateTime createdAt;
+    private string? errorMessage;
+    private bool saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            ProcedureDTO procedure = await ProcedureApiClient.GetAsync(Id);
+            instrumentTypes = (await InstrumentTypeApiClient.GetAllAsync()).Where(t => t.IsActive || t.Id == procedure.InstrumentTypeId).ToList();
+            createdAt = procedure.CreatedAt;
+            model = new ProcedureForm.ProcedureFormModel
+            {
+                Code = procedure.Code,
+                Name = procedure.Name,
+                VersionNumber = procedure.VersionNumber,
+                ApprovedAt = procedure.ApprovedAt.Date,
+                InstrumentTypeId = procedure.InstrumentTypeId,
+                IsActive = procedure.IsActive
+            };
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        saving = true;
+        try
+        {
+            await ProcedureApiClient.UpdateAsync(new ProcedureDTO
+            {
+                Id = Id,
+                Code = model!.Code.Trim(),
+                Name = model.Name.Trim(),
+                VersionNumber = model.VersionNumber.Trim(),
+                ApprovedAt = model.ApprovedAt.Date,
+                IsActive = model.IsActive,
+                CreatedAt = createdAt,
+                InstrumentTypeId = model.InstrumentTypeId,
+                InstrumentTypeName = string.Empty
+            });
+            Flash.Success("Procedimiento actualizado.");
+            NavigationManager.NavigateTo("procedures");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

@@ -3,10 +3,15 @@
 @inject AreaApiClient AreaApiClient
 @inject LocationApiClient LocationApiClient
 @inject NavigationManager NavigationManager
+@inject FlashService Flash
 
 <PageTitle>Nueva área - CalibrAr</PageTitle>
 
-<h1 class="h3 mb-3">Nueva área</h1>
+<PageHeader Title="Nueva área">
+    <Actions>
+        <a href="areas" class="btn btn-sm btn-outline-secondary">← Volver</a>
+    </Actions>
+</PageHeader>
 
 @if (errorMessage != null)
 {
@@ -32,7 +37,8 @@ else
     {
         try
         {
-            locations = await LocationApiClient.GetAllAsync();
+            // Una ubicación inactiva no se ofrece para áreas nuevas.
+            locations = (await LocationApiClient.GetAllAsync()).Where(l => l.IsActive).ToList();
         }
         catch (UnauthorizedAccessException)
         {
@@ -56,6 +62,7 @@ else
                 LocationId = model.LocationId,
                 IsActive = model.IsActive
             });
+            Flash.Success("Área creada.");
             NavigationManager.NavigateTo("areas");
         }
         catch (UnauthorizedAccessException)

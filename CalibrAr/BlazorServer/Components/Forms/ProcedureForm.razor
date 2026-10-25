@@ -1,0 +1,105 @@
+@using System.ComponentModel.DataAnnotations
+
+<EditForm Model="Model" OnValidSubmit="OnValidSubmit" class="form-narrow">
+    <DataAnnotationsValidator />
+
+    <div class="row g-3 mb-3">
+        <div class="col-sm-5">
+            <label for="code" class="form-label">Código</label>
+            <InputText id="code" class="form-control" @bind-Value="Model.Code" />
+            <ValidationMessage For="() => Model.Code" />
+        </div>
+        <div class="col-sm-7">
+            <label for="name" class="form-label">Nombre</label>
+            <InputText id="name" class="form-control" @bind-Value="Model.Name" />
+            <ValidationMessage For="() => Model.Name" />
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-sm-6">
+            <label for="version" class="form-label">Versión</label>
+            <InputText id="version" class="form-control" @bind-Value="Model.VersionNumber" />
+            <ValidationMessage For="() => Model.VersionNumber" />
+        </div>
+        <div class="col-sm-6">
+            <label for="approvedAt" class="form-label">Fecha de aprobación</label>
+            <InputDate id="approvedAt" class="form-control" @bind-Value="Model.ApprovedAt" ParsingErrorMessage="La fecha de aprobación no es válida." />
+            <ValidationMessage For="() => Model.ApprovedAt" />
+        </div>
+    </div>
+
+    <div class="@(IsEdit ? "mb-3" : "mb-4")">
+        <label for="instrumentType" class="form-label">Tipo de instrumento</label>
+        <InputSelect id="instrumentType" class="form-select" @bind-Value="Model.InstrumentTypeId">
+            <option value="0">Seleccione un tipo</option>
+            @foreach (var instrumentType in InstrumentTypes)
+            {
+                <option value="@instrumentType.Id">@instrumentType.Name</option>
+            }
+        </InputSelect>
+        <div class="form-text">Se ofrece en las calibraciones de instrumentos de este tipo.</div>
+        <ValidationMessage For="() => Model.InstrumentTypeId" />
+    </div>
+
+    @if (IsEdit)
+    {
+        <div class="form-check mb-4">
+            <InputCheckbox id="isActive" class="form-check-input" @bind-Value="Model.IsActive" />
+            <label for="isActive" class="form-check-label">Activo</label>
+            <div class="form-text">Desmarcalo cuando salga una versión nueva del documento. Las calibraciones anteriores lo conservan.</div>
+        </div>
+    }
+
+    <button type="submit" class="btn btn-primary" disabled="@Saving">Guardar</button>
+    <a href="procedures" class="btn btn-outline-secondary">Cancelar</a>
+</EditForm>
+
+@code {
+    [Parameter, EditorRequired]
+    public ProcedureFormModel Model { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public List<InstrumentTypeDTO> InstrumentTypes { get; set; } = default!;
+
+    // El estado "activo" solo se elige al editar (al crear queda activo).
+    [Parameter]
+    public bool IsEdit { get; set; }
+
+    [Parameter]
+    public EventCallback OnValidSubmit { get; set; }
+
+    [Parameter]
+    public bool Saving { get; set; }
+
+    public class ProcedureFormModel : IValidatableObject
+    {
+        [Required(ErrorMessage = "El código es obligatorio.")]
+        [StringLength(50, ErrorMessage = "El código no puede superar los 50 caracteres.")]
+        public string Code { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El nombre es obligatorio.")]
+        [StringLength(100, ErrorMessage = "El nombre no puede superar los 100 caracteres.")]
+        public string Name { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La versión es obligatoria.")]
+        [StringLength(20, ErrorMessage = "La versión no puede superar los 20 caracteres.")]
+        public string VersionNumber { get; set; } = string.Empty;
+
+        public DateTime ApprovedAt { get; set; } = DateTime.Today;
+
+        [Range(1, int.MaxValue, ErrorMessage = "Seleccione un tipo de instrumento.")]
+        public int InstrumentTypeId { get; set; }
+
+        public bool IsActive { get; set; } = true;
+
+        // WinForms no deja elegir una fecha de aprobación futura; acá se pide lo mismo.
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (ApprovedAt == default)
+                yield return new ValidationResult("La fecha de aprobación es obligatoria.", new[] { nameof(ApprovedAt) });
+            else if (ApprovedAt.Date > DateTime.Today)
+                yield return new ValidationResult("La fecha de aprobación no puede ser futura.", new[] { nameof(ApprovedAt) });
+        }
+    }
+}

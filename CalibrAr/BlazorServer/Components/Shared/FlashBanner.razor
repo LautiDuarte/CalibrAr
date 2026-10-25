@@ -1,0 +1,38 @@
+@implements IDisposable
+@inject FlashService Flash
+
+@if (message != null)
+{
+    <div class="alert alert-success d-flex justify-content-between align-items-center">
+        <span>@message</span>
+        <button type="button" class="btn-close" aria-label="Cerrar" @onclick="Close"></button>
+    </div>
+}
+
+@code {
+    private string? message;
+
+    protected override void OnInitialized()
+    {
+        // Mensaje que dejó la pantalla anterior (por ejemplo, después de guardar).
+        message = Flash.Take();
+        Flash.Changed += OnChanged;
+    }
+
+    // Mensaje que llega con la pantalla ya abierta (por ejemplo, después de eliminar).
+    private void OnChanged()
+    {
+        message = Flash.Take();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void Close()
+    {
+        message = null;
+    }
+
+    public void Dispose()
+    {
+        Flash.Changed -= OnChanged;
+    }
+}

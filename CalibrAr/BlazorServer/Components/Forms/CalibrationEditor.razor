@@ -1,0 +1,471 @@
+@using System.ComponentModel.DataAnnotations
+@inject InstrumentApiClient InstrumentApiClient
+@inject InstrumentTypeApiClient InstrumentTypeApiClient
+@inject ProcedureApiClient ProcedureApiClient
+@inject ReferenceStandardApiClient ReferenceStandardApiClient
+@inject NavigationManager NavigationManager
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger form-narrow">@errorMessage</div>
+}
+
+@if (editContext == null)
+{
+    @if (loadError == null)
+    {
+        <p class="text-secondary">Cargando...</p>
+    }
+    else
+    {
+        <div class="alert alert-danger form-narrow">@loadError</div>
+    }
+}
+else
+{
+    <EditForm EditContext="editContext" class="form-narrow">
+        <DataAnnotationsValidator />
+
+        <h2 class="form-section">Datos generales</h2>
+
+        <div class="mb-3">
+            <label for="instrument" class="form-label">Instrumento</label>
+            @* Value + ValueChanged (en lugar de @bind-Value) para limpiar el procedimiento al cambiar de instrumento. *@
+            <InputSelect id="instrument" class="form-select" Value="model.InstrumentId"
+                         ValueChanged="@((int instrumentId) => OnInstrumentChanged(instrumentId))"
+                         ValueExpression="@(() => model.InstrumentId)">
+                <option value="0">Seleccione un instrumento</option>
+                @foreach (var instrument in instruments!)
+                {
+                    <option value="@instrument.Id">@instrument.Code - @instrument.Name</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="() => model.InstrumentId" />
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-sm-6">
+                <label for="intervention" class="form-label">Tipo de intervención</label>
+                <InputSelect id="intervention" class="form-select" @bind-Value="model.InterventionType">
+                    @foreach (var intervention in Interventions)
+                    {
+                        <option value="@intervention">@CalibrationText.InterventionText(intervention)</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="col-sm-6">
+                <label for="procedure" class="form-label">Procedimiento@(model.IsExternal ? " (opcional)" : string.Empty)</label>
+                <InputSelect id="procedure" class="form-select" @bind-Value="model.ProcedureId" disabled="@(model.InstrumentId == 0)">
+                    <option value="0">@(model.IsExternal ? "Ninguno" : "Seleccione un procedimiento")</option>
+                    @foreach (var procedure in InstrumentProcedures)
+                    {
+                        <option value="@procedure.Id">@ProcedureOption(procedure)</option>
+                    }
+                </InputSelect>
+                @if (model.InstrumentId == 0)
+                {
+                    <div class="form-text">Elegí primero un instrumento.</div>
+                }
+                else if (InstrumentProcedures.Count == 0)
+                {
+                    <div class="form-text">No hay procedimientos activos para este tipo de instrumento.</div>
+                }
+                <ValidationMessage For="() => model.ProcedureId" />
+            </div>
+        </div>
+
+        @if (IsEdit)
+        {
+            <div class="mb-3">
+                <label for="date" class="form-label">Fecha</label>
+                <InputDate id="date" class="form-control" @bind-Value="model.CalibrationDate"
+                           max="@DateTime.Today.ToString("yyyy-MM-dd")" ParsingErrorMessage="La fecha no es válida." />
+                <ValidationMessage For="() => model.CalibrationDate" />
+            </div>
+        }
+        else
+        {
+            <p class="text-secondary small">La fecha de la calibración es la de hoy y quien la realiza sos vos.</p>
+        }
+
+        <h2 class="form-section">Origen</h2>
+
+        <div class="form-check mb-3">
+            <InputCheckbox id="isExternal" class="form-check-input" @bind-Value="model.IsExternal" />
+            <label for="isExternal" class="form-check-label">Calibración externa (la hizo un laboratorio)</label>
+        </div>
+
+        @if (model.IsExternal)
+        {
+            <div class="mb-3">
+                <label for="externalLab" class="form-label">Laboratorio externo</label>
+                <InputText id="externalLab" class="form-control" @bind-Value="model.ExternalLab" />
+                <ValidationMessage For="() => model.ExternalLab" />
+            </div>
+        }
+
+        <div class="mb-3">
+            <label for="certificate" class="form-label">N° de certificado (opcional)</label>
+            <InputText id="certificate" class="form-control" @bind-Value="model.CertificateNumber" />
+            <ValidationMessage For="() => model.CertificateNumber" />
+        </div>
+
+        <h2 class="form-section">Patrones de referencia</h2>
+
+        @if (model.IsExternal)
+        {
+            <p class="text-secondary">Las calibraciones externas no usan patrones de referencia.</p>
+        }
+        else if (AvailableStandards.Count == 0)
+        {
+            <p class="text-secondary">No hay patrones de referencia vigentes.</p>
+        }
+        else
+        {
+            @foreach (var standard in AvailableStandards)
+            {
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="@($"standard-{standard.Id}")"
+                           checked="@model.ReferenceStandardIds.Contains(standard.Id)"
+                           @onchange="e => ToggleStandard(standard.Id, (bool)e.Value!)" />
+                    <label class="form-check-label" for="@($"standard-{standard.Id}")">
+                        @standard.Description <span class="text-secondary">(@standard.CertificateNumber)</span>
+                        @* Solo se ven vencidos o inactivos en una edición, si la calibración ya los usaba. *@
+                        @if (!standard.IsActive)
+                        {
+                            <StatusBadge Text="Inactivo" Kind="secondary" />
+                        }
+                        else if (standard.CertificateExpiresAt.Date < DateTime.Today)
+                        {
+                            <StatusBadge Text="Vencido" Kind="danger" />
+                        }
+                    </label>
+                </div>
+            }
+        }
+    </EditForm>
+
+    @* Fuera de los <form>: Enter en estos campos agrega la medición y no guarda la calibración. *@
+    <div class="form-narrow">
+        <MeasurementsEditor Measurements="measurements" MaxAllowedError="MaxAllowedError" OnChanged="OnMeasurementsChanged" />
+    </div>
+
+    @* Mismo EditContext que el formulario de arriba: el resultado se elige después de cargar las mediciones. *@
+    <EditForm EditContext="editContext" class="form-narrow">
+        <h2 class="form-section">Resultado</h2>
+
+        <div class="mb-3">
+            <label for="result" class="form-label">Resultado</label>
+            <InputSelect id="result" class="form-select" @bind-Value="model.Result">
+                <option value="">Seleccione un resultado</option>
+                @foreach (var result in Results)
+                {
+                    <option value="@result">@CalibrationText.ResultText(result)</option>
+                }
+            </InputSelect>
+            @if (SuggestedResult != null)
+            {
+                <div class="form-text">Sugerido según las mediciones: @CalibrationText.ResultText(SuggestedResult).</div>
+            }
+            <ValidationMessage For="() => model.Result" />
+        </div>
+
+        @if (model.Result == "Conformant" && SuggestedResult == "NonConformant")
+        {
+            <div class="alert alert-warning">Hay mediciones fuera de la tolerancia, pero el resultado elegido es Conforme.</div>
+        }
+
+        @if (model.Result == "WithRestrictions")
+        {
+            <div class="mb-3">
+                <label for="restriction" class="form-label">Detalle de las restricciones</label>
+                <InputTextArea id="restriction" class="form-control" rows="2" @bind-Value="model.RestrictionDetail" />
+                <ValidationMessage For="() => model.RestrictionDetail" />
+            </div>
+        }
+
+        <div class="mb-3">
+            <label for="notes" class="form-label">Notas (opcional)</label>
+            <InputTextArea id="notes" class="form-control" rows="3" @bind-Value="model.Notes" />
+            <ValidationMessage For="() => model.Notes" />
+        </div>
+    </EditForm>
+
+    <div class="form-narrow">
+        <div class="mt-4">
+            <button type="button" class="btn btn-primary" @onclick="SaveClickAsync" disabled="@Saving">Guardar</button>
+            <a href="calibrations" class="btn btn-outline-secondary">Cancelar</a>
+        </div>
+    </div>
+}
+
+@code {
+    // Calibración que se edita (null = alta).
+    [Parameter]
+    public CalibrationDTO? Calibration { get; set; }
+
+    [Parameter]
+    public bool IsEdit { get; set; }
+
+    // Recibe la calibración ya armada; quien la usa decide cómo guardarla.
+    [Parameter, EditorRequired]
+    public EventCallback<CalibrationDTO> OnSave { get; set; }
+
+    [Parameter]
+    public bool Saving { get; set; }
+
+    private static readonly string[] Interventions = ["Calibration", "Verification", "Maintenance", "AdjustmentAndCalibration"];
+    private static readonly string[] Results = ["Conformant", "WithRestrictions", "NonConformant"];
+
+    private List<InstrumentDTO>? instruments;
+    private List<InstrumentTypeDTO>? instrumentTypes;
+    private List<ProcedureDTO>? procedures;
+    private List<ReferenceStandardDTO>? standards;
+
+    private CalibrationFormModel model = new();
+    private EditContext? editContext;
+    private List<CalibrationMeasurementDTO> measurements = new();
+    private string? loadError;
+    private string? errorMessage;
+
+    // Lo que ya tenía la calibración al abrirla: se sigue mostrando aunque hoy esté inactivo o vencido.
+    private int initialProcedureId;
+    private HashSet<int> initialStandardIds = new();
+
+    // El último resultado que se sugirió, para no pisar uno que la persona ya cambió a mano.
+    private string? lastSuggestedResult;
+
+    // Solo los procedimientos activos del mismo tipo que el instrumento elegido.
+    private List<ProcedureDTO> InstrumentProcedures
+    {
+        get
+        {
+            var instrument = instruments?.FirstOrDefault(i => i.Id == model.InstrumentId);
+            return instrument == null
+                ? new List<ProcedureDTO>()
+                : procedures!.Where(p => p.InstrumentTypeId == instrument.InstrumentTypeId
+                                         && (p.IsActive || p.Id == initialProcedureId)).ToList();
+        }
+    }
+
+    // Una versión vieja (inactiva) solo aparece si la calibración ya la usaba: ahí sí importa distinguir la versión.
+    private static string ProcedureOption(ProcedureDTO procedure) =>
+        procedure.IsActive
+            ? $"{procedure.Code} - {procedure.Name}"
+            : $"{procedure.Code} - {procedure.Name} (v{procedure.VersionNumber}, inactivo)";
+
+    // Solo los patrones activos y vigentes, más los que la calibración ya tenía.
+    private List<ReferenceStandardDTO> AvailableStandards => standards!
+        .Where(s => (s.IsActive && s.CertificateExpiresAt.Date >= DateTime.Today) || initialStandardIds.Contains(s.Id))
+        .ToList();
+
+    // Resultado que surge de las mediciones: todas dentro de la tolerancia o alguna fuera.
+    private string? SuggestedResult
+    {
+        get
+        {
+            if (measurements.Count == 0 || MaxAllowedError == null)
+                return null;
+
+            return measurements.All(m => Math.Abs(m.MeasuredValue - m.NominalValue) <= MaxAllowedError.Value)
+                ? "Conformant"
+                : "NonConformant";
+        }
+    }
+
+    // El error máximo del instrumento pisa al de su tipo (misma regla que usa la API).
+    private decimal? MaxAllowedError
+    {
+        get
+        {
+            var instrument = instruments?.FirstOrDefault(i => i.Id == model.InstrumentId);
+            if (instrument == null)
+                return null;
+
+            return instrument.MaxAllowedError
+                ?? instrumentTypes!.FirstOrDefault(t => t.Id == instrument.InstrumentTypeId)?.MaxAllowedError;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            instruments = await InstrumentApiClient.GetAllAsync();
+            instrumentTypes = await InstrumentTypeApiClient.GetAllAsync();
+            procedures = await ProcedureApiClient.GetAllAsync();
+            standards = await ReferenceStandardApiClient.GetAllAsync();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+            return;
+        }
+        catch (Exception ex)
+        {
+            loadError = ApiError.Message(ex);
+            return;
+        }
+
+        if (Calibration != null)
+        {
+            model = new CalibrationFormModel
+            {
+                IsEdit = IsEdit,
+                InstrumentId = Calibration.InstrumentId,
+                ProcedureId = Calibration.ProcedureId ?? 0,
+                InterventionType = Calibration.InterventionType,
+                CalibrationDate = Calibration.CalibrationDate.Date,
+                IsExternal = Calibration.IsExternal,
+                ExternalLab = Calibration.ExternalLab,
+                CertificateNumber = Calibration.CertificateNumber,
+                Result = Calibration.Result,
+                RestrictionDetail = Calibration.RestrictionDetail,
+                Notes = Calibration.Notes,
+                ReferenceStandardIds = Calibration.ReferenceStandardIds.ToHashSet()
+            };
+            initialProcedureId = model.ProcedureId;
+            initialStandardIds = Calibration.ReferenceStandardIds.ToHashSet();
+
+            // Se trabaja sobre copias: si se cancela, la calibración original queda como estaba.
+            measurements = Calibration.Measurements.Select(m => new CalibrationMeasurementDTO
+            {
+                Id = m.Id,
+                CalibrationId = m.CalibrationId,
+                NominalValue = m.NominalValue,
+                MeasuredValue = m.MeasuredValue,
+                Error = m.Error,
+                IsWithinTolerance = m.IsWithinTolerance,
+                Notes = m.Notes
+            }).ToList();
+        }
+        else
+        {
+            model = new CalibrationFormModel { IsEdit = IsEdit };
+        }
+
+        editContext = new EditContext(model);
+    }
+
+    private void OnInstrumentChanged(int instrumentId)
+    {
+        model.InstrumentId = instrumentId;
+
+        // El procedimiento tiene que ser del tipo del instrumento elegido; al cambiarlo se descarta el anterior.
+        model.ProcedureId = 0;
+    }
+
+    // Si la persona no eligió otro resultado a mano, se acompaña a las mediciones. Un resultado ya guardado no se toca.
+    private void OnMeasurementsChanged()
+    {
+        var suggested = SuggestedResult;
+        if (suggested != null && (model.Result == string.Empty || model.Result == lastSuggestedResult))
+            model.Result = suggested;
+
+        lastSuggestedResult = suggested;
+    }
+
+    private void ToggleStandard(int id, bool isChecked)
+    {
+        if (isChecked)
+            model.ReferenceStandardIds.Add(id);
+        else
+            model.ReferenceStandardIds.Remove(id);
+    }
+
+    private async Task SaveClickAsync()
+    {
+        errorMessage = null;
+
+        if (!editContext!.Validate())
+            return;
+
+        // Misma regla que WinForms: una calibración interna necesita medirse.
+        if (!model.IsExternal && measurements.Count == 0)
+        {
+            errorMessage = "Una calibración interna necesita al menos una medición.";
+            return;
+        }
+
+        if (measurements.Count > 0 && MaxAllowedError == null)
+        {
+            errorMessage = "Ni el instrumento ni su tipo definen un error máximo: no se pueden guardar mediciones.";
+            return;
+        }
+
+        await OnSave.InvokeAsync(BuildDto());
+    }
+
+    private CalibrationDTO BuildDto()
+    {
+        var dto = Calibration ?? new CalibrationDTO();
+
+        dto.InstrumentId = model.InstrumentId;
+        dto.ProcedureId = model.ProcedureId == 0 ? null : model.ProcedureId;
+        dto.InterventionType = model.InterventionType;
+        dto.IsExternal = model.IsExternal;
+        dto.ExternalLab = model.IsExternal && !string.IsNullOrWhiteSpace(model.ExternalLab) ? model.ExternalLab.Trim() : null;
+        dto.CertificateNumber = string.IsNullOrWhiteSpace(model.CertificateNumber) ? null : model.CertificateNumber.Trim();
+        dto.Result = model.Result;
+        dto.RestrictionDetail = model.Result == "WithRestrictions" && !string.IsNullOrWhiteSpace(model.RestrictionDetail)
+            ? model.RestrictionDetail.Trim()
+            : null;
+        dto.Notes = string.IsNullOrWhiteSpace(model.Notes) ? null : model.Notes.Trim();
+
+        // Una calibración externa no usa patrones (la API los descarta igual).
+        dto.ReferenceStandardIds = model.IsExternal ? new List<int>() : model.ReferenceStandardIds.ToList();
+        dto.Measurements = measurements;
+
+        // Al editar, si la fecha no cambió se conserva la hora que ya tenía.
+        if (IsEdit && model.CalibrationDate.Date != dto.CalibrationDate.Date)
+            dto.CalibrationDate = model.CalibrationDate.Date;
+
+        return dto;
+    }
+
+    public class CalibrationFormModel : IValidatableObject
+    {
+        public bool IsEdit { get; set; }
+
+        [Range(1, int.MaxValue, ErrorMessage = "Seleccione un instrumento.")]
+        public int InstrumentId { get; set; }
+
+        // 0 = sin procedimiento.
+        public int ProcedureId { get; set; }
+
+        public string InterventionType { get; set; } = "Calibration";
+
+        public DateTime CalibrationDate { get; set; } = DateTime.Today;
+
+        public bool IsExternal { get; set; }
+
+        [StringLength(100, ErrorMessage = "El laboratorio no puede superar los 100 caracteres.")]
+        public string? ExternalLab { get; set; }
+
+        [StringLength(100, ErrorMessage = "El certificado no puede superar los 100 caracteres.")]
+        public string? CertificateNumber { get; set; }
+
+        [Required(ErrorMessage = "Seleccione un resultado.")]
+        public string Result { get; set; } = string.Empty;
+
+        [StringLength(200, ErrorMessage = "El detalle no puede superar los 200 caracteres.")]
+        public string? RestrictionDetail { get; set; }
+
+        [StringLength(500, ErrorMessage = "Las notas no pueden superar los 500 caracteres.")]
+        public string? Notes { get; set; }
+
+        public HashSet<int> ReferenceStandardIds { get; set; } = new();
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            // En una interna el procedimiento es obligatorio (la API lo deja opcional; acá se pide igual).
+            if (!IsExternal && ProcedureId == 0)
+                yield return new ValidationResult("Seleccione un procedimiento.", new[] { nameof(ProcedureId) });
+
+            if (IsEdit && CalibrationDate == default)
+                yield return new ValidationResult("La fecha es obligatoria.", new[] { nameof(CalibrationDate) });
+            else if (IsEdit && CalibrationDate.Date > DateTime.Today)
+                yield return new ValidationResult("La fecha no puede ser futura.", new[] { nameof(CalibrationDate) });
+        }
+    }
+}

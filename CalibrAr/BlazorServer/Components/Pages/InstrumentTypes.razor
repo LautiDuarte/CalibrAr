@@ -2,16 +2,20 @@
 @attribute [Authorize(Policy = "InstrumentTypesRead")]
 @inject InstrumentTypeApiClient InstrumentTypeApiClient
 @inject NavigationManager NavigationManager
+@inject FlashService Flash
 @inject IJSRuntime JS
 
 <PageTitle>Tipos de instrumento - CalibrAr</PageTitle>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 m-0">Tipos de instrumento</h1>
-    <AuthorizeView Policy="InstrumentTypesCreate">
-        <a href="instrument-types/new" class="btn btn-primary">Nuevo tipo de instrumento</a>
-    </AuthorizeView>
-</div>
+<PageHeader Title="Tipos de instrumento" Count="instrumentTypes?.Count">
+    <Actions>
+        <AuthorizeView Policy="InstrumentTypesCreate">
+            <a href="instrument-types/new" class="btn btn-primary">Nuevo tipo de instrumento</a>
+        </AuthorizeView>
+    </Actions>
+</PageHeader>
+
+<FlashBanner />
 
 @if (errorMessage != null)
 {
@@ -49,7 +53,7 @@ else
                         <td class="text-end">@instrumentType.MaxAllowedError</td>
                         <td class="text-end">@instrumentType.CalibrationFrequencyMonths</td>
                         <td>
-                            <span class="badge @(instrumentType.IsActive ? "text-bg-success" : "text-bg-secondary")">@(instrumentType.IsActive ? "Sí" : "No")</span>
+                            <StatusBadge Text="@(instrumentType.IsActive ? "Sí" : "No")" Kind="@(instrumentType.IsActive ? "success" : "secondary")" />
                         </td>
                         <td class="text-end text-nowrap">
                             <AuthorizeView Policy="InstrumentTypesUpdate">
@@ -103,6 +107,7 @@ else
             await InstrumentTypeApiClient.DeleteAsync(instrumentType.Id);
             errorMessage = null;
             await LoadInstrumentTypes();
+            Flash.Success($"Tipo de instrumento \"{instrumentType.Name}\" eliminado.");
         }
         catch (UnauthorizedAccessException)
         {

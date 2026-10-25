@@ -1,4 +1,5 @@
 using API.Clients;
+using BlazorServer;
 using BlazorServer.Auth;
 using BlazorServer.Components;
 using Microsoft.AspNetCore.Antiforgery;
@@ -29,7 +30,7 @@ builder.Services.AddAuthorization(options =>
 {
     // Mismo esquema que la WebAPI: la política "LocationsRead" exige el claim permission "Locations.read".
     // Solo las entidades que tienen pantalla en Blazor.
-    string[] categories = ["Locations", "Areas", "Instruments", "InstrumentTypes"];
+    string[] categories = ["Locations", "Areas", "Instruments", "InstrumentTypes", "Procedures", "ReferenceStandards", "InstrumentStatusHistory", "Users", "NonConformities", "Calibrations"];
     (string Suffix, string Action)[] actions =
     [
         ("Read", "read"), ("Create", "create"), ("Update", "update"), ("Delete", "delete")
@@ -57,6 +58,18 @@ builder.Services.AddScoped<LocationApiClient>();
 builder.Services.AddScoped<AreaApiClient>();
 builder.Services.AddScoped<InstrumentTypeApiClient>();
 builder.Services.AddScoped<InstrumentApiClient>();
+builder.Services.AddScoped<ProcedureApiClient>();
+builder.Services.AddScoped<ReferenceStandardApiClient>();
+builder.Services.AddScoped<InstrumentStatusHistoryApiClient>();
+builder.Services.AddScoped<UserApiClient>();
+builder.Services.AddScoped<NonConformityApiClient>();
+builder.Services.AddScoped<CalibrationApiClient>();
+
+// Mensaje de "guardado" entre pantallas, uno por usuario.
+builder.Services.AddScoped<FlashService>();
+
+// Id del usuario de la sesión, para las operaciones que la API pide "quién lo hizo".
+builder.Services.AddScoped<CurrentUser>();
 
 var app = builder.Build();
 

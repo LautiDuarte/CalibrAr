@@ -12,6 +12,7 @@
     <div class="mb-3">
         <label for="responsible" class="form-label">Responsable</label>
         <InputText id="responsible" class="form-control" @bind-Value="Model.Responsible" />
+        <div class="form-text">Persona a cargo del área. Se escribe a mano, no hace falta que sea un usuario del sistema.</div>
         <ValidationMessage For="() => Model.Responsible" />
     </div>
 
@@ -30,6 +31,7 @@
     <div class="form-check mb-4">
         <InputCheckbox id="isActive" class="form-check-input" @bind-Value="Model.IsActive" />
         <label for="isActive" class="form-check-label">Activa</label>
+        <div class="form-text">Si se desmarca, deja de ofrecerse al cargar instrumentos nuevos. Lo ya registrado se conserva.</div>
     </div>
 
     <button type="submit" class="btn btn-primary" disabled="@Saving">Guardar</button>

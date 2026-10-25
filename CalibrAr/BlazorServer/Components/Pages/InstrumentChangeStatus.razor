@@ -1,0 +1,130 @@
+@page "/instruments/{Id:int}/status"
+@attribute [Authorize(Policy = "InstrumentsUpdate")]
+@inject InstrumentApiClient InstrumentApiClient
+@inject CurrentUser CurrentUser
+@inject FlashService Flash
+@inject NavigationManager NavigationManager
+
+<PageTitle>Cambiar estado - CalibrAr</PageTitle>
+
+<PageHeader Title="Cambiar estado">
+    <Actions>
+        <a href="instruments" class="btn btn-sm btn-outline-secondary">← Volver</a>
+    </Actions>
+</PageHeader>
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger form-narrow">@errorMessage</div>
+}
+
+@if (instrument == null)
+{
+    @if (errorMessage == null)
+    {
+        <p class="text-secondary">Cargando...</p>
+    }
+}
+else
+{
+    <div class="form-narrow">
+        <p class="mb-1">
+            <span class="font-monospace">@instrument.Code</span> - @instrument.Name
+        </p>
+        <p class="mb-3">
+            Estado actual: <StatusBadge Text="@InstrumentForm.StatusText(instrument.Status)" Kind="@InstrumentForm.StatusKind(instrument.Status)" />
+        </p>
+
+        @if (CalibrationOverdue)
+        {
+            <div class="alert alert-warning">
+                La calibración de este instrumento está vencida (próxima: @instrument.NextCalibrationDate!.Value.ToString("dd/MM/yyyy")).
+                Si lo pasás a "Activo", el sistema lo vuelve a marcar como vencido hasta que se registre una calibración.
+            </div>
+        }
+
+        <form @onsubmit="SaveAsync">
+            <div class="mb-3">
+                <label for="newStatus" class="form-label">Nuevo estado</label>
+                <select id="newStatus" class="form-select" @bind="newStatus">
+                    <option value="">Seleccione un estado</option>
+                    @foreach (var status in InstrumentForm.ManualStatuses.Where(s => s != instrument.Status))
+                    {
+                        <option value="@status">@InstrumentForm.StatusText(status)</option>
+                    }
+                </select>
+                @if (validationMessage != null)
+                {
+                    <div class="validation-message">@validationMessage</div>
+                }
+            </div>
+
+            <button type="submit" class="btn btn-primary" disabled="@saving">Guardar</button>
+            <a href="instruments" class="btn btn-outline-secondary">Cancelar</a>
+        </form>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private InstrumentDTO? instrument;
+    private string newStatus = string.Empty;
+    private string? validationMessage;
+    private string? errorMessage;
+    private bool saving;
+
+    // El sistema marca como vencido a todo instrumento "Activo" cuya próxima calibración ya pasó.
+    private bool CalibrationOverdue =>
+        instrument?.NextCalibrationDate != null && instrument.NextCalibrationDate.Value < DateTime.Now;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            instrument = await InstrumentApiClient.GetAsync(Id);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (newStatus == string.Empty)
+        {
+            validationMessage = "Seleccione el nuevo estado.";
+            return;
+        }
+
+        validationMessage = null;
+        saving = true;
+        try
+        {
+            // La API actualiza el instrumento completo: se manda lo que ya tenía, solo con el estado nuevo.
+            instrument!.Status = newStatus;
+            instrument.ChangedByUserId = await CurrentUser.GetIdAsync();
+            await InstrumentApiClient.UpdateAsync(instrument);
+            Flash.Success($"Estado de \"{instrument.Code}\" actualizado a {InstrumentForm.StatusText(newStatus)}.");
+            NavigationManager.NavigateTo("instruments");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}
