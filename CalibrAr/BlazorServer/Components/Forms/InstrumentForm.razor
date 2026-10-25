@@ -89,13 +89,13 @@
         <div class="col-sm-6">
             <label for="maxError" class="form-label">Error máximo</label>
             <InputNumber id="maxError" class="form-control" @bind-Value="Model.MaxAllowedError" />
-            <div class="form-text">Si se deja vacío se usa el del tipo.</div>
+            <div class="form-text">Si se deja vacío se usa el del tipo@(SelectedType == null ? "." : $": {SelectedType.MaxAllowedError:0.####} {SelectedType.MeasurementUnit}.")</div>
             <ValidationMessage For="() => Model.MaxAllowedError" />
         </div>
         <div class="col-sm-6">
             <label for="frequency" class="form-label">Frecuencia (meses)</label>
             <InputNumber id="frequency" class="form-control" @bind-Value="Model.CalibrationFrequencyMonths" />
-            <div class="form-text">Si se deja vacío se usa la del tipo.</div>
+            <div class="form-text">Si se deja vacío se usa la del tipo@(SelectedType == null ? "." : $": {SelectedType.CalibrationFrequencyMonths} meses.")</div>
             <ValidationMessage For="() => Model.CalibrationFrequencyMonths" />
         </div>
     </div>
@@ -113,6 +113,9 @@
 
     [Parameter, EditorRequired]
     public List<AreaDTO> Areas { get; set; } = default!;
+
+    // El tipo elegido, para mostrar qué valores se usan cuando el instrumento no define los suyos.
+    private InstrumentTypeDTO? SelectedType => InstrumentTypes.FirstOrDefault(t => t.Id == Model.InstrumentTypeId);
 
     // El estado solo se elige al editar (al crear el servicio lo deja en Active)
     // y el tipo no se puede cambiar una vez creado el instrumento.

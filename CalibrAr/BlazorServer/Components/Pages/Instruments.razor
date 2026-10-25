@@ -65,6 +65,11 @@ else
         </div>
     </div>
 
+    <div class="form-check mb-3">
+        <input type="checkbox" id="hideDecommissioned" class="form-check-input" @bind="hideDecommissioned" />
+        <label for="hideDecommissioned" class="form-check-label">Ocultar dados de baja</label>
+    </div>
+
     @if (filtered.Count == 0)
     {
         <p class="text-secondary">Ningún instrumento coincide con los filtros.</p>
@@ -128,6 +133,7 @@ else
     private string searchText = string.Empty;
     private string statusFilter = string.Empty;
     private string areaFilter = string.Empty;
+    private bool hideDecommissioned;
 
     protected override async Task OnInitializedAsync()
     {
@@ -135,13 +141,14 @@ else
     }
 
     private bool HasFilters =>
-        !string.IsNullOrWhiteSpace(searchText) || statusFilter != string.Empty || areaFilter != string.Empty;
+        !string.IsNullOrWhiteSpace(searchText) || statusFilter != string.Empty || areaFilter != string.Empty || hideDecommissioned;
 
     // Los filtros se aplican en memoria sobre la lista ya cargada, sin volver a llamar a la API.
     private List<InstrumentDTO> FilteredInstruments => instruments!
         .Where(i => (string.IsNullOrWhiteSpace(searchText) || Matches(i, searchText.Trim()))
                     && (statusFilter == string.Empty || i.Status == statusFilter)
-                    && (areaFilter == string.Empty || i.AreaName == areaFilter))
+                    && (areaFilter == string.Empty || i.AreaName == areaFilter)
+                    && (!hideDecommissioned || i.Status != nameof(InstrumentStatusDTO.Decommissioned)))
         .ToList();
 
     // Con filtros activos el subtítulo cambia a "N de M instrumentos"; sin filtros queda en null y el
@@ -164,6 +171,7 @@ else
         searchText = string.Empty;
         statusFilter = string.Empty;
         areaFilter = string.Empty;
+        hideDecommissioned = false;
     }
 
     private async Task LoadInstruments()
