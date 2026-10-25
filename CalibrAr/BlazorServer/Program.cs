@@ -64,6 +64,7 @@ builder.Services.AddScoped<InstrumentStatusHistoryApiClient>();
 builder.Services.AddScoped<UserApiClient>();
 builder.Services.AddScoped<NonConformityApiClient>();
 builder.Services.AddScoped<CalibrationApiClient>();
+builder.Services.AddScoped<ReportApiClient>();
 
 // Mensaje de "guardado" entre pantallas, uno por usuario.
 builder.Services.AddScoped<FlashService>();
