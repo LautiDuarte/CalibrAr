@@ -64,6 +64,8 @@ builder.Services.AddScoped<ICalibrationService, CalibrationService>();
 builder.Services.AddScoped<INonConformityService, NonConformityService>();
 builder.Services.AddScoped<IInstrumentStatusHistoryService, InstrumentStatusHistoryService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddSingleton<ReportPdfGenerator>();
 builder.Services.AddScoped<AuthService>();
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -93,7 +95,7 @@ builder.Services.AddAuthorization(options =>
     [
         "Locations", "Areas", "Instruments", "Calibrations", "Users", "InstrumentTypes",
         "Procedures", "NonConformities", "ReferenceStandards", "InstrumentStatusHistory",
-        "CalibrationMeasurements"
+        "CalibrationMeasurements", "Reports"
     ];
     (string Suffix, string Action)[] actions =
     [
@@ -119,6 +121,15 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<CalibrArContext>();
     context.Database.EnsureCreated();
     context.SeedInitialData();
+
+    try
+    {
+        DemoDataSeeder.Seed(context);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"No se pudieron cargar los datos de ejemplo: {ex.Message}");
+    }
 }
 
 // Configure the HTTP request pipeline.
@@ -146,6 +157,7 @@ app.MapProcedureEndpoints();
 app.MapCalibrationEndpoints();
 app.MapNonConformityEndpoints();
 app.MapInstrumentStatusHistoryEndpoints();
+app.MapReportEndpoints();
 app.MapUserEndpoints();
 app.MapAuthEndpoints();
 

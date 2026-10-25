@@ -75,6 +75,9 @@ namespace WindowsForms
 
             bool canViewUsers = authService.HasPermission("Users.read");
             usersToolStripMenuItem.Visible = canViewUsers;
+
+            bool canViewReports = authService.HasPermission("Reports.read");
+            reportsToolStripMenuItem.Visible = canViewReports;
         }
 
         private void instrumentsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -126,6 +129,11 @@ namespace WindowsForms
         { 
             OpenMdiChild<UserList>(); 
         }
+        private void reportsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenMdiChild<ReportsForm>();
+        }
+
         private void Home_Load(object sender, EventArgs e)
         {
 

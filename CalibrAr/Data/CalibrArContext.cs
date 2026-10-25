@@ -455,7 +455,10 @@ namespace Data
                 new { Id = 41, Name = "read", Description = "Read calibration measurements", Category = "CalibrationMeasurements", IsActive = true },
                 new { Id = 42, Name = "create", Description = "Create calibration measurements", Category = "CalibrationMeasurements", IsActive = true },
                 new { Id = 43, Name = "update", Description = "Update calibration measurements", Category = "CalibrationMeasurements", IsActive = true },
-                new { Id = 44, Name = "delete", Description = "Delete calibration measurements", Category = "CalibrationMeasurements", IsActive = true }
+                new { Id = 44, Name = "delete", Description = "Delete calibration measurements", Category = "CalibrationMeasurements", IsActive = true },
+
+                //Permisos para Reports
+                new { Id = 45, Name = "read", Description = "Read reports", Category = "Reports", IsActive = true }
                 );
 
             modelBuilder.Entity<PermissionGroup>().HasData(
@@ -511,6 +514,7 @@ namespace Data
                                  (p.Category == "CalibrationMeasurements") ||
                                  (p.Category == "NonConformities") ||
                                  (p.Category == "InstrumentStatusHistory" && p.Name == "read") ||
+                                 (p.Category == "Reports") ||
                                  (p.Category == "ReferenceStandards")
                         ).ToList();
 
@@ -542,7 +546,8 @@ namespace Data
                         }
 
                         var auditorPermissions = allPermissions.Where(
-                            p => (p.Category == "Instruments" && p.Name == "read")
+                            p => (p.Category == "Instruments" && p.Name == "read") ||
+                                 (p.Category == "Reports")
                         ).ToList();
 
                         foreach(var permission in auditorPermissions)

@@ -40,13 +40,14 @@ namespace WindowsForms
             instrumentStatusHistoryToolStripMenuItem = new ToolStripMenuItem();
             logoutToolStripMenuItem = new ToolStripMenuItem();
             usersToolStripMenuItem = new ToolStripMenuItem();
+            reportsToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
             // 
             menuStrip1.ImageScalingSize = new Size(20, 20);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { usersToolStripMenuItem, instrumentsToolStripMenuItem, instrumentTypesToolStripMenuItem, locationsToolStripMenuItem, areasToolStripMenuItem, proceduresToolStripMenuItem, calibrationsToolStripMenuItem, nonConformitiesToolStripMenuItem, referenceStandardsToolStripMenuItem, instrumentStatusHistoryToolStripMenuItem, logoutToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { usersToolStripMenuItem, instrumentsToolStripMenuItem, instrumentTypesToolStripMenuItem, locationsToolStripMenuItem, areasToolStripMenuItem, proceduresToolStripMenuItem, calibrationsToolStripMenuItem, nonConformitiesToolStripMenuItem, referenceStandardsToolStripMenuItem, instrumentStatusHistoryToolStripMenuItem, reportsToolStripMenuItem, logoutToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(1013, 24);
@@ -130,6 +131,13 @@ namespace WindowsForms
             usersToolStripMenuItem.Size = new Size(47, 20);
             usersToolStripMenuItem.Text = "Users";
             usersToolStripMenuItem.Click += usersToolStripMenuItem_Click;
+            //
+            // reportsToolStripMenuItem
+            //
+            reportsToolStripMenuItem.Name = "reportsToolStripMenuItem";
+            reportsToolStripMenuItem.Size = new Size(65, 20);
+            reportsToolStripMenuItem.Text = "Reportes";
+            reportsToolStripMenuItem.Click += reportsToolStripMenuItem_Click;
             // 
             // Home
             // 
@@ -161,5 +169,6 @@ namespace WindowsForms
         private ToolStripMenuItem referenceStandardsToolStripMenuItem;
         private ToolStripMenuItem instrumentStatusHistoryToolStripMenuItem;
         private ToolStripMenuItem usersToolStripMenuItem;
+        private ToolStripMenuItem reportsToolStripMenuItem;
     }
 }
