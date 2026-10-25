@@ -121,6 +121,15 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<CalibrArContext>();
     context.Database.EnsureCreated();
     context.SeedInitialData();
+
+    try
+    {
+        DemoDataSeeder.Seed(context);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"No se pudieron cargar los datos de ejemplo: {ex.Message}");
+    }
 }
 
 // Configure the HTTP request pipeline.
