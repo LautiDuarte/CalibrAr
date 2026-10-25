@@ -30,7 +30,7 @@ builder.Services.AddAuthorization(options =>
 {
     // Mismo esquema que la WebAPI: la política "LocationsRead" exige el claim permission "Locations.read".
     // Solo las entidades que tienen pantalla en Blazor.
-    string[] categories = ["Locations", "Areas", "Instruments", "InstrumentTypes", "Procedures", "ReferenceStandards", "InstrumentStatusHistory", "Users", "NonConformities", "Calibrations"];
+    string[] categories = ["Locations", "Areas", "Instruments", "InstrumentTypes", "Procedures", "ReferenceStandards", "InstrumentStatusHistory", "Users", "NonConformities", "Calibrations", "Reports"];
     (string Suffix, string Action)[] actions =
     [
         ("Read", "read"), ("Create", "create"), ("Update", "update"), ("Delete", "delete")
