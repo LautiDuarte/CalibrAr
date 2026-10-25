@@ -42,6 +42,7 @@
         <div class="form-check mb-3">
             <InputCheckbox id="isActive" class="form-check-input" @bind-Value="Model.IsActive" disabled="@IsSelf" />
             <label for="isActive" class="form-check-label">Activo</label>
+            <div class="form-text">Un usuario inactivo no puede iniciar sesión, pero se conserva su historial.</div>
         </div>
     }
 

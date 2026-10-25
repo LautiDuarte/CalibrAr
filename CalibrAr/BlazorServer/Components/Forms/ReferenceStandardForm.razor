@@ -31,6 +31,7 @@
         <div class="col-sm-6">
             <label for="expiresAt" class="form-label">Fecha de vencimiento</label>
             <InputDate id="expiresAt" class="form-control" @bind-Value="Model.CertificateExpiresAt" ParsingErrorMessage="La fecha de vencimiento no es válida." />
+            <div class="form-text">Pasada esa fecha el patrón no debe usarse para calibrar.</div>
             <ValidationMessage For="() => Model.CertificateExpiresAt" />
         </div>
     </div>

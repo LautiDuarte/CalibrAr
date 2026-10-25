@@ -24,11 +24,13 @@
         <div class="col-sm-6">
             <label for="maxError" class="form-label">Error máximo</label>
             <InputNumber id="maxError" class="form-control" @bind-Value="Model.MaxAllowedError" />
+            <div class="form-text">En la unidad de medida de este tipo. Lo usan los instrumentos que no tengan uno propio.</div>
             <ValidationMessage For="() => Model.MaxAllowedError" />
         </div>
         <div class="col-sm-6">
             <label for="frequency" class="form-label">Frecuencia (meses)</label>
             <InputNumber id="frequency" class="form-control" @bind-Value="Model.CalibrationFrequencyMonths" />
+            <div class="form-text">Cada cuántos meses se calibran. Lo usan los instrumentos que no tengan una propia.</div>
             <ValidationMessage For="() => Model.CalibrationFrequencyMonths" />
         </div>
     </div>

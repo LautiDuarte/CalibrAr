@@ -12,6 +12,7 @@
     <div class="mb-3">
         <label for="responsible" class="form-label">Responsable</label>
         <InputText id="responsible" class="form-control" @bind-Value="Model.Responsible" />
+        <div class="form-text">Persona a cargo del área. Se escribe a mano, no hace falta que sea un usuario del sistema.</div>
         <ValidationMessage For="() => Model.Responsible" />
     </div>
 
