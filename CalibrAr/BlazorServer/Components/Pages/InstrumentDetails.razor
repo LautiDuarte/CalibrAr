@@ -9,7 +9,6 @@
     <Actions>
         <a href="instruments" class="btn btn-sm btn-outline-secondary">← Volver</a>
         <AuthorizeView Policy="InstrumentsUpdate">
-            <a href="instruments/@Id/status" class="btn btn-sm btn-outline-primary">Cambiar estado</a>
             <a href="instruments/@Id/edit" class="btn btn-sm btn-primary">Editar</a>
         </AuthorizeView>
     </Actions>
@@ -51,6 +50,9 @@ else
         <dt class="col-sm-3">Estado actual</dt>
         <dd class="col-sm-9">
             <StatusBadge Text="@InstrumentForm.StatusText(instrument.Status)" Kind="@InstrumentForm.StatusKind(instrument.Status)" />
+            <AuthorizeView Policy="InstrumentsUpdate">
+                <a href="instruments/@Id/status" class="ms-2 small">Cambiar estado</a>
+            </AuthorizeView>
         </dd>
 
         <dt class="col-sm-3">Última calibración</dt>

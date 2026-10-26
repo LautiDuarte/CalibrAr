@@ -92,8 +92,8 @@ else
                 <tbody>
                     @foreach (var instrument in filtered)
                     {
-                        <tr>
-                            <td class="font-monospace">@instrument.Code</td>
+                        <tr class="clickable-row" @onclick="() => OpenDetails(instrument)">
+                            <td class="font-monospace text-nowrap"><a href="instruments/@instrument.Id" @onclick:stopPropagation="true">@instrument.Code</a></td>
                             <td>
                                 <div>@instrument.Name</div>
                                 @if (BrandAndModel(instrument) != string.Empty)
@@ -107,11 +107,10 @@ else
                                 <StatusBadge Text="@InstrumentForm.StatusText(instrument.Status)" Kind="@InstrumentForm.StatusKind(instrument.Status)" />
                             </td>
                             <td>@(instrument.NextCalibrationDate?.ToString("dd/MM/yyyy") ?? "-")</td>
-                            <td class="text-end text-nowrap">
-                                <a href="instruments/@instrument.Id" class="btn btn-sm btn-outline-secondary">Ver</a>
+                            @* Los botones no abren el detalle de la fila: solo hacen lo suyo. *@
+                            <td class="text-end text-nowrap" @onclick:stopPropagation="true">
                                 <AuthorizeView Policy="InstrumentsUpdate">
                                     <a href="instruments/@instrument.Id/edit" class="btn btn-sm btn-outline-primary">Editar</a>
-                                    <a href="instruments/@instrument.Id/status" class="btn btn-sm btn-outline-primary">Estado</a>
                                 </AuthorizeView>
                                 <AuthorizeView Policy="InstrumentsDelete">
                                     <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteAsync(instrument)">Eliminar</button>
@@ -165,6 +164,9 @@ else
 
     private static string BrandAndModel(InstrumentDTO instrument) =>
         string.Join(" ", new[] { instrument.Brand, instrument.Model }.Where(s => !string.IsNullOrWhiteSpace(s)));
+
+    // Tocar la fila abre el detalle del instrumento.
+    private void OpenDetails(InstrumentDTO instrument) => NavigationManager.NavigateTo($"instruments/{instrument.Id}");
 
     private void ClearFilters()
     {
