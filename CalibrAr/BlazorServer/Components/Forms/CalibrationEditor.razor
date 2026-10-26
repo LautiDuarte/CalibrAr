@@ -70,6 +70,10 @@ else
                 {
                     <div class="form-text">No hay procedimientos activos para este tipo de instrumento.</div>
                 }
+                @if (!string.IsNullOrWhiteSpace(SelectedProcedure?.DocumentUrl))
+                {
+                    <div class="form-text"><a href="@SelectedProcedure!.DocumentUrl" target="_blank" rel="noopener noreferrer">Ver procedimiento</a></div>
+                }
                 <ValidationMessage For="() => model.ProcedureId" />
             </div>
         </div>
@@ -247,6 +251,9 @@ else
                                          && (p.IsActive || p.Id == initialProcedureId)).ToList();
         }
     }
+
+    // El procedimiento elegido, para mostrar el link a su documento.
+    private ProcedureDTO? SelectedProcedure => procedures?.FirstOrDefault(p => p.Id == model.ProcedureId);
 
     // Una versión vieja (inactiva) solo aparece si la calibración ya la usaba: ahí sí importa distinguir la versión.
     private static string ProcedureOption(ProcedureDTO procedure) =>

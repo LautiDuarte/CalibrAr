@@ -52,6 +52,7 @@ else
                 Code = procedure.Code,
                 Name = procedure.Name,
                 VersionNumber = procedure.VersionNumber,
+                DocumentUrl = procedure.DocumentUrl,
                 ApprovedAt = procedure.ApprovedAt.Date,
                 InstrumentTypeId = procedure.InstrumentTypeId,
                 IsActive = procedure.IsActive
@@ -78,6 +79,7 @@ else
                 Code = model!.Code.Trim(),
                 Name = model.Name.Trim(),
                 VersionNumber = model.VersionNumber.Trim(),
+                DocumentUrl = string.IsNullOrWhiteSpace(model.DocumentUrl) ? null : model.DocumentUrl.Trim(),
                 ApprovedAt = model.ApprovedAt.Date,
                 IsActive = model.IsActive,
                 CreatedAt = createdAt,

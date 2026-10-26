@@ -55,6 +55,7 @@ namespace Data
                 existing.SetName(procedure.Name);
                 existing.SetVersionNumber(procedure.VersionNumber);
                 existing.SetApprovedAt(procedure.ApprovedAt);
+                existing.SetDocumentUrl(procedure.DocumentUrl);
                 existing.SetIsActive(procedure.IsActive);
                 existing.SetCreatedAt(procedure.CreatedAt);
                 existing.SetInstrumentTypeId(procedure.InstrumentTypeId);

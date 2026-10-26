@@ -41,6 +41,7 @@ else
                     <th>Versión</th>
                     <th>Tipo de instrumento</th>
                     <th>Aprobado</th>
+                    <th>Documento</th>
                     <th>Activo</th>
                     <th></th>
                 </tr>
@@ -54,6 +55,16 @@ else
                         <td>@procedure.VersionNumber</td>
                         <td>@procedure.InstrumentTypeName</td>
                         <td>@procedure.ApprovedAt.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(procedure.DocumentUrl))
+                            {
+                                <a href="@procedure.DocumentUrl" target="_blank" rel="noopener noreferrer">Ver</a>
+                            }
+                            else
+                            {
+                                <span class="text-secondary">-</span>
+                            }
+                        </td>
                         <td>
                             <StatusBadge Text="@(procedure.IsActive ? "Sí" : "No")" Kind="@(procedure.IsActive ? "success" : "secondary")" />
                         </td>

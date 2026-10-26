@@ -33,7 +33,7 @@
         <div class="mb-3">
             <label for="password" class="form-label">Contraseña</label>
             <InputText id="password" type="password" class="form-control" @bind-Value="Model.Password" autocomplete="new-password" />
-            <div class="form-text">Hasta 30 caracteres.</div>
+            <div class="form-text">Entre 8 y 30 caracteres.</div>
             <ValidationMessage For="() => Model.Password" />
         </div>
     }
@@ -100,6 +100,8 @@
 
             if (IsNew && string.IsNullOrWhiteSpace(Password))
                 yield return new ValidationResult("La contraseña es obligatoria.", new[] { nameof(Password) });
+            else if (IsNew && Password != null && Password.Length < 8)
+                yield return new ValidationResult("La contraseña debe tener al menos 8 caracteres.", new[] { nameof(Password) });
             else if (Password != null && Password.Length > 30)
                 yield return new ValidationResult("La contraseña no puede superar los 30 caracteres.", new[] { nameof(Password) });
         }

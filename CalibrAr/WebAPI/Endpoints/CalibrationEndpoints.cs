@@ -89,14 +89,21 @@ namespace WebAPI
 
             app.MapDelete("/calibrations/{id}", async (int id, ICalibrationService calibrationService) =>
             {
-                var deleted = await calibrationService.DeleteAsync(id);
-
-                if (!deleted)
+                try
                 {
-                    return Results.NotFound();
-                }
+                    var deleted = await calibrationService.DeleteAsync(id);
 
-                return Results.NoContent();
+                    if (!deleted)
+                    {
+                        return Results.NotFound();
+                    }
+
+                    return Results.NoContent();
+                }
+                catch (InvalidOperationException ex)
+                {
+                    return Results.Conflict(new { error = ex.Message });
+                }
             })
             .WithName("DeleteCalibration")
             .Produces(StatusCodes.Status204NoContent)

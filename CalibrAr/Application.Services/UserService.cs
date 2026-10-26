@@ -23,6 +23,9 @@ namespace Application.Services
             if (string.IsNullOrWhiteSpace(dto.Password))
                 throw new ArgumentException("Password is required to create a user.", nameof(dto.Password));
 
+            if (dto.Password.Length < 8)
+                throw new ArgumentException("La contraseña debe tener al menos 8 caracteres.");
+
             await EnsureEmailIsUniqueAsync(dto.Email);
             var role = ParseRole(dto.Role);
             var group = await ResolveGroupAsync(role);

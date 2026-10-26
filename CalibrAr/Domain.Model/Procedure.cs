@@ -14,6 +14,9 @@ namespace Domain.Model
         public string VersionNumber { get; private set; } = string.Empty;
         public DateTime ApprovedAt { get; private set; }
 
+        // Link al PDF del procedimiento (opcional).
+        public string? DocumentUrl { get; private set; }
+
         public bool IsActive { get; private set; }
         public DateTime CreatedAt { get; private set; }
         private int _instrumentTypeId;
@@ -33,8 +36,9 @@ namespace Domain.Model
             }
         }
 
-        public Procedure(int id, string code, string name, string versionNumber, DateTime approvedAt, bool isActive, DateTime createdAt, int instrumentTypeId)
+        public Procedure(int id, string code, string name, string versionNumber, DateTime approvedAt, bool isActive, DateTime createdAt, int instrumentTypeId, string? documentUrl = null)
         {
+            SetDocumentUrl(documentUrl);
             SetId(id);
             SetCode(code);
             SetName(name);
@@ -71,6 +75,25 @@ namespace Domain.Model
             if (string.IsNullOrWhiteSpace(versionNumber))
                 throw new ArgumentException("The version number cannot be null or empty.", nameof(versionNumber));
             VersionNumber = versionNumber;
+        }
+
+        public void SetDocumentUrl(string? documentUrl)
+        {
+            if (string.IsNullOrWhiteSpace(documentUrl))
+            {
+                DocumentUrl = null;
+                return;
+            }
+
+            var trimmed = documentUrl.Trim();
+            if (trimmed.Length > 500)
+                throw new ArgumentException("El link al documento no puede superar los 500 caracteres.");
+
+            // Solo http o https, para que no se pueda guardar algo como "javascript:..." que después se muestre como link.
+            if (!Uri.TryCreate(trimmed, UriKind.Absolute, out var uri) || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+                throw new ArgumentException("El link al documento tiene que ser una dirección http o https válida.");
+
+            DocumentUrl = trimmed;
         }
 
         public void SetApprovedAt(DateTime approvedAt)

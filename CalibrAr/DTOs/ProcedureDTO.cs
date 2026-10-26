@@ -13,6 +13,7 @@ namespace DTOs
         public string Name { get; set; } = string.Empty;
         public string VersionNumber { get; set; } = string.Empty;
         public DateTime ApprovedAt { get; set; }
+        public string? DocumentUrl { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
         public int InstrumentTypeId { get; set; }

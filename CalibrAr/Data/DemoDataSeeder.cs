@@ -37,10 +37,10 @@ namespace Data
             context.Areas.AddRange(lab, production, quality, maintenance);
 
             // PC-001 tiene dos versiones: la vieja quedó inactiva y solo la usan calibraciones anteriores.
-            var pressureProcedure = new Procedure(0, "PC-001", "Calibración de manómetros", "3", today.AddMonths(-10), true, now, pressure.Id);
-            var oldPressureProcedure = new Procedure(0, "PC-001", "Calibración de manómetros", "2", today.AddMonths(-26), false, now, pressure.Id);
-            var temperatureProcedure = new Procedure(0, "PC-002", "Calibración de termómetros", "2", today.AddMonths(-14), true, now, temperature.Id);
-            var flowProcedure = new Procedure(0, "PC-003", "Calibración de medidores de flujo", "1", today.AddMonths(-8), true, now, flow.Id);
+            var pressureProcedure = new Procedure(0, "PC-001", "Calibración de manómetros", "3", today.AddMonths(-10), true, now, pressure.Id, "https://drive.google.com/file/d/1l-KP7jSNNUgTyGzKzEWm3NiS0yYyIPaL/view?usp=sharing");
+            var oldPressureProcedure = new Procedure(0, "PC-001", "Calibración de manómetros", "2", today.AddMonths(-26), false, now, pressure.Id, "https://drive.google.com/file/d/1B0XApaqsLEV_9m9HuSYrThv6Q-E7IYHa/view?usp=sharing");
+            var temperatureProcedure = new Procedure(0, "PC-002", "Calibración de termómetros", "2", today.AddMonths(-14), true, now, temperature.Id, "https://drive.google.com/file/d/1zmvGaWWtsm6bwCymeY9_i-PQJbhTxCbo/view?usp=sharing");
+            var flowProcedure = new Procedure(0, "PC-003", "Calibración de medidores de flujo", "1", today.AddMonths(-8), true, now, flow.Id, "https://drive.google.com/file/d/1FWZt_S0bf84GSVs5GM3Fy542ziTRGMCm/view?usp=sharing");
             context.Procedures.AddRange(pressureProcedure, oldPressureProcedure, temperatureProcedure, flowProcedure);
 
             var pressureStandard = new ReferenceStandard(0, "Calibrador de presión patrón, 0 a 100 psi", "INTI", "C-2025-118",
@@ -171,17 +171,17 @@ namespace Data
             context.SaveChanges();
 
             context.NonConformities.AddRange(
-                new NonConformity(0, "NC-001", "El manómetro quedó fuera de tolerancia en la última calibración. Se retira de uso hasta analizar la causa.",
+                new NonConformity(0, "NC-0001", "El manómetro quedó fuera de tolerancia en la última calibración. Se retira de uso hasta analizar la causa.",
                     Origin.NonConformantResult, NonConformityStatus.UnderAnalysis, null, man2.AddDays(1), null, man2.AddDays(1),
                     instruments["MAN-002"].Id, man2Calibration.Id, operatorUser.Id, null),
-                new NonConformity(0, "NC-002", "Se encontró la mirilla del manómetro rota durante el uso. Está en reparación.",
+                new NonConformity(0, "NC-0002", "Se encontró la mirilla del manómetro rota durante el uso. Está en reparación.",
                     Origin.PhysicalDamage, NonConformityStatus.Open, null, today.AddDays(-20), null, today.AddDays(-20),
                     instruments["MAN-004"].Id, null, operatorUser.Id, null),
-                new NonConformity(0, "NC-003", "El termómetro dio fuera de tolerancia y no se pudo ajustar.",
+                new NonConformity(0, "NC-0003", "El termómetro dio fuera de tolerancia y no se pudo ajustar.",
                     Origin.NonConformantResult, NonConformityStatus.Closed, "Se dio de baja el instrumento y se reemplazó por el TER-002.",
                     ter4.AddDays(1), ter4.AddDays(15), ter4.AddDays(1),
                     instruments["TER-004"].Id, ter4Calibration.Id, operatorUser.Id, admin.Id),
-                new NonConformity(0, "NC-004", "La calibración del termómetro venció y todavía no se renovó.",
+                new NonConformity(0, "NC-0004", "La calibración del termómetro venció y todavía no se renovó.",
                     Origin.CalibrationExpired, NonConformityStatus.Open, null, today.AddDays(-7), null, today.AddDays(-7),
                     instruments["TER-003"].Id, null, operatorUser.Id, null));
 

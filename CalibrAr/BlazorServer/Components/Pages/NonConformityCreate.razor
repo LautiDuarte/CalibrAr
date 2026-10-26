@@ -71,7 +71,7 @@ else
             // "Detectada por" es quien carga la no conformidad. El servicio la crea "Abierta" con la fecha de hoy.
             await NonConformityApiClient.AddAsync(new NonConformityDTO
             {
-                Code = model.Code.Trim(),
+                Code = string.Empty,
                 Description = model.Description.Trim(),
                 Origin = model.Origin,
                 Status = "Open",
