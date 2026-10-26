@@ -41,7 +41,7 @@
             createButton.Name = "createButton";
             createButton.Size = new Size(75, 23);
             createButton.TabIndex = 1;
-            createButton.Text = "Create";
+            createButton.Text = "Crear";
             createButton.UseVisualStyleBackColor = true;
             createButton.Click += createButton_Click;
             // 
@@ -52,7 +52,7 @@
             updateButton.Name = "updateButton";
             updateButton.Size = new Size(75, 23);
             updateButton.TabIndex = 2;
-            updateButton.Text = "Update";
+            updateButton.Text = "Modificar";
             updateButton.UseVisualStyleBackColor = true;
             updateButton.Click += updateButton_Click;
             // 
@@ -63,7 +63,7 @@
             deleteButton.Name = "deleteButton";
             deleteButton.Size = new Size(75, 23);
             deleteButton.TabIndex = 3;
-            deleteButton.Text = "Delete";
+            deleteButton.Text = "Eliminar";
             deleteButton.UseVisualStyleBackColor = true;
             deleteButton.Click += deleteButton_Click;
             // 
@@ -77,7 +77,7 @@
             Controls.Add(createButton);
             Controls.Add(referenceStandardsDataGridView);
             Name = "ReferenceStandardList";
-            Text = "Reference standards";
+            Text = "Patrones de referencia";
             Load += ReferenceStandardList_Load;
             ((System.ComponentModel.ISupportInitialize)referenceStandardsDataGridView).EndInit();
             ResumeLayout(false);

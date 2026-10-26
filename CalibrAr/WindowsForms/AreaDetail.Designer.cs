@@ -49,11 +49,11 @@
             nameLabel.Name = "nameLabel";
             nameLabel.Size = new Size(39, 15);
             nameLabel.TabIndex = 0;
-            nameLabel.Text = "Name";
+            nameLabel.Text = "Nombre";
             // 
             // nameTextBox
             // 
-            nameTextBox.Location = new Point(72, 15);
+            nameTextBox.Location = new Point(125, 15);
             nameTextBox.Name = "nameTextBox";
             nameTextBox.Size = new Size(100, 23);
             nameTextBox.TabIndex = 1;
@@ -65,11 +65,11 @@
             responsibleLabel.Name = "responsibleLabel";
             responsibleLabel.Size = new Size(70, 15);
             responsibleLabel.TabIndex = 2;
-            responsibleLabel.Text = "Responsible";
+            responsibleLabel.Text = "Responsable";
             // 
             // responsibleTextBox
             // 
-            responsibleTextBox.Location = new Point(103, 44);
+            responsibleTextBox.Location = new Point(125, 44);
             responsibleTextBox.Name = "responsibleTextBox";
             responsibleTextBox.Size = new Size(100, 23);
             responsibleTextBox.TabIndex = 3;
@@ -81,12 +81,12 @@
             locationLabel.Name = "locationLabel";
             locationLabel.Size = new Size(53, 15);
             locationLabel.TabIndex = 4;
-            locationLabel.Text = "Location";
+            locationLabel.Text = "Ubicación";
             // 
             // locationComboBox
             // 
             locationComboBox.FormattingEnabled = true;
-            locationComboBox.Location = new Point(82, 73);
+            locationComboBox.Location = new Point(125, 73);
             locationComboBox.Name = "locationComboBox";
             locationComboBox.Size = new Size(121, 23);
             locationComboBox.TabIndex = 5;
@@ -97,7 +97,7 @@
             saveButton.Name = "saveButton";
             saveButton.Size = new Size(75, 23);
             saveButton.TabIndex = 6;
-            saveButton.Text = "Save";
+            saveButton.Text = "Guardar";
             saveButton.UseVisualStyleBackColor = true;
             saveButton.Click += saveButton_Click;
             // 
@@ -107,7 +107,7 @@
             cancelButton.Name = "cancelButton";
             cancelButton.Size = new Size(75, 23);
             cancelButton.TabIndex = 7;
-            cancelButton.Text = "Cancel";
+            cancelButton.Text = "Cancelar";
             cancelButton.UseVisualStyleBackColor = true;
             cancelButton.Click += cancelButton_Click;
             // 
@@ -129,7 +129,7 @@
             Controls.Add(nameTextBox);
             Controls.Add(nameLabel);
             Name = "AreaDetail";
-            Text = "AreaDetail";
+            Text = "Área";
             Load += AreaDetail_Load;
             ((System.ComponentModel.ISupportInitialize)errorProvider).EndInit();
             ResumeLayout(false);

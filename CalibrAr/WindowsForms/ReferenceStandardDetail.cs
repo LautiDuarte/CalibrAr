@@ -87,7 +87,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error saving reference standard: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudo guardar el patrón de referencia: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -112,25 +112,25 @@ namespace WindowsForms
             if (string.IsNullOrWhiteSpace(descriptionTextBox.Text))
             {
                 isValid = false;
-                errorProvider.SetError(descriptionTextBox, "Description is required");
+                errorProvider.SetError(descriptionTextBox, "La descripción es obligatoria");
             }
 
             if (string.IsNullOrWhiteSpace(certifyingBodyTextBox.Text))
             {
                 isValid = false;
-                errorProvider.SetError(certifyingBodyTextBox, "Certifying body is required");
+                errorProvider.SetError(certifyingBodyTextBox, "El organismo certificante es obligatorio");
             }
 
             if (string.IsNullOrWhiteSpace(certificateNumberTextBox.Text))
             {
                 isValid = false;
-                errorProvider.SetError(certificateNumberTextBox, "Certificate number is required");
+                errorProvider.SetError(certificateNumberTextBox, "El N° de certificado es obligatorio");
             }
 
             if (certificateExpiresAtDateTimePicker.Value.Date <= certificateIssuedAtDateTimePicker.Value.Date)
             {
                 isValid = false;
-                errorProvider.SetError(certificateExpiresAtDateTimePicker, "Expiration date must be after the issue date");
+                errorProvider.SetError(certificateExpiresAtDateTimePicker, "La fecha de vencimiento debe ser posterior a la de emisión");
             }
 
             return isValid;

@@ -39,6 +39,8 @@
             approvedAtDateTimePicker = new DateTimePicker();
             instrumentTypeLabel = new Label();
             instrumentTypeComboBox = new ComboBox();
+            documentUrlLabel = new Label();
+            documentUrlTextBox = new TextBox();
             cancelButton = new Button();
             saveButton = new Button();
             errorProvider = new ErrorProvider(components);
@@ -48,7 +50,7 @@
             // 
             // codeTextBox
             // 
-            codeTextBox.Location = new Point(160, 12);
+            codeTextBox.Location = new Point(200, 12);
             codeTextBox.Name = "codeTextBox";
             codeTextBox.Size = new Size(200, 23);
             codeTextBox.TabIndex = 0;
@@ -60,7 +62,7 @@
             codeLabel.Name = "codeLabel";
             codeLabel.Size = new Size(35, 15);
             codeLabel.TabIndex = 1;
-            codeLabel.Text = "Code";
+            codeLabel.Text = "Código";
             // 
             // nameLabel
             // 
@@ -69,11 +71,11 @@
             nameLabel.Name = "nameLabel";
             nameLabel.Size = new Size(39, 15);
             nameLabel.TabIndex = 2;
-            nameLabel.Text = "Name";
+            nameLabel.Text = "Nombre";
             // 
             // nameTextBox
             // 
-            nameTextBox.Location = new Point(160, 41);
+            nameTextBox.Location = new Point(200, 41);
             nameTextBox.Name = "nameTextBox";
             nameTextBox.Size = new Size(200, 23);
             nameTextBox.TabIndex = 3;
@@ -85,11 +87,11 @@
             versionNumberLabel.Name = "versionNumberLabel";
             versionNumberLabel.Size = new Size(92, 15);
             versionNumberLabel.TabIndex = 4;
-            versionNumberLabel.Text = "Version Number";
+            versionNumberLabel.Text = "Versión";
             // 
             // versionNumberTextBox
             // 
-            versionNumberTextBox.Location = new Point(160, 70);
+            versionNumberTextBox.Location = new Point(200, 70);
             versionNumberTextBox.Name = "versionNumberTextBox";
             versionNumberTextBox.Size = new Size(200, 23);
             versionNumberTextBox.TabIndex = 5;
@@ -101,11 +103,12 @@
             approvedAtLabel.Name = "approvedAtLabel";
             approvedAtLabel.Size = new Size(74, 15);
             approvedAtLabel.TabIndex = 6;
-            approvedAtLabel.Text = "Approved At";
+            approvedAtLabel.Text = "Fecha de aprobación";
             // 
             // approvedAtDateTimePicker
             // 
-            approvedAtDateTimePicker.Location = new Point(160, 99);
+            approvedAtDateTimePicker.Format = DateTimePickerFormat.Short;
+            approvedAtDateTimePicker.Location = new Point(200, 99);
             approvedAtDateTimePicker.Name = "approvedAtDateTimePicker";
             approvedAtDateTimePicker.Size = new Size(200, 23);
             approvedAtDateTimePicker.TabIndex = 7;
@@ -117,33 +120,49 @@
             instrumentTypeLabel.Name = "instrumentTypeLabel";
             instrumentTypeLabel.Size = new Size(92, 15);
             instrumentTypeLabel.TabIndex = 8;
-            instrumentTypeLabel.Text = "Instrument Type";
+            instrumentTypeLabel.Text = "Tipo de instrumento";
             // 
             // instrumentTypeComboBox
             // 
             instrumentTypeComboBox.FormattingEnabled = true;
-            instrumentTypeComboBox.Location = new Point(160, 128);
+            instrumentTypeComboBox.Location = new Point(200, 128);
             instrumentTypeComboBox.Name = "instrumentTypeComboBox";
             instrumentTypeComboBox.Size = new Size(200, 23);
             instrumentTypeComboBox.TabIndex = 9;
             // 
+            // documentUrlLabel
+            // 
+            documentUrlLabel.AutoSize = true;
+            documentUrlLabel.Location = new Point(40, 160);
+            documentUrlLabel.Name = "documentUrlLabel";
+            documentUrlLabel.Size = new Size(100, 15);
+            documentUrlLabel.TabIndex = 10;
+            documentUrlLabel.Text = "Documento (link)";
+            // 
+            // documentUrlTextBox
+            // 
+            documentUrlTextBox.Location = new Point(200, 157);
+            documentUrlTextBox.Name = "documentUrlTextBox";
+            documentUrlTextBox.Size = new Size(300, 23);
+            documentUrlTextBox.TabIndex = 11;
+            // 
             // cancelButton
             // 
-            cancelButton.Location = new Point(385, 185);
+            cancelButton.Location = new Point(425, 215);
             cancelButton.Name = "cancelButton";
             cancelButton.Size = new Size(75, 23);
-            cancelButton.TabIndex = 10;
-            cancelButton.Text = "Cancel";
+            cancelButton.TabIndex = 12;
+            cancelButton.Text = "Cancelar";
             cancelButton.UseVisualStyleBackColor = true;
             cancelButton.Click += cancelButton_Click;
             // 
             // saveButton
             // 
-            saveButton.Location = new Point(304, 185);
+            saveButton.Location = new Point(344, 215);
             saveButton.Name = "saveButton";
             saveButton.Size = new Size(75, 23);
-            saveButton.TabIndex = 11;
-            saveButton.Text = "Save";
+            saveButton.TabIndex = 13;
+            saveButton.Text = "Guardar";
             saveButton.UseVisualStyleBackColor = true;
             saveButton.Click += saveButton_Click;
             // 
@@ -155,9 +174,11 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(480, 225);
+            ClientSize = new Size(520, 255);
             Controls.Add(saveButton);
             Controls.Add(cancelButton);
+            Controls.Add(documentUrlTextBox);
+            Controls.Add(documentUrlLabel);
             Controls.Add(instrumentTypeComboBox);
             Controls.Add(instrumentTypeLabel);
             Controls.Add(approvedAtDateTimePicker);
@@ -169,7 +190,7 @@
             Controls.Add(codeLabel);
             Controls.Add(codeTextBox);
             Name = "ProcedureDetail";
-            Text = "ProcedureDetail";
+            Text = "Procedimiento";
             Load += ProcedureDetail_Load;
             ((System.ComponentModel.ISupportInitialize)errorProvider).EndInit();
             ResumeLayout(false);
@@ -188,6 +209,8 @@
         private DateTimePicker approvedAtDateTimePicker;
         private Label instrumentTypeLabel;
         private ComboBox instrumentTypeComboBox;
+        private Label documentUrlLabel;
+        private TextBox documentUrlTextBox;
         private Button cancelButton;
         private Button saveButton;
         private ErrorProvider errorProvider;

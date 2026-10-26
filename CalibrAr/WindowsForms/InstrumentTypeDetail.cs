@@ -58,7 +58,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudieron cargar los datos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -92,7 +92,7 @@ namespace WindowsForms
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error creating instrument type: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"No se pudo crear el tipo de instrumento: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 finally
                 {
@@ -125,25 +125,25 @@ namespace WindowsForms
 
             if (this.nameTextBox.Text == string.Empty)
             {
-                errorProvider.SetError(nameTextBox, "Name is required.");
+                errorProvider.SetError(nameTextBox, "El nombre es obligatorio.");
                 isValid = false;
             }
 
             if (this.measurementUnitTextBox.Text == string.Empty)
             {
-                errorProvider.SetError(measurementUnitTextBox, "Measurement Unit is required.");
+                errorProvider.SetError(measurementUnitTextBox, "La unidad de medida es obligatoria.");
                 isValid = false;
             }
 
             if (this.maxAllowedErrorTextBox.Text == string.Empty)
             {
-                errorProvider.SetError(maxAllowedErrorTextBox, "Max Allowed Error is required.");
+                errorProvider.SetError(maxAllowedErrorTextBox, "El error máximo es obligatorio.");
                 isValid = false;
             }
 
             if (this.calibrationFrequencyMonthsTextBox.Text == string.Empty)
             {
-                errorProvider.SetError(calibrationFrequencyMonthsTextBox, "Calibration Frequency (Months) is required.");
+                errorProvider.SetError(calibrationFrequencyMonthsTextBox, "La frecuencia (meses) es obligatoria.");
                 isValid = false;
             }
 

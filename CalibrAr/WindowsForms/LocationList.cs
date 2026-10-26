@@ -37,21 +37,21 @@ namespace WindowsForms
             this.locationsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Name",
-                HeaderText = "Name",
+                HeaderText = "Nombre",
                 DataPropertyName = "Name",
                 Width = 200
             });
             this.locationsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Address",
-                HeaderText = "Address",
+                HeaderText = "Dirección",
                 DataPropertyName = "Address",
                 Width = 300
             });
             this.locationsDataGridView.Columns.Add(new DataGridViewCheckBoxColumn
             {
                 Name = "IsActive",
-                HeaderText = "Is active",
+                HeaderText = "Activo",
                 DataPropertyName = "IsActive",
                 Width = 80
             });
@@ -59,7 +59,7 @@ namespace WindowsForms
             this.locationsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "CreatedAt",
-                HeaderText = "Created at",
+                HeaderText = "Fecha de alta",
                 DataPropertyName = "CreatedAt",
                 Width = 150,
                 DefaultCellStyle = { Format = "dd/MM/yyyy HH:mm:ss" }
@@ -118,7 +118,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error updating location: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudo modificar la ubicación: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -131,7 +131,7 @@ namespace WindowsForms
             LocationDTO? location = this.SelectedItem();
             if (location == null) return;
 
-            var result = MessageBox.Show($"¿Are you sure you want to delete this item: {location.Name} {location.Address}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = MessageBox.Show($"¿Eliminar {location.Name} {location.Address}?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
             {
@@ -142,7 +142,7 @@ namespace WindowsForms
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error deleting location: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"No se pudo eliminar la ubicación: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                 }
                 finally
@@ -184,7 +184,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading locations: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudieron cargar las ubicaciones: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -196,7 +196,7 @@ namespace WindowsForms
         {
             if (locationsDataGridView.SelectedRows.Count == 0)
             {
-                MessageBox.Show("Please select a location first.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Primero seleccione una ubicación.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
             }
 

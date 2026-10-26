@@ -58,7 +58,7 @@
             // 
             // codeTextBox
             // 
-            codeTextBox.Location = new Point(85, 12);
+            codeTextBox.Location = new Point(175, 12);
             codeTextBox.Name = "codeTextBox";
             codeTextBox.Size = new Size(166, 23);
             codeTextBox.TabIndex = 0;
@@ -70,7 +70,7 @@
             codeLabel.Name = "codeLabel";
             codeLabel.Size = new Size(35, 15);
             codeLabel.TabIndex = 1;
-            codeLabel.Text = "Code";
+            codeLabel.Text = "Código";
             // 
             // nameLabel
             // 
@@ -79,18 +79,18 @@
             nameLabel.Name = "nameLabel";
             nameLabel.Size = new Size(39, 15);
             nameLabel.TabIndex = 2;
-            nameLabel.Text = "Name";
+            nameLabel.Text = "Nombre";
             // 
             // nameTextBox
             // 
-            nameTextBox.Location = new Point(85, 41);
+            nameTextBox.Location = new Point(175, 41);
             nameTextBox.Name = "nameTextBox";
             nameTextBox.Size = new Size(166, 23);
             nameTextBox.TabIndex = 3;
             // 
             // serialNumberTextBox
             // 
-            serialNumberTextBox.Location = new Point(128, 73);
+            serialNumberTextBox.Location = new Point(175, 73);
             serialNumberTextBox.Name = "serialNumberTextBox";
             serialNumberTextBox.Size = new Size(166, 23);
             serialNumberTextBox.TabIndex = 5;
@@ -102,7 +102,7 @@
             serialNumberLabel.Name = "serialNumberLabel";
             serialNumberLabel.Size = new Size(82, 15);
             serialNumberLabel.TabIndex = 6;
-            serialNumberLabel.Text = "Serial Number";
+            serialNumberLabel.Text = "N° de serie";
             // 
             // brandLabel
             // 
@@ -111,11 +111,11 @@
             brandLabel.Name = "brandLabel";
             brandLabel.Size = new Size(38, 15);
             brandLabel.TabIndex = 8;
-            brandLabel.Text = "Brand";
+            brandLabel.Text = "Marca";
             // 
             // brandTextBox
             // 
-            brandTextBox.Location = new Point(85, 102);
+            brandTextBox.Location = new Point(175, 102);
             brandTextBox.Name = "brandTextBox";
             brandTextBox.Size = new Size(100, 23);
             brandTextBox.TabIndex = 9;
@@ -127,11 +127,11 @@
             modelLabel.Name = "modelLabel";
             modelLabel.Size = new Size(41, 15);
             modelLabel.TabIndex = 10;
-            modelLabel.Text = "Model";
+            modelLabel.Text = "Modelo";
             // 
             // modelTextBox
             // 
-            modelTextBox.Location = new Point(85, 129);
+            modelTextBox.Location = new Point(175, 129);
             modelTextBox.Name = "modelTextBox";
             modelTextBox.Size = new Size(100, 23);
             modelTextBox.TabIndex = 11;
@@ -143,12 +143,12 @@
             statusLabel.Name = "statusLabel";
             statusLabel.Size = new Size(39, 15);
             statusLabel.TabIndex = 12;
-            statusLabel.Text = "Status";
+            statusLabel.Text = "Estado";
             // 
             // statusComboBox
             // 
             statusComboBox.FormattingEnabled = true;
-            statusComboBox.Location = new Point(85, 158);
+            statusComboBox.Location = new Point(175, 158);
             statusComboBox.Name = "statusComboBox";
             statusComboBox.Size = new Size(121, 23);
             statusComboBox.TabIndex = 13;
@@ -160,7 +160,7 @@
             maxAllowedErrorLabel.Name = "maxAllowedErrorLabel";
             maxAllowedErrorLabel.Size = new Size(104, 15);
             maxAllowedErrorLabel.TabIndex = 14;
-            maxAllowedErrorLabel.Text = "Max Allowed Error";
+            maxAllowedErrorLabel.Text = "Error máximo";
             // 
             // calibrationFrequencyMonthsLabel
             // 
@@ -169,18 +169,18 @@
             calibrationFrequencyMonthsLabel.Name = "calibrationFrequencyMonthsLabel";
             calibrationFrequencyMonthsLabel.Size = new Size(175, 15);
             calibrationFrequencyMonthsLabel.TabIndex = 15;
-            calibrationFrequencyMonthsLabel.Text = "Calibration Frequency (Months)";
+            calibrationFrequencyMonthsLabel.Text = "Frecuencia (meses)";
             // 
             // maxAllowedErrorTextBox
             // 
-            maxAllowedErrorTextBox.Location = new Point(151, 191);
+            maxAllowedErrorTextBox.Location = new Point(175, 191);
             maxAllowedErrorTextBox.Name = "maxAllowedErrorTextBox";
             maxAllowedErrorTextBox.Size = new Size(100, 23);
             maxAllowedErrorTextBox.TabIndex = 16;
             // 
             // calibrationFrequencyMonthsTextBox
             // 
-            calibrationFrequencyMonthsTextBox.Location = new Point(222, 219);
+            calibrationFrequencyMonthsTextBox.Location = new Point(175, 219);
             calibrationFrequencyMonthsTextBox.Name = "calibrationFrequencyMonthsTextBox";
             calibrationFrequencyMonthsTextBox.Size = new Size(100, 23);
             calibrationFrequencyMonthsTextBox.TabIndex = 17;
@@ -192,12 +192,12 @@
             instrumentTypeLabel.Name = "instrumentTypeLabel";
             instrumentTypeLabel.Size = new Size(92, 15);
             instrumentTypeLabel.TabIndex = 21;
-            instrumentTypeLabel.Text = "Instrument Type";
+            instrumentTypeLabel.Text = "Tipo de instrumento";
             // 
             // instrumentTypeComboBox
             // 
             instrumentTypeComboBox.FormattingEnabled = true;
-            instrumentTypeComboBox.Location = new Point(138, 282);
+            instrumentTypeComboBox.Location = new Point(175, 282);
             instrumentTypeComboBox.Name = "instrumentTypeComboBox";
             instrumentTypeComboBox.Size = new Size(121, 23);
             instrumentTypeComboBox.TabIndex = 22;
@@ -209,12 +209,12 @@
             areaLabel.Name = "areaLabel";
             areaLabel.Size = new Size(31, 15);
             areaLabel.TabIndex = 23;
-            areaLabel.Text = "Area";
+            areaLabel.Text = "Área";
             // 
             // areaComboBox
             // 
             areaComboBox.FormattingEnabled = true;
-            areaComboBox.Location = new Point(77, 246);
+            areaComboBox.Location = new Point(175, 246);
             areaComboBox.Name = "areaComboBox";
             areaComboBox.Size = new Size(182, 23);
             areaComboBox.TabIndex = 24;
@@ -225,7 +225,7 @@
             cancelButton.Name = "cancelButton";
             cancelButton.Size = new Size(75, 23);
             cancelButton.TabIndex = 25;
-            cancelButton.Text = "Cancel";
+            cancelButton.Text = "Cancelar";
             cancelButton.UseVisualStyleBackColor = true;
             cancelButton.Click += cancelButton_Click;
             // 
@@ -235,7 +235,7 @@
             saveButton.Name = "saveButton";
             saveButton.Size = new Size(75, 23);
             saveButton.TabIndex = 26;
-            saveButton.Text = "Save";
+            saveButton.Text = "Guardar";
             saveButton.UseVisualStyleBackColor = true;
             saveButton.Click += saveButton_Click;
             // 
@@ -252,7 +252,7 @@
             InstrumentTypeWarningLabel.Name = "InstrumentTypeWarningLabel";
             InstrumentTypeWarningLabel.Size = new Size(177, 11);
             InstrumentTypeWarningLabel.TabIndex = 27;
-            InstrumentTypeWarningLabel.Text = "Instrument type cannot be changed after creation.";
+            InstrumentTypeWarningLabel.Text = "El tipo de instrumento no se puede cambiar después de crear el instrumento.";
             // 
             // InstrumentDetail
             // 
@@ -284,7 +284,7 @@
             Controls.Add(codeTextBox);
             Name = "InstrumentDetail";
             StartPosition = FormStartPosition.CenterParent;
-            Text = "IntrumentDetail";
+            Text = "Instrumento";
             Load += IntrumentDetail_Load;
             ((System.ComponentModel.ISupportInitialize)errorProvider).EndInit();
             ResumeLayout(false);

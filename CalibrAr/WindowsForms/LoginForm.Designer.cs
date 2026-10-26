@@ -67,7 +67,7 @@
             passwordLabel.Name = "passwordLabel";
             passwordLabel.Size = new Size(60, 15);
             passwordLabel.TabIndex = 3;
-            passwordLabel.Text = "Password:";
+            passwordLabel.Text = "Contraseña:";
             // 
             // passwordTextBox
             // 
@@ -86,7 +86,7 @@
             loginButton.Name = "loginButton";
             loginButton.Size = new Size(65, 21);
             loginButton.TabIndex = 5;
-            loginButton.Text = "Log In";
+            loginButton.Text = "Iniciar sesión";
             loginButton.UseVisualStyleBackColor = true;
             loginButton.Click += loginButton_Click;
             // 
@@ -97,7 +97,7 @@
             cancelButton.Name = "cancelButton";
             cancelButton.Size = new Size(65, 21);
             cancelButton.TabIndex = 6;
-            cancelButton.Text = "Cancel";
+            cancelButton.Text = "Cancelar";
             cancelButton.UseVisualStyleBackColor = true;
             cancelButton.Click += cancelButton_Click;
             // 
@@ -110,7 +110,7 @@
             titleLabel.Name = "titleLabel";
             titleLabel.Size = new Size(69, 25);
             titleLabel.TabIndex = 0;
-            titleLabel.Text = "Log In";
+            titleLabel.Text = "Iniciar sesión";
             titleLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // errorProvider
@@ -138,7 +138,7 @@
             Name = "LoginForm";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterParent;
-            Text = "CalibrAr - Login";
+            Text = "CalibrAr - Inicio de sesión";
             Load += LoginForm_Load;
             ((System.ComponentModel.ISupportInitialize)errorProvider).EndInit();
             ResumeLayout(false);

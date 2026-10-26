@@ -37,28 +37,28 @@ namespace WindowsForms
             this.areasDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Name",
-                HeaderText = "Name",
+                HeaderText = "Nombre",
                 DataPropertyName = "Name",
                 Width = 200
             });
             this.areasDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Responsible",
-                HeaderText = "Responsible",
+                HeaderText = "Responsable",
                 DataPropertyName = "Responsible",
                 Width = 200
             });
             this.areasDataGridView.Columns.Add(new DataGridViewCheckBoxColumn
             {
                 Name = "IsActive",
-                HeaderText = "Is active",
+                HeaderText = "Activo",
                 DataPropertyName = "IsActive",
                 Width = 80
             });
             this.areasDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "CreatedAt",
-                HeaderText = "Created at",
+                HeaderText = "Fecha de alta",
                 DataPropertyName = "CreatedAt",
                 Width = 150,
                 DefaultCellStyle = { Format = "dd/MM/yyyy HH:mm:ss" }
@@ -66,7 +66,7 @@ namespace WindowsForms
             this.areasDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "LocationName",
-                HeaderText = "Location",
+                HeaderText = "Ubicación",
                 DataPropertyName = "LocationName",
                 Width = 200
             });
@@ -124,7 +124,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error updating area: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudo modificar el área: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -137,7 +137,7 @@ namespace WindowsForms
             AreaDTO? area = this.SelectedItem();
             if(area == null) return;
 
-            var result = MessageBox.Show($"¿Are you sure you want to delete this item:{area.Name}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = MessageBox.Show($"¿Eliminar {area.Name}?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
             {
@@ -150,7 +150,7 @@ namespace WindowsForms
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error deleting area: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"No se pudo eliminar el área: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 finally
                 {
@@ -190,7 +190,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading areas: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudieron cargar las áreas: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -202,7 +202,7 @@ namespace WindowsForms
         {
             if (areasDataGridView.SelectedRows.Count == 0)
             {
-                MessageBox.Show("Please select an area first.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Primero seleccione un área.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
             }
 

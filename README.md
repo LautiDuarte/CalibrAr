@@ -89,11 +89,12 @@ Las dos interfaces (WindowsForms y Blazor) tienen las diez entidades: Ubicacione
 
 Algunas cosas que hace la versión web (Blazor) y que tuvimos que respetar:
 
-- Al **crear** un instrumento el estado siempre es "Activo". Después se cambia desde "Cambiar estado", y cada cambio queda en el historial, que también se ve en el detalle del instrumento junto con sus calibraciones.
+- Al **crear** un instrumento el estado siempre es "Activo". Después se cambia desde el detalle del instrumento (link "Cambiar estado", junto al estado actual), y cada cambio queda en el historial, que también se ve en el detalle del instrumento junto con sus calibraciones.
+- En la lista de instrumentos, tocar una fila abre el detalle (con las calibraciones y el historial de estados); cada fila solo tiene los botones Editar y Eliminar.
 - El **error máximo** y la **frecuencia** del instrumento son opcionales: si quedan vacíos se usan los del tipo de instrumento.
 - Las ubicaciones, áreas, tipos de instrumento, procedimientos y patrones **inactivos** no se ofrecen al cargar algo nuevo, pero se conservan en lo que ya estaba cargado.
 - En una calibración, el resultado se elige después de cargar las mediciones y se sugiere según ellas (si alguna está fuera de tolerancia avisa). En las internas el procedimiento es obligatorio y los patrones vencidos o inactivos no se pueden elegir. Una calibración aprobada queda en solo lectura hasta que se le quita la aprobación.
-- Un procedimiento puede tener un link a su PDF: se ve como "Ver" en la lista de procedimientos y como "Ver procedimiento" al elegirlo en una calibración. WindowsForms todavía no lo muestra, pero lo conserva cuando se edita un procedimiento.
+- Un procedimiento puede tener un link a su PDF. En la web se ve como "Ver" en la lista de procedimientos y como "Ver procedimiento" al elegirlo en una calibración; en WindowsForms se carga en el formulario del procedimiento y se abre con el botón "Ver documento" de la lista.
 - Si el servidor rechaza algo (por ejemplo, borrar una ubicación que tiene áreas, o repetir un código de instrumento), el mensaje se muestra arriba en un cuadro rojo.
 
 Algunas reglas que valida la API (valen para las dos interfaces):
@@ -128,7 +129,7 @@ Para poder probar y mostrar la aplicación, cuando la base está vacía la WebAP
 
 Cosas que charlamos y no llegamos a hacer:
 
-- Mostrar en WindowsForms el link al PDF del procedimiento (hoy solo se ve en la web).
+- Relacionar los patrones de referencia con los tipos de instrumento, para que en una calibración solo se ofrezcan los que corresponden (hoy se ofrecen todos los vigentes). Lo ideal es una relación de muchos a muchos, porque un mismo patrón puede servir para varios tipos; una versión más simple sería que cada patrón tenga un solo tipo, opcional.
 - Que la API también exija el procedimiento en las calibraciones internas (hoy lo controla solo la web).
 - Sacar el "tipo de intervención" de la calibración: el mantenimiento no encaja con las mediciones y el resultado.
 - Que cada usuario pueda cambiar su propia contraseña.

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Security.Policy;
@@ -40,7 +41,7 @@ namespace WindowsForms
             this.proceduresDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Code",
-                HeaderText = "Code",
+                HeaderText = "Código",
                 DataPropertyName = "Code",
                 Width = 120
             });
@@ -48,7 +49,7 @@ namespace WindowsForms
             this.proceduresDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Name",
-                HeaderText = "Name",
+                HeaderText = "Nombre",
                 DataPropertyName = "Name",
                 Width = 250
             });
@@ -56,7 +57,7 @@ namespace WindowsForms
             this.proceduresDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "VersionNumber",
-                HeaderText = "Version number",
+                HeaderText = "Versión",
                 DataPropertyName = "VersionNumber",
                 Width = 120
             });
@@ -64,7 +65,7 @@ namespace WindowsForms
             this.proceduresDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "ApprovedAt",
-                HeaderText = "Approved at",
+                HeaderText = "Fecha de aprobación",
                 DataPropertyName = "ApprovedAt",
                 Width = 150,
                 DefaultCellStyle = { Format = "dd/MM/yyyy HH:mm:ss" }
@@ -73,15 +74,23 @@ namespace WindowsForms
             this.proceduresDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "InstrumentTypeName",
-                HeaderText = "Instrument Type",
+                HeaderText = "Tipo de instrumento",
                 DataPropertyName = "InstrumentTypeName",
                 Width = 200
             });
 
             this.proceduresDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
+                Name = "DocumentUrl",
+                HeaderText = "Documento",
+                DataPropertyName = "DocumentUrl",
+                Width = 200
+            });
+
+            this.proceduresDataGridView.Columns.Add(new DataGridViewTextBoxColumn
+            {
                 Name = "IsActive",
-                HeaderText = "Is active",
+                HeaderText = "Activo",
                 DataPropertyName = "IsActive",
                 Width = 80
             });
@@ -89,7 +98,7 @@ namespace WindowsForms
             this.proceduresDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "CreatedAt",
-                HeaderText = "Created at",
+                HeaderText = "Fecha de alta",
                 DataPropertyName = "CreatedAt",
                 Width = 150,
                 DefaultCellStyle = { Format = "dd/MM/yyyy HH:mm:ss" }
@@ -148,7 +157,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error updating procedure: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudo modificar el procedimiento: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -162,7 +171,7 @@ namespace WindowsForms
             if (procedure == null) return;
 
 
-            var result = MessageBox.Show($"¿Are you sure you want to delete this item: {procedure.Code}{procedure.Name}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = MessageBox.Show($"¿Eliminar {procedure.Code} - {procedure.Name}?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
             {
@@ -173,7 +182,7 @@ namespace WindowsForms
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error deleting procedure: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"No se pudo eliminar el procedimiento: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 finally
                 {
@@ -213,11 +222,40 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading procedures: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudieron cargar los procedimientos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
                 EnableControls();
+            }
+        }
+
+        // Abre el documento del procedimiento elegido en el navegador. Solo se abren links http o https.
+        private void viewDocumentButton_Click(object sender, EventArgs e)
+        {
+            ProcedureDTO? procedure = this.SelectedItem();
+            if (procedure == null) return;
+
+            if (string.IsNullOrWhiteSpace(procedure.DocumentUrl))
+            {
+                MessageBox.Show("Este procedimiento no tiene un documento cargado.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            if (!Uri.TryCreate(procedure.DocumentUrl, UriKind.Absolute, out Uri? uri)
+                || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+            {
+                MessageBox.Show("El link del documento no es válido.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                Process.Start(new ProcessStartInfo(uri.AbsoluteUri) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"No se pudo abrir el documento: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -226,7 +264,7 @@ namespace WindowsForms
             ProcedureDTO procedure;
             if (proceduresDataGridView.SelectedRows.Count == 0)
             {
-                MessageBox.Show("Please select a procedure first.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Primero seleccione un procedimiento.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
             }
 
@@ -239,12 +277,14 @@ namespace WindowsForms
             createButton.Enabled = false;
             updateButton.Enabled = false;
             deleteButton.Enabled = false;
+            viewDocumentButton.Enabled = false;
             proceduresDataGridView.Enabled = false;
         }
 
         private void EnableControls()
         {
             createButton.Enabled = true;
+            viewDocumentButton.Enabled = true;
             proceduresDataGridView.Enabled = true;
         }
     }

@@ -59,63 +59,63 @@ namespace WindowsForms
             // 
             instrumentsToolStripMenuItem.Name = "instrumentsToolStripMenuItem";
             instrumentsToolStripMenuItem.Size = new Size(82, 20);
-            instrumentsToolStripMenuItem.Text = "Instruments";
+            instrumentsToolStripMenuItem.Text = "Instrumentos";
             instrumentsToolStripMenuItem.Click += instrumentsToolStripMenuItem_Click;
             // 
             // instrumentTypesToolStripMenuItem
             // 
             instrumentTypesToolStripMenuItem.Name = "instrumentTypesToolStripMenuItem";
             instrumentTypesToolStripMenuItem.Size = new Size(108, 20);
-            instrumentTypesToolStripMenuItem.Text = "Instrument types";
+            instrumentTypesToolStripMenuItem.Text = "Tipos de instrumento";
             instrumentTypesToolStripMenuItem.Click += instrumentTypesToolStripMenuItem_Click;
             // 
             // locationsToolStripMenuItem
             // 
             locationsToolStripMenuItem.Name = "locationsToolStripMenuItem";
             locationsToolStripMenuItem.Size = new Size(70, 20);
-            locationsToolStripMenuItem.Text = "Locations";
+            locationsToolStripMenuItem.Text = "Ubicaciones";
             locationsToolStripMenuItem.Click += locationsToolStripMenuItem_Click;
             // 
             // areasToolStripMenuItem
             // 
             areasToolStripMenuItem.Name = "areasToolStripMenuItem";
             areasToolStripMenuItem.Size = new Size(48, 20);
-            areasToolStripMenuItem.Text = "Areas";
+            areasToolStripMenuItem.Text = "Áreas";
             areasToolStripMenuItem.Click += areasToolStripMenuItem_Click;
             // 
             // proceduresToolStripMenuItem
             // 
             proceduresToolStripMenuItem.Name = "proceduresToolStripMenuItem";
             proceduresToolStripMenuItem.Size = new Size(78, 20);
-            proceduresToolStripMenuItem.Text = "Procedures";
+            proceduresToolStripMenuItem.Text = "Procedimientos";
             proceduresToolStripMenuItem.Click += proceduresToolStripMenuItem_Click;
             // 
             // calibrationsToolStripMenuItem
             // 
             calibrationsToolStripMenuItem.Name = "calibrationsToolStripMenuItem";
             calibrationsToolStripMenuItem.Size = new Size(82, 20);
-            calibrationsToolStripMenuItem.Text = "Calibrations";
+            calibrationsToolStripMenuItem.Text = "Calibraciones";
             calibrationsToolStripMenuItem.Click += calibrationsToolStripMenuItem_Click;
             // 
             // nonConformitiesToolStripMenuItem
             // 
             nonConformitiesToolStripMenuItem.Name = "nonConformitiesToolStripMenuItem";
             nonConformitiesToolStripMenuItem.Size = new Size(112, 20);
-            nonConformitiesToolStripMenuItem.Text = "Non conformities";
+            nonConformitiesToolStripMenuItem.Text = "No conformidades";
             nonConformitiesToolStripMenuItem.Click += nonConformitiesToolStripMenuItem_Click;
             // 
             // referenceStandardsToolStripMenuItem
             // 
             referenceStandardsToolStripMenuItem.Name = "referenceStandardsToolStripMenuItem";
             referenceStandardsToolStripMenuItem.Size = new Size(125, 20);
-            referenceStandardsToolStripMenuItem.Text = "Reference standards";
+            referenceStandardsToolStripMenuItem.Text = "Patrones de referencia";
             referenceStandardsToolStripMenuItem.Click += referenceStandardsToolStripMenuItem_Click;
             // 
             // instrumentStatusHistoryToolStripMenuItem
             // 
             instrumentStatusHistoryToolStripMenuItem.Name = "instrumentStatusHistoryToolStripMenuItem";
             instrumentStatusHistoryToolStripMenuItem.Size = new Size(90, 20);
-            instrumentStatusHistoryToolStripMenuItem.Text = "Status history";
+            instrumentStatusHistoryToolStripMenuItem.Text = "Historial de estados";
             instrumentStatusHistoryToolStripMenuItem.Click += instrumentStatusHistoryToolStripMenuItem_Click;
             // 
             // logoutToolStripMenuItem
@@ -129,7 +129,7 @@ namespace WindowsForms
             // 
             usersToolStripMenuItem.Name = "usersToolStripMenuItem";
             usersToolStripMenuItem.Size = new Size(47, 20);
-            usersToolStripMenuItem.Text = "Users";
+            usersToolStripMenuItem.Text = "Usuarios";
             usersToolStripMenuItem.Click += usersToolStripMenuItem_Click;
             //
             // reportsToolStripMenuItem
@@ -147,7 +147,7 @@ namespace WindowsForms
             Controls.Add(menuStrip1);
             MainMenuStrip = menuStrip1;
             Name = "Home";
-            Text = "Home";
+            Text = "Inicio";
             Load += Home_Load;
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();

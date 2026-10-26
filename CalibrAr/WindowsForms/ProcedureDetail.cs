@@ -64,7 +64,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudieron cargar los datos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -94,6 +94,7 @@ namespace WindowsForms
                     this.Procedure.VersionNumber = versionNumberTextBox.Text;
                     this.Procedure.ApprovedAt = approvedAtDateTimePicker.Value;
                     this.Procedure.InstrumentTypeId = (int)instrumentTypeComboBox.SelectedValue;
+                    this.Procedure.DocumentUrl = string.IsNullOrWhiteSpace(documentUrlTextBox.Text) ? null : documentUrlTextBox.Text.Trim();
                     if (this.Mode == FormMode.Update)
                     {
                         await procedureApiClient.UpdateAsync(this.Procedure);
@@ -107,7 +108,7 @@ namespace WindowsForms
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error creating procedure: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"No se pudo crear el procedimiento: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 finally
                 {
@@ -133,6 +134,7 @@ namespace WindowsForms
             }
 
             this.instrumentTypeComboBox.SelectedValue = this.Procedure.InstrumentTypeId;
+            this.documentUrlTextBox.Text = this.Procedure.DocumentUrl ?? string.Empty;
         }
 
         private void SetFormMode(FormMode value)
@@ -149,35 +151,45 @@ namespace WindowsForms
             errorProvider.SetError(versionNumberTextBox, string.Empty);
             errorProvider.SetError(approvedAtDateTimePicker, string.Empty);
             errorProvider.SetError(instrumentTypeComboBox, string.Empty);
+            errorProvider.SetError(documentUrlTextBox, string.Empty);
 
             if (this.codeTextBox.Text == string.Empty)
             {
                 isValid = false;
-                errorProvider.SetError(codeTextBox, "Code is required");
+                errorProvider.SetError(codeTextBox, "El código es obligatorio");
             }
 
             if (this.nameTextBox.Text == string.Empty)
             {
                 isValid = false;
-                errorProvider.SetError(nameTextBox, "Name is required");
+                errorProvider.SetError(nameTextBox, "El nombre es obligatorio");
             }
 
             if (this.versionNumberTextBox.Text == string.Empty)
             {
                 isValid = false;
-                errorProvider.SetError(versionNumberTextBox, "Version number is required");
+                errorProvider.SetError(versionNumberTextBox, "La versión es obligatoria");
             }
 
             if (this.approvedAtDateTimePicker.Checked == false)
             {
                 isValid = false;
-                errorProvider.SetError(approvedAtDateTimePicker, "Approved at is required");
+                errorProvider.SetError(approvedAtDateTimePicker, "La fecha de aprobación es obligatoria");
             }
 
             if (this.instrumentTypeComboBox.SelectedValue == null)
             {
                 isValid = false;
-                errorProvider.SetError(instrumentTypeComboBox, "Instrument Type is required");
+                errorProvider.SetError(instrumentTypeComboBox, "El tipo de instrumento es obligatorio");
+            }
+
+            // El link es opcional; si hay algo tiene que ser una dirección http o https (la API lo valida igual).
+            string documentUrl = this.documentUrlTextBox.Text.Trim();
+            if (documentUrl != string.Empty
+                && !(Uri.TryCreate(documentUrl, UriKind.Absolute, out Uri? uri) && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)))
+            {
+                isValid = false;
+                errorProvider.SetError(documentUrlTextBox, "El link tiene que empezar con http:// o https://");
             }
 
             return isValid;
@@ -190,6 +202,7 @@ namespace WindowsForms
             versionNumberTextBox.Enabled = false;
             approvedAtDateTimePicker.Enabled = false;
             instrumentTypeComboBox.Enabled = false;
+            documentUrlTextBox.Enabled = false;
         }
 
         private void EnableControls()
@@ -199,6 +212,7 @@ namespace WindowsForms
             versionNumberTextBox.Enabled = true;
             approvedAtDateTimePicker.Enabled = true;
             instrumentTypeComboBox.Enabled = true;
+            documentUrlTextBox.Enabled = true;
         }
 
         private void ProcedureDetail_Load(object sender, EventArgs e)

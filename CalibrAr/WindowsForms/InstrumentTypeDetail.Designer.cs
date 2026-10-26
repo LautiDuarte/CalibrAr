@@ -53,11 +53,11 @@
             nameLabel.Name = "nameLabel";
             nameLabel.Size = new Size(39, 15);
             nameLabel.TabIndex = 0;
-            nameLabel.Text = "Name";
+            nameLabel.Text = "Nombre";
             // 
             // nameTextBox
             // 
-            nameTextBox.Location = new Point(84, 22);
+            nameTextBox.Location = new Point(190, 22);
             nameTextBox.Name = "nameTextBox";
             nameTextBox.Size = new Size(100, 23);
             nameTextBox.TabIndex = 1;
@@ -69,11 +69,11 @@
             descriptionLabel.Name = "descriptionLabel";
             descriptionLabel.Size = new Size(67, 15);
             descriptionLabel.TabIndex = 2;
-            descriptionLabel.Text = "Description";
+            descriptionLabel.Text = "Descripción";
             // 
             // descriptionTextBox
             // 
-            descriptionTextBox.Location = new Point(112, 54);
+            descriptionTextBox.Location = new Point(190, 54);
             descriptionTextBox.Name = "descriptionTextBox";
             descriptionTextBox.Size = new Size(100, 23);
             descriptionTextBox.TabIndex = 3;
@@ -85,11 +85,11 @@
             measurementUnitLabel.Name = "measurementUnitLabel";
             measurementUnitLabel.Size = new Size(105, 15);
             measurementUnitLabel.TabIndex = 4;
-            measurementUnitLabel.Text = "Measurement Unit";
+            measurementUnitLabel.Text = "Unidad de medida";
             // 
             // measurementUnitTextBox
             // 
-            measurementUnitTextBox.Location = new Point(150, 86);
+            measurementUnitTextBox.Location = new Point(190, 86);
             measurementUnitTextBox.Name = "measurementUnitTextBox";
             measurementUnitTextBox.Size = new Size(100, 23);
             measurementUnitTextBox.TabIndex = 5;
@@ -101,11 +101,11 @@
             maxAllowedErrorLabel.Name = "maxAllowedErrorLabel";
             maxAllowedErrorLabel.Size = new Size(104, 15);
             maxAllowedErrorLabel.TabIndex = 6;
-            maxAllowedErrorLabel.Text = "Max Allowed Error";
+            maxAllowedErrorLabel.Text = "Error máximo";
             // 
             // maxAllowedErrorTextBox
             // 
-            maxAllowedErrorTextBox.Location = new Point(149, 118);
+            maxAllowedErrorTextBox.Location = new Point(190, 118);
             maxAllowedErrorTextBox.Name = "maxAllowedErrorTextBox";
             maxAllowedErrorTextBox.Size = new Size(100, 23);
             maxAllowedErrorTextBox.TabIndex = 7;
@@ -117,11 +117,11 @@
             calibrationFrequencyMonthsLabel.Name = "calibrationFrequencyMonthsLabel";
             calibrationFrequencyMonthsLabel.Size = new Size(175, 15);
             calibrationFrequencyMonthsLabel.TabIndex = 8;
-            calibrationFrequencyMonthsLabel.Text = "Calibration Frequency (Months)";
+            calibrationFrequencyMonthsLabel.Text = "Frecuencia (meses)";
             // 
             // calibrationFrequencyMonthsTextBox
             // 
-            calibrationFrequencyMonthsTextBox.Location = new Point(220, 153);
+            calibrationFrequencyMonthsTextBox.Location = new Point(190, 153);
             calibrationFrequencyMonthsTextBox.Name = "calibrationFrequencyMonthsTextBox";
             calibrationFrequencyMonthsTextBox.Size = new Size(100, 23);
             calibrationFrequencyMonthsTextBox.TabIndex = 9;
@@ -132,7 +132,7 @@
             saveButton.Name = "saveButton";
             saveButton.Size = new Size(75, 23);
             saveButton.TabIndex = 10;
-            saveButton.Text = "Save";
+            saveButton.Text = "Guardar";
             saveButton.UseVisualStyleBackColor = true;
             saveButton.Click += saveButton_Click;
             // 
@@ -142,7 +142,7 @@
             cancelButton.Name = "cancelButton";
             cancelButton.Size = new Size(75, 23);
             cancelButton.TabIndex = 11;
-            cancelButton.Text = "Cancel";
+            cancelButton.Text = "Cancelar";
             cancelButton.UseVisualStyleBackColor = true;
             cancelButton.Click += cancelButton_Click;
             // 
@@ -168,7 +168,7 @@
             Controls.Add(nameTextBox);
             Controls.Add(nameLabel);
             Name = "InstrumentTypeDetail";
-            Text = "InstrumentTypeDetail";
+            Text = "Tipo de instrumento";
             Load += InstrumentTypeDetail_Load;
             ((System.ComponentModel.ISupportInitialize)errorProvider).EndInit();
             ResumeLayout(false);

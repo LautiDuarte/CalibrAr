@@ -55,6 +55,7 @@ namespace WindowsForms
         {
             InitializeComponent();
             calibrationDateTimePicker.MaxDate = DateTime.Today.AddDays(1).AddTicks(-1);
+            ConfigureColumns();
 
         }
 
@@ -87,7 +88,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudieron cargar los datos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -102,7 +103,7 @@ namespace WindowsForms
             this.measurementsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "NominalValue",
-                HeaderText = "Nominal value",
+                HeaderText = "Valor nominal",
                 DataPropertyName = "NominalValue",
                 Width = 80,
                 DefaultCellStyle = { Format = "N3" }
@@ -111,7 +112,7 @@ namespace WindowsForms
             this.measurementsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "MeasuredValue",
-                HeaderText = "Measured value",
+                HeaderText = "Valor medido",
                 DataPropertyName = "MeasuredValue",
                 Width = 80,
                 DefaultCellStyle = { Format = "N3" }
@@ -129,7 +130,7 @@ namespace WindowsForms
             this.measurementsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "IsWithinTolerance",
-                HeaderText = "Within tolerance",
+                HeaderText = "Dentro de tolerancia",
                 DataPropertyName = "IsWithinTolerance",
                 Width = 80
             });
@@ -137,7 +138,7 @@ namespace WindowsForms
             this.measurementsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Notes",
-                HeaderText = "Notes",
+                HeaderText = "Notas",
                 DataPropertyName = "Notes",
                 Width = 100
             });
@@ -145,12 +146,14 @@ namespace WindowsForms
 
         private void LoadInterventionTypes()
         {
+            EnumText.ApplyTo(interventionTypeComboBox);
             interventionTypeComboBox.DataSource = Enum.GetValues(typeof(InterventionTypeDTO));
             interventionTypeComboBox.SelectedIndex = -1;
         }
 
         private void LoadResults()
         {
+            EnumText.ApplyTo(resultComboBox);
             resultComboBox.DataSource = Enum.GetValues(typeof(ResultDTO));
             resultComboBox.SelectedIndex = -1;
         }
@@ -210,7 +213,7 @@ namespace WindowsForms
 
                 if (currentUserId == null)
                 {
-                    MessageBox.Show("Current user not found. Please check your session.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("No se encontró el usuario actual. Revisá tu sesión.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     this.Close();
                 }
                 return;
@@ -327,7 +330,7 @@ namespace WindowsForms
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error creating calibration: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"No se pudo crear la calibración: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 finally
                 {
@@ -347,7 +350,7 @@ namespace WindowsForms
 
             if (maxAllowedError == null)
             {
-                MessageBox.Show("Please select an instrument first.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Primero seleccione un instrumento.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -370,7 +373,7 @@ namespace WindowsForms
 
             if (maxAllowedError == null)
             {
-                MessageBox.Show("Please select an instrument first.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Primero seleccione un instrumento.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -405,8 +408,8 @@ namespace WindowsForms
             CalibrationMeasurementDTO? selectedMeasurement = this.SelectedMeasurement();
             if (selectedMeasurement == null) return;
 
-            var result = MessageBox.Show($"¿Are you sure you want to delete the measurement {selectedMeasurement.NominalValue:N3}?",
-                "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = MessageBox.Show($"¿Eliminar la medición {selectedMeasurement.NominalValue:N3}?",
+                "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
             {
@@ -419,7 +422,7 @@ namespace WindowsForms
         {
             if (measurementsDataGridView.SelectedRows.Count == 0)
             {
-                MessageBox.Show("Please select a measurement first.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Primero seleccione una medición.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
             }
 
@@ -450,8 +453,8 @@ namespace WindowsForms
             int totalMeasurements = measurementsLocales.Count;
             int outOfTolerance = measurementsLocales.Count(m => !m.IsWithinTolerance);
 
-            totalMeasurementsLabel.Text = $"Total measurements: {totalMeasurements}";
-            outOfToleranceLabel.Text = $"Out of tolerance: {outOfTolerance}";
+            totalMeasurementsLabel.Text = $"Total de mediciones: {totalMeasurements}";
+            outOfToleranceLabel.Text = $"Fuera de tolerancia: {outOfTolerance}";
         }
 
         private void SetCalibration()
@@ -577,32 +580,32 @@ namespace WindowsForms
             if (this.instrumentComboBox.SelectedValue == null)
             {
                 isValid = false;
-                errorProvider.SetError(instrumentComboBox, "Instrument is required");
+                errorProvider.SetError(instrumentComboBox, "El instrumento es obligatorio");
             }
 
             if (this.calibrationDateTimePicker.Checked == false)
             {
                 isValid = false;
-                errorProvider.SetError(calibrationDateTimePicker, "Calibration Date is required");
+                errorProvider.SetError(calibrationDateTimePicker, "La fecha de calibración es obligatoria");
             }
 
             if (this.interventionTypeComboBox.SelectedItem == null)
             {
                 isValid = false;
-                errorProvider.SetError(interventionTypeComboBox, "Intervention Type is required");
+                errorProvider.SetError(interventionTypeComboBox, "El tipo de intervención es obligatorio");
             }
 
             if (this.resultComboBox.SelectedItem == null)
             {
                 isValid = false;
-                errorProvider.SetError(resultComboBox, "Result is required");
+                errorProvider.SetError(resultComboBox, "El resultado es obligatorio");
             }
 
             // Las calibraciones internas requieren al menos una medición
             if (!this.isExternalCheckBox.Checked && measurementsLocales.Count == 0)
             {
                 isValid = false;
-                errorProvider.SetError(measurementsDataGridView, "At least one measurement is required for internal calibrations");
+                errorProvider.SetError(measurementsDataGridView, "Una calibración interna necesita al menos una medición");
             }
 
             return isValid;

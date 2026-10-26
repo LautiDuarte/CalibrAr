@@ -34,12 +34,12 @@ namespace WindowsForms
         private void ConfigureColumns()
         {
             referenceStandardsDataGridView.AutoGenerateColumns = false;
-            AddColumn("Description", "Description", 250);
-            AddColumn("CertifyingBody", "Certifying body", 150);
-            AddColumn("CertificateNumber", "Certificate number", 150);
-            AddColumn("CertificateIssuedAt", "Issued at", 100, "dd/MM/yyyy");
-            AddColumn("CertificateExpiresAt", "Expires at", 100, "dd/MM/yyyy");
-            AddColumn("CreatedAt", "Created at", 130, "dd/MM/yyyy HH:mm");
+            AddColumn("Description", "Descripción", 250);
+            AddColumn("CertifyingBody", "Organismo certificante", 150);
+            AddColumn("CertificateNumber", "N° de certificado", 150);
+            AddColumn("CertificateIssuedAt", "Emisión", 100, "dd/MM/yyyy");
+            AddColumn("CertificateExpiresAt", "Vencimiento", 100, "dd/MM/yyyy");
+            AddColumn("CreatedAt", "Fecha de alta", 130, "dd/MM/yyyy HH:mm");
         }
 
         private async void ReferenceStandardList_Load(object sender, EventArgs e)
@@ -85,7 +85,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error updating reference standard: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudo modificar el patrón de referencia: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -98,7 +98,7 @@ namespace WindowsForms
             ReferenceStandardDTO? referenceStandard = SelectedItem();
             if (referenceStandard == null) return;
 
-            var result = MessageBox.Show($"Are you sure you want to delete this item: {referenceStandard.Description}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = MessageBox.Show($"¿Eliminar {referenceStandard.Description}?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result != DialogResult.Yes) return;
 
             try
@@ -108,7 +108,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error deleting reference standard: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudo eliminar el patrón de referencia: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -134,7 +134,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading reference standards: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudieron cargar los patrones de referencia: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -146,7 +146,7 @@ namespace WindowsForms
         {
             if (referenceStandardsDataGridView.SelectedRows.Count == 0)
             {
-                MessageBox.Show("Please select a reference standard first.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Primero seleccione un patrón de referencia.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
             }
             return (ReferenceStandardDTO)referenceStandardsDataGridView.SelectedRows[0].DataBoundItem;

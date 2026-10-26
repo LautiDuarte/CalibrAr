@@ -21,6 +21,7 @@ namespace WindowsForms
         {
             InitializeComponent();
             ConfigureColumns();
+            EnumText.ApplyTo(statusHistoriesDataGridView, "PreviousStatus", "NewStatus");
         }
 
         private void AddColumn(string name, string header, int width, string? format = null)
@@ -33,11 +34,11 @@ namespace WindowsForms
         private void ConfigureColumns()
         {
             statusHistoriesDataGridView.AutoGenerateColumns = false;
-            AddColumn("InstrumentCode", "Instrument", 120);
-            AddColumn("PreviousStatus", "Previous status", 150);
-            AddColumn("NewStatus", "New status", 150);
-            AddColumn("ChangedAt", "Changed at", 150, "dd/MM/yyyy HH:mm:ss");
-            AddColumn("ChangedByUserName", "Changed by", 200);
+            AddColumn("InstrumentCode", "Instrumento", 120);
+            AddColumn("PreviousStatus", "Estado anterior", 150);
+            AddColumn("NewStatus", "Estado nuevo", 150);
+            AddColumn("ChangedAt", "Fecha del cambio", 150, "dd/MM/yyyy HH:mm:ss");
+            AddColumn("ChangedByUserName", "Cambiado por", 200);
             // Los cambios automáticos del sistema no tienen usuario
             statusHistoriesDataGridView.Columns["ChangedByUserName"].DefaultCellStyle.NullValue = "System";
         }
@@ -50,7 +51,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading instrument status history: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudo cargar el historial de estados: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

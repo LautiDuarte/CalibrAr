@@ -34,7 +34,7 @@
             ClientSize = new Size(860, 470);
             Controls.Add(statusHistoriesDataGridView);
             Name = "InstrumentStatusHistoryList";
-            Text = "Instrument status history";
+            Text = "Historial de estados";
             Load += InstrumentStatusHistoryList_Load;
             ((System.ComponentModel.ISupportInitialize)statusHistoriesDataGridView).EndInit();
             ResumeLayout(false);

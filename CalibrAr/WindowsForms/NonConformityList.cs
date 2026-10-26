@@ -23,6 +23,7 @@ namespace WindowsForms
         {
             InitializeComponent();
             ConfigureColumns();
+            EnumText.ApplyTo(nonConformitiesDataGridView, "Origin", "Status");
         }
 
         private void AddColumn(string name, string header, int width, string? format = null)
@@ -35,23 +36,23 @@ namespace WindowsForms
         private void ConfigureColumns()
         {
             nonConformitiesDataGridView.AutoGenerateColumns = false;
-            AddColumn("Code", "Code", 100);
-            AddColumn("InstrumentCode", "Instrument", 100);
-            AddColumn("CalibrationCertificateNumber", "Calibration certificate", 150);
-            AddColumn("Origin", "Origin", 140);
-            AddColumn("Status", "Status", 140);
-            AddColumn("Description", "Description", 250);
-            AddColumn("CorrectiveAction", "Corrective action", 200);
-            AddColumn("OpenedAt", "Opened at", 130, "dd/MM/yyyy HH:mm");
-            AddColumn("ClosedAt", "Closed at", 130, "dd/MM/yyyy HH:mm");
-            AddColumn("DetectedByUserName", "Detected by", 150);
-            AddColumn("ClosedByUserName", "Closed by", 150);
-            AddColumn("CreatedAt", "Created at", 130, "dd/MM/yyyy HH:mm");
+            AddColumn("Code", "Código", 100);
+            AddColumn("InstrumentCode", "Instrumento", 100);
+            AddColumn("CalibrationCertificateNumber", "Certificado de calibración", 150);
+            AddColumn("Origin", "Origen", 140);
+            AddColumn("Status", "Estado", 140);
+            AddColumn("Description", "Descripción", 250);
+            AddColumn("CorrectiveAction", "Acción correctiva", 200);
+            AddColumn("OpenedAt", "Fecha de apertura", 130, "dd/MM/yyyy HH:mm");
+            AddColumn("ClosedAt", "Fecha de cierre", 130, "dd/MM/yyyy HH:mm");
+            AddColumn("DetectedByUserName", "Detectada por", 150);
+            AddColumn("ClosedByUserName", "Cerrada por", 150);
+            AddColumn("CreatedAt", "Fecha de alta", 130, "dd/MM/yyyy HH:mm");
             nonConformitiesDataGridView.Columns.Add(new DataGridViewButtonColumn
             {
                 Name = "Close",
                 HeaderText = string.Empty,
-                Text = "Close",
+                Text = "Cerrar",
                 UseColumnTextForButtonValue = true,
                 Width = 70
             });
@@ -111,12 +112,12 @@ namespace WindowsForms
             int? closerId = AuthServiceProvider.Instance.GetUserId();
             if (closerId == null)
             {
-                MessageBox.Show("Current user not found. Please check your session.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("No se encontró el usuario actual. Revisá tu sesión.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             var result = MessageBox.Show(
-                $"Are you sure you want to close this non conformity: {nonConformity.Code}?",
+                $"¿Cerrar la no conformidad {nonConformity.Code}?",
                 "Confirm close", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
             if (result != DialogResult.OK) return;
 
@@ -127,7 +128,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error closing non conformity: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudo cerrar la no conformidad: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -156,7 +157,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error updating non conformity: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudo modificar la no conformidad: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -169,7 +170,7 @@ namespace WindowsForms
             NonConformityDTO? nonConformity = SelectedItem();
             if (nonConformity == null) return;
 
-            var result = MessageBox.Show($"Are you sure you want to delete this item: {nonConformity.Code}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = MessageBox.Show($"¿Eliminar {nonConformity.Code}?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result != DialogResult.Yes) return;
 
             try
@@ -179,7 +180,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error deleting non conformity: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudo eliminar la no conformidad: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -205,7 +206,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading non conformities: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudieron cargar las no conformidades: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -217,7 +218,7 @@ namespace WindowsForms
         {
             if (nonConformitiesDataGridView.SelectedRows.Count == 0)
             {
-                MessageBox.Show("Please select a non conformity first.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Primero seleccione una no conformidad.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
             }
             return (NonConformityDTO)nonConformitiesDataGridView.SelectedRows[0].DataBoundItem;
