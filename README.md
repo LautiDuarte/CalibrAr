@@ -40,7 +40,7 @@ DROP DATABASE IF EXISTS CalibrAr;
 
 Esto pasó en la Entrega 3 y le va a pasar a cualquiera que venga de una versión anterior: se quitó `NextCalibrationDate` de `Calibration` (ahora se calcula) y se pasaron a `decimal(18,4)` las columnas decimales (`MaxAllowedError`, `NominalValue`, `MeasuredValue` y `Error`). Si no borrás la base, crear una calibración falla porque la columna vieja es `NOT NULL`. Y con `decimal(18,2)` un valor como `0.004` se guardaba como `0` y después rompía la lista de calibraciones al leerlo.
 
-Con los reportes pasó lo mismo: el permiso nuevo `Reports.read` se carga junto con el modelo, así que una base vieja no lo tiene. Si venís de una versión anterior (o querés ver los datos de ejemplo, que solo se cargan cuando no hay instrumentos), borrá la base y dejá que se cree de nuevo.
+Con los reportes pasó lo mismo: el permiso nuevo `Reports.read` se carga junto con el modelo, así que una base vieja no lo tiene. Si venís de una versión anterior (o querés ver los datos de ejemplo, que solo se cargan cuando no hay instrumentos), borrá la base y dejá que se cree de nuevo. Lo mismo pasa con el link al documento de los procedimientos (`DocumentUrl`), que agregó una columna nueva.
 
 ## Cómo correr todo
 
@@ -93,6 +93,7 @@ Algunas cosas que hace la versión web (Blazor) y que tuvimos que respetar:
 - El **error máximo** y la **frecuencia** del instrumento son opcionales: si quedan vacíos se usan los del tipo de instrumento.
 - Las ubicaciones, áreas, tipos de instrumento, procedimientos y patrones **inactivos** no se ofrecen al cargar algo nuevo, pero se conservan en lo que ya estaba cargado.
 - En una calibración, el resultado se elige después de cargar las mediciones y se sugiere según ellas (si alguna está fuera de tolerancia avisa). En las internas el procedimiento es obligatorio y los patrones vencidos o inactivos no se pueden elegir. Una calibración aprobada queda en solo lectura hasta que se le quita la aprobación.
+- Un procedimiento puede tener un link a su PDF: se ve como "Ver" en la lista de procedimientos y como "Ver procedimiento" al elegirlo en una calibración. WindowsForms todavía no lo muestra, pero lo conserva cuando se edita un procedimiento.
 - Si el servidor rechaza algo (por ejemplo, borrar una ubicación que tiene áreas, o repetir un código de instrumento), el mensaje se muestra arriba en un cuadro rojo.
 
 Algunas reglas que valida la API (valen para las dos interfaces):
@@ -127,7 +128,7 @@ Para poder probar y mostrar la aplicación, cuando la base está vacía la WebAP
 
 Cosas que charlamos y no llegamos a hacer:
 
-- Un campo con el link al PDF del procedimiento, para poder abrirlo desde la calibración.
+- Mostrar en WindowsForms el link al PDF del procedimiento (hoy solo se ve en la web).
 - Que la API también exija el procedimiento en las calibraciones internas (hoy lo controla solo la web).
 - Sacar el "tipo de intervención" de la calibración: el mantenimiento no encaja con las mediciones y el resultado.
 - Que cada usuario pueda cambiar su propia contraseña.
