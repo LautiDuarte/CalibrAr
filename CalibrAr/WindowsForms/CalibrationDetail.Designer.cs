@@ -33,6 +33,7 @@
             instrumentComboBox = new ComboBox();
             procedureLabel = new Label();
             procedureComboBox = new ComboBox();
+            viewDocumentButton = new Button();
             calibrationDateLabel = new Label();
             calibrationDateTimePicker = new DateTimePicker();
             interventionTypeLabel = new Label();
@@ -102,6 +103,16 @@
             procedureComboBox.Name = "procedureComboBox";
             procedureComboBox.Size = new Size(200, 23);
             procedureComboBox.TabIndex = 3;
+            // 
+            // viewDocumentButton
+            // 
+            viewDocumentButton.Enabled = false;
+            viewDocumentButton.Location = new Point(406, 40);
+            viewDocumentButton.Name = "viewDocumentButton";
+            viewDocumentButton.Size = new Size(125, 25);
+            viewDocumentButton.TabIndex = 4;
+            viewDocumentButton.Text = "Ver documento";
+            viewDocumentButton.UseVisualStyleBackColor = true;
             // 
             // calibrationDateLabel
             // 
@@ -381,7 +392,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(491, 745);
+            ClientSize = new Size(545, 745);
             Controls.Add(referenceStandardsCheckedListBox);
             Controls.Add(referenceStandardsLabel);
             Controls.Add(saveButton);
@@ -406,6 +417,7 @@
             Controls.Add(calibrationDateTimePicker);
             Controls.Add(calibrationDateLabel);
             Controls.Add(procedureComboBox);
+            Controls.Add(viewDocumentButton);
             Controls.Add(procedureLabel);
             Controls.Add(instrumentComboBox);
             Controls.Add(instrumentLabel);
@@ -435,6 +447,7 @@
         private ComboBox instrumentComboBox;
         private Label procedureLabel;
         private ComboBox procedureComboBox;
+        private Button viewDocumentButton;
         private Label calibrationDateLabel;
         private DateTimePicker calibrationDateTimePicker;
         private Label interventionTypeLabel;

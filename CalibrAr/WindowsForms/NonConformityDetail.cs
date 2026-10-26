@@ -49,6 +49,9 @@ namespace WindowsForms
         public NonConformityDetail()
         {
             InitializeComponent();
+
+            // El código lo asigna la API al crear (NC-0001, NC-0002...), así que nunca se escribe a mano.
+            codeTextBox.ReadOnly = true;
         }
 
         public NonConformityDetail(FormMode mode, NonConformityDTO nonConformity) : this()
@@ -136,8 +139,8 @@ namespace WindowsForms
 
             var options = allCalibrations
                 .Where(c => c.InstrumentId == selectedInstrument.Id)
-                .Select(c => new { c.Id, DisplayName = $"{c.CalibrationDate:dd/MM/yyyy HH:mm} - {c.InterventionType}" })
-                .Prepend(new { Id = 0, DisplayName = "(None)" })
+                .Select(c => new { c.Id, DisplayName = $"{c.CalibrationDate:dd/MM/yyyy HH:mm} - {EnumText.Translate(c.InterventionType)}" })
+                .Prepend(new { Id = 0, DisplayName = "(Ninguna)" })
                 .ToList();
 
             calibrationComboBox.DataSource = options;
@@ -154,7 +157,7 @@ namespace WindowsForms
 
         private void SetNonConformity()
         {
-            codeTextBox.Text = NonConformity.Code;
+            codeTextBox.Text = this.Mode == FormMode.Create ? "Se asigna al guardar" : NonConformity.Code;
             instrumentComboBox.SelectedValue = NonConformity.InstrumentId; // dispara FilterCalibrations
             calibrationComboBox.SelectedValue = NonConformity.CalibrationId ?? 0;
             descriptionTextBox.Text = NonConformity.Description;
@@ -196,7 +199,7 @@ namespace WindowsForms
                 var closers = allUsers
                     .Where(u => rolesThatCanClose.Contains(u.Role.ToString()) || u.Id == NonConformity.ClosedByUserId)
                     .ToList();
-                closers.Insert(0, new UserDTO { Id = 0, FullName = "(None)" });
+                closers.Insert(0, new UserDTO { Id = 0, FullName = "(Ninguno)" });
 
                 closedByUserComboBox.DataSource = closers;
                 closedByUserComboBox.DisplayMember = "FullName";
@@ -243,7 +246,8 @@ namespace WindowsForms
             {
                 DisableControls();
 
-                NonConformity.Code = codeTextBox.Text.Trim();
+                // Vacío al crear: la API genera el código. Al editar se conserva el que ya tenía.
+                NonConformity.Code = this.Mode == FormMode.Create ? string.Empty : codeTextBox.Text.Trim();
                 NonConformity.InstrumentId = (int)instrumentComboBox.SelectedValue;
                 NonConformity.CalibrationId = calibrationComboBox.SelectedValue is int calibrationId && calibrationId != 0
                     ? calibrationId
@@ -313,7 +317,7 @@ namespace WindowsForms
             errorProvider.SetError(detectedByUserComboBox, string.Empty);
             errorProvider.SetError(closedAtDateTimePicker, string.Empty);
 
-            if (string.IsNullOrWhiteSpace(codeTextBox.Text))
+            if (this.Mode == FormMode.Update && string.IsNullOrWhiteSpace(codeTextBox.Text))
             {
                 isValid = false;
                 errorProvider.SetError(codeTextBox, "El código es obligatorio");

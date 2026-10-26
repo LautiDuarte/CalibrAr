@@ -94,7 +94,7 @@ Algunas cosas que hace la versión web (Blazor) y que tuvimos que respetar:
 - El **error máximo** y la **frecuencia** del instrumento son opcionales: si quedan vacíos se usan los del tipo de instrumento.
 - Las ubicaciones, áreas, tipos de instrumento, procedimientos y patrones **inactivos** no se ofrecen al cargar algo nuevo, pero se conservan en lo que ya estaba cargado.
 - En una calibración, el resultado se elige después de cargar las mediciones y se sugiere según ellas (si alguna está fuera de tolerancia avisa). En las internas el procedimiento es obligatorio y los patrones vencidos o inactivos no se pueden elegir. Una calibración aprobada queda en solo lectura hasta que se le quita la aprobación.
-- Un procedimiento puede tener un link a su PDF. En la web se ve como "Ver" en la lista de procedimientos y como "Ver procedimiento" al elegirlo en una calibración; en WindowsForms se carga en el formulario del procedimiento y se abre con el botón "Ver documento" de la lista.
+- Un procedimiento puede tener un link a su PDF. En la web se ve como "Ver" en la lista de procedimientos y como "Ver procedimiento" al elegirlo en una calibración. En WindowsForms se carga en el formulario del procedimiento y se abre con el botón "Ver documento", que está en la lista de procedimientos y también en la pantalla de la calibración, al lado del procedimiento elegido.
 - Si el servidor rechaza algo (por ejemplo, borrar una ubicación que tiene áreas, o repetir un código de instrumento), el mensaje se muestra arriba en un cuadro rojo.
 
 Algunas reglas que valida la API (valen para las dos interfaces):
@@ -103,7 +103,7 @@ Algunas reglas que valida la API (valen para las dos interfaces):
 - No se puede eliminar una calibración que tiene una no conformidad asociada (hay que eliminar primero la no conformidad).
 - Un procedimiento puede repetir el código, pero no la combinación de código y versión. Una versión nueva se carga como otro procedimiento con el mismo código, y el anterior se deja inactivo.
 - La contraseña de un usuario nuevo tiene que tener entre 8 y 30 caracteres.
-- El código de una no conformidad lo genera la API (NC-0001, NC-0002...) si no se manda uno, y no puede repetirse.
+- El código de una no conformidad lo genera la API (NC-0001, NC-0002...) si no se manda uno, y no puede repetirse. En las dos interfaces se asigna solo al guardar y después no se edita.
 
 ## Reportes
 

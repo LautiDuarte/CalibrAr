@@ -236,27 +236,7 @@ namespace WindowsForms
             ProcedureDTO? procedure = this.SelectedItem();
             if (procedure == null) return;
 
-            if (string.IsNullOrWhiteSpace(procedure.DocumentUrl))
-            {
-                MessageBox.Show("Este procedimiento no tiene un documento cargado.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            if (!Uri.TryCreate(procedure.DocumentUrl, UriKind.Absolute, out Uri? uri)
-                || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
-            {
-                MessageBox.Show("El link del documento no es válido.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            try
-            {
-                Process.Start(new ProcessStartInfo(uri.AbsoluteUri) { UseShellExecute = true });
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"No se pudo abrir el documento: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            DocumentLink.Open(procedure.DocumentUrl);
         }
 
         private ProcedureDTO SelectedItem()
