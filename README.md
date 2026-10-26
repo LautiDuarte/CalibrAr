@@ -101,6 +101,7 @@ Algunas reglas que valida la API (valen para las dos interfaces):
 - No se puede eliminar una calibración que tiene una no conformidad asociada (hay que eliminar primero la no conformidad).
 - Un procedimiento puede repetir el código, pero no la combinación de código y versión. Una versión nueva se carga como otro procedimiento con el mismo código, y el anterior se deja inactivo.
 - La contraseña de un usuario nuevo tiene que tener entre 8 y 30 caracteres.
+- El código de una no conformidad lo genera la API (NC-0001, NC-0002...) si no se manda uno, y no puede repetirse.
 
 ## Reportes
 
@@ -128,7 +129,6 @@ Cosas que charlamos y no llegamos a hacer:
 
 - Un campo con el link al PDF del procedimiento, para poder abrirlo desde la calibración.
 - Que la API también exija el procedimiento en las calibraciones internas (hoy lo controla solo la web).
-- Que el código de las no conformidades se genere solo (NC-0001, NC-0002...).
 - Sacar el "tipo de intervención" de la calibración: el mantenimiento no encaja con las mediciones y el resultado.
 - Que cada usuario pueda cambiar su propia contraseña.
 - Que las reglas de autoprotección de usuarios (no borrarse ni cambiarse el rol) y el usuario que registra un cambio de estado salgan del token y no de un dato que manda el cliente.
