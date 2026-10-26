@@ -39,6 +39,8 @@
             approvedAtDateTimePicker = new DateTimePicker();
             instrumentTypeLabel = new Label();
             instrumentTypeComboBox = new ComboBox();
+            documentUrlLabel = new Label();
+            documentUrlTextBox = new TextBox();
             cancelButton = new Button();
             saveButton = new Button();
             errorProvider = new ErrorProvider(components);
@@ -128,22 +130,38 @@
             instrumentTypeComboBox.Size = new Size(200, 23);
             instrumentTypeComboBox.TabIndex = 9;
             // 
+            // documentUrlLabel
+            // 
+            documentUrlLabel.AutoSize = true;
+            documentUrlLabel.Location = new Point(40, 160);
+            documentUrlLabel.Name = "documentUrlLabel";
+            documentUrlLabel.Size = new Size(100, 15);
+            documentUrlLabel.TabIndex = 10;
+            documentUrlLabel.Text = "Documento (link)";
+            // 
+            // documentUrlTextBox
+            // 
+            documentUrlTextBox.Location = new Point(200, 157);
+            documentUrlTextBox.Name = "documentUrlTextBox";
+            documentUrlTextBox.Size = new Size(300, 23);
+            documentUrlTextBox.TabIndex = 11;
+            // 
             // cancelButton
             // 
-            cancelButton.Location = new Point(425, 185);
+            cancelButton.Location = new Point(425, 215);
             cancelButton.Name = "cancelButton";
             cancelButton.Size = new Size(75, 23);
-            cancelButton.TabIndex = 10;
+            cancelButton.TabIndex = 12;
             cancelButton.Text = "Cancelar";
             cancelButton.UseVisualStyleBackColor = true;
             cancelButton.Click += cancelButton_Click;
             // 
             // saveButton
             // 
-            saveButton.Location = new Point(344, 185);
+            saveButton.Location = new Point(344, 215);
             saveButton.Name = "saveButton";
             saveButton.Size = new Size(75, 23);
-            saveButton.TabIndex = 11;
+            saveButton.TabIndex = 13;
             saveButton.Text = "Guardar";
             saveButton.UseVisualStyleBackColor = true;
             saveButton.Click += saveButton_Click;
@@ -156,9 +174,11 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(520, 225);
+            ClientSize = new Size(520, 255);
             Controls.Add(saveButton);
             Controls.Add(cancelButton);
+            Controls.Add(documentUrlTextBox);
+            Controls.Add(documentUrlLabel);
             Controls.Add(instrumentTypeComboBox);
             Controls.Add(instrumentTypeLabel);
             Controls.Add(approvedAtDateTimePicker);
@@ -189,6 +209,8 @@
         private DateTimePicker approvedAtDateTimePicker;
         private Label instrumentTypeLabel;
         private ComboBox instrumentTypeComboBox;
+        private Label documentUrlLabel;
+        private TextBox documentUrlTextBox;
         private Button cancelButton;
         private Button saveButton;
         private ErrorProvider errorProvider;

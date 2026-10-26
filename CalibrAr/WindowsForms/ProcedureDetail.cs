@@ -94,6 +94,7 @@ namespace WindowsForms
                     this.Procedure.VersionNumber = versionNumberTextBox.Text;
                     this.Procedure.ApprovedAt = approvedAtDateTimePicker.Value;
                     this.Procedure.InstrumentTypeId = (int)instrumentTypeComboBox.SelectedValue;
+                    this.Procedure.DocumentUrl = string.IsNullOrWhiteSpace(documentUrlTextBox.Text) ? null : documentUrlTextBox.Text.Trim();
                     if (this.Mode == FormMode.Update)
                     {
                         await procedureApiClient.UpdateAsync(this.Procedure);
@@ -133,6 +134,7 @@ namespace WindowsForms
             }
 
             this.instrumentTypeComboBox.SelectedValue = this.Procedure.InstrumentTypeId;
+            this.documentUrlTextBox.Text = this.Procedure.DocumentUrl ?? string.Empty;
         }
 
         private void SetFormMode(FormMode value)
@@ -149,6 +151,7 @@ namespace WindowsForms
             errorProvider.SetError(versionNumberTextBox, string.Empty);
             errorProvider.SetError(approvedAtDateTimePicker, string.Empty);
             errorProvider.SetError(instrumentTypeComboBox, string.Empty);
+            errorProvider.SetError(documentUrlTextBox, string.Empty);
 
             if (this.codeTextBox.Text == string.Empty)
             {
@@ -180,6 +183,15 @@ namespace WindowsForms
                 errorProvider.SetError(instrumentTypeComboBox, "El tipo de instrumento es obligatorio");
             }
 
+            // El link es opcional; si hay algo tiene que ser una dirección http o https (la API lo valida igual).
+            string documentUrl = this.documentUrlTextBox.Text.Trim();
+            if (documentUrl != string.Empty
+                && !(Uri.TryCreate(documentUrl, UriKind.Absolute, out Uri? uri) && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)))
+            {
+                isValid = false;
+                errorProvider.SetError(documentUrlTextBox, "El link tiene que empezar con http:// o https://");
+            }
+
             return isValid;
         }
 
@@ -190,6 +202,7 @@ namespace WindowsForms
             versionNumberTextBox.Enabled = false;
             approvedAtDateTimePicker.Enabled = false;
             instrumentTypeComboBox.Enabled = false;
+            documentUrlTextBox.Enabled = false;
         }
 
         private void EnableControls()
@@ -199,6 +212,7 @@ namespace WindowsForms
             versionNumberTextBox.Enabled = true;
             approvedAtDateTimePicker.Enabled = true;
             instrumentTypeComboBox.Enabled = true;
+            documentUrlTextBox.Enabled = true;
         }
 
         private void ProcedureDetail_Load(object sender, EventArgs e)

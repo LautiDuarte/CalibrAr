@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Security.Policy;
@@ -75,6 +76,14 @@ namespace WindowsForms
                 Name = "InstrumentTypeName",
                 HeaderText = "Tipo de instrumento",
                 DataPropertyName = "InstrumentTypeName",
+                Width = 200
+            });
+
+            this.proceduresDataGridView.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "DocumentUrl",
+                HeaderText = "Documento",
+                DataPropertyName = "DocumentUrl",
                 Width = 200
             });
 
@@ -221,6 +230,35 @@ namespace WindowsForms
             }
         }
 
+        // Abre el documento del procedimiento elegido en el navegador. Solo se abren links http o https.
+        private void viewDocumentButton_Click(object sender, EventArgs e)
+        {
+            ProcedureDTO? procedure = this.SelectedItem();
+            if (procedure == null) return;
+
+            if (string.IsNullOrWhiteSpace(procedure.DocumentUrl))
+            {
+                MessageBox.Show("Este procedimiento no tiene un documento cargado.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            if (!Uri.TryCreate(procedure.DocumentUrl, UriKind.Absolute, out Uri? uri)
+                || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+            {
+                MessageBox.Show("El link del documento no es válido.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                Process.Start(new ProcessStartInfo(uri.AbsoluteUri) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"No se pudo abrir el documento: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private ProcedureDTO SelectedItem()
         {
             ProcedureDTO procedure;
@@ -239,12 +277,14 @@ namespace WindowsForms
             createButton.Enabled = false;
             updateButton.Enabled = false;
             deleteButton.Enabled = false;
+            viewDocumentButton.Enabled = false;
             proceduresDataGridView.Enabled = false;
         }
 
         private void EnableControls()
         {
             createButton.Enabled = true;
+            viewDocumentButton.Enabled = true;
             proceduresDataGridView.Enabled = true;
         }
     }

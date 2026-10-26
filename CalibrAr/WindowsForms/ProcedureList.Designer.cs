@@ -35,6 +35,7 @@
             deleteButton = new Button();
             updateButton = new Button();
             createButton = new Button();
+            viewDocumentButton = new Button();
             ((System.ComponentModel.ISupportInitialize)errorProvider1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)proceduresDataGridView).BeginInit();
             SuspendLayout();
@@ -85,12 +86,24 @@
             createButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             createButton.Click += createButton_Click;
             // 
+            // viewDocumentButton
+            // 
+            viewDocumentButton.Location = new Point(420, 420);
+            viewDocumentButton.Name = "viewDocumentButton";
+            viewDocumentButton.Size = new Size(125, 23);
+            viewDocumentButton.TabIndex = 4;
+            viewDocumentButton.Text = "Ver documento";
+            viewDocumentButton.UseVisualStyleBackColor = true;
+            viewDocumentButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            viewDocumentButton.Click += viewDocumentButton_Click;
+            // 
             // ProcedureList
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
             Controls.Add(createButton);
+            Controls.Add(viewDocumentButton);
             Controls.Add(updateButton);
             Controls.Add(deleteButton);
             Controls.Add(proceduresDataGridView);
@@ -109,5 +122,6 @@
         private Button createButton;
         private Button updateButton;
         private Button deleteButton;
+        private Button viewDocumentButton;
     }
 }
