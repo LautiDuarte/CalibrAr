@@ -64,7 +64,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudieron cargar los datos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -107,7 +107,7 @@ namespace WindowsForms
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error creating procedure: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"No se pudo crear el procedimiento: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 finally
                 {
@@ -153,31 +153,31 @@ namespace WindowsForms
             if (this.codeTextBox.Text == string.Empty)
             {
                 isValid = false;
-                errorProvider.SetError(codeTextBox, "Code is required");
+                errorProvider.SetError(codeTextBox, "El código es obligatorio");
             }
 
             if (this.nameTextBox.Text == string.Empty)
             {
                 isValid = false;
-                errorProvider.SetError(nameTextBox, "Name is required");
+                errorProvider.SetError(nameTextBox, "El nombre es obligatorio");
             }
 
             if (this.versionNumberTextBox.Text == string.Empty)
             {
                 isValid = false;
-                errorProvider.SetError(versionNumberTextBox, "Version number is required");
+                errorProvider.SetError(versionNumberTextBox, "La versión es obligatoria");
             }
 
             if (this.approvedAtDateTimePicker.Checked == false)
             {
                 isValid = false;
-                errorProvider.SetError(approvedAtDateTimePicker, "Approved at is required");
+                errorProvider.SetError(approvedAtDateTimePicker, "La fecha de aprobación es obligatoria");
             }
 
             if (this.instrumentTypeComboBox.SelectedValue == null)
             {
                 isValid = false;
-                errorProvider.SetError(instrumentTypeComboBox, "Instrument Type is required");
+                errorProvider.SetError(instrumentTypeComboBox, "El tipo de instrumento es obligatorio");
             }
 
             return isValid;

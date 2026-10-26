@@ -55,7 +55,7 @@ namespace WindowsForms
                 catch (UnauthorizedAccessException ex)
                 {
                     // Sesión expirada, mostrar mensaje y volver al login
-                    MessageBox.Show(ex.Message, "Session expired",
+                    MessageBox.Show(ex.Message, "Sesión vencida",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     // El loop continuará y volverá a mostrar login
                 }
@@ -67,7 +67,7 @@ namespace WindowsForms
             if (e.Exception is UnauthorizedAccessException)
             {
                 // Sesión expirada
-                MessageBox.Show("Session has expired. You need to re-authenticate.", "Session Expired",
+                MessageBox.Show("La sesión venció. Volvé a iniciar sesión.", "Sesión vencida",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                 // Reiniciar la aplicación para volver al login
@@ -76,7 +76,7 @@ namespace WindowsForms
             else
             {
                 // Otras excepciones, mostrar error genérico
-                MessageBox.Show($"Unexpected error: {e.Exception.Message}", "Error",
+                MessageBox.Show($"Error inesperado: {e.Exception.Message}", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

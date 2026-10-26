@@ -21,6 +21,7 @@ namespace WindowsForms
         {
             InitializeComponent();
             ConfigureColumns();
+            EnumText.ApplyTo(instrumentsDataGridView, "Status");
         }
 
         private void ConfigureColumns()
@@ -39,7 +40,7 @@ namespace WindowsForms
             this.instrumentsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Code",
-                HeaderText = "Code",
+                HeaderText = "Código",
                 DataPropertyName = "Code",
                 Width = 80
             });
@@ -47,7 +48,7 @@ namespace WindowsForms
             this.instrumentsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Name",
-                HeaderText = "Name",
+                HeaderText = "Nombre",
                 DataPropertyName = "Name",
                 Width = 200
             });
@@ -55,7 +56,7 @@ namespace WindowsForms
             this.instrumentsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "SerialNumber",
-                HeaderText = "Serial number",
+                HeaderText = "N° de serie",
                 DataPropertyName = "SerialNumber",
                 Width = 200
             });
@@ -63,7 +64,7 @@ namespace WindowsForms
             this.instrumentsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Brand",
-                HeaderText = "Brand",
+                HeaderText = "Marca",
                 DataPropertyName = "Brand",
                 Width = 200
             });
@@ -71,7 +72,7 @@ namespace WindowsForms
             this.instrumentsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Model",
-                HeaderText = "Model",
+                HeaderText = "Modelo",
                 DataPropertyName = "Model",
                 Width = 200
             });
@@ -79,7 +80,7 @@ namespace WindowsForms
             this.instrumentsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Status",
-                HeaderText = "Status",
+                HeaderText = "Estado",
                 DataPropertyName = "Status",
                 Width = 200
             });
@@ -87,7 +88,7 @@ namespace WindowsForms
             this.instrumentsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "MaxAllowedError",
-                HeaderText = "Max allowed error",
+                HeaderText = "Error máximo",
                 DataPropertyName = "MaxAllowedError",
                 Width = 80
             });
@@ -95,7 +96,7 @@ namespace WindowsForms
             this.instrumentsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "CalibrationFrequencyMonths",
-                HeaderText = "Calibration frequency months",
+                HeaderText = "Frecuencia (meses)",
                 DataPropertyName = "CalibrationFrequencyMonths",
                 Width = 80
             });
@@ -103,7 +104,7 @@ namespace WindowsForms
             this.instrumentsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "LastCalibrationDate",
-                HeaderText = "Last calibration date",
+                HeaderText = "Última calibración",
                 DataPropertyName = "LastCalibrationDate",
                 Width = 150,
                 DefaultCellStyle = { Format = "dd/MM/yyyy HH:mm:ss" }
@@ -112,7 +113,7 @@ namespace WindowsForms
             this.instrumentsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "NextCalibrationDate",
-                HeaderText = "Next calibration date",
+                HeaderText = "Próxima calibración",
                 DataPropertyName = "NextCalibrationDate",
                 Width = 150,
                 DefaultCellStyle = { Format = "dd/MM/yyyy HH:mm:ss" }
@@ -121,7 +122,7 @@ namespace WindowsForms
             this.instrumentsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "InstrumentTypeName",
-                HeaderText = "Instrument Type",
+                HeaderText = "Tipo de instrumento",
                 DataPropertyName = "InstrumentTypeName",
                 Width = 200
             });
@@ -129,7 +130,7 @@ namespace WindowsForms
             this.instrumentsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "AreaName",
-                HeaderText = "Area",
+                HeaderText = "Área",
                 DataPropertyName = "AreaName",
                 Width = 200
             });
@@ -137,7 +138,7 @@ namespace WindowsForms
             this.instrumentsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "IsActive",
-                HeaderText = "Is active",
+                HeaderText = "Activo",
                 DataPropertyName = "IsActive",
                 Width = 80
             });
@@ -145,7 +146,7 @@ namespace WindowsForms
             this.instrumentsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "CreatedAt",
-                HeaderText = "Created at",
+                HeaderText = "Fecha de alta",
                 DataPropertyName = "CreatedAt",
                 Width = 150,
                 DefaultCellStyle = { Format = "dd/MM/yyyy HH:mm:ss" }
@@ -154,7 +155,7 @@ namespace WindowsForms
             this.instrumentsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "UpdatedAt",
-                HeaderText = "Updated at",
+                HeaderText = "Última modificación",
                 DataPropertyName = "UpdatedAt",
                 Width = 150,
                 DefaultCellStyle = { Format = "dd/MM/yyyy HH:mm:ss" }
@@ -213,7 +214,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error updating instrument: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudo modificar el instrumento: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -226,7 +227,7 @@ namespace WindowsForms
             InstrumentDTO? instrument = this.SelectedItem();
             if (instrument == null) return;
 
-            var result = MessageBox.Show($"Calibrations associated will be also deleted ¿Are you sure you want to delete this item: {instrument.Code}{instrument.Name}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = MessageBox.Show($"Se van a eliminar también las calibraciones asociadas. ¿Eliminar {instrument.Code} - {instrument.Name}?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
             {
@@ -237,7 +238,7 @@ namespace WindowsForms
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error deleting instrument: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"No se pudo eliminar el instrumento: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 finally
                 {
@@ -277,7 +278,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading instruments: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudieron cargar los instrumentos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -289,7 +290,7 @@ namespace WindowsForms
         {
             if (instrumentsDataGridView.SelectedRows.Count == 0)
             {
-                MessageBox.Show("Please select an instrument first.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Primero seleccione un instrumento.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return null;
             }
 

@@ -34,13 +34,13 @@ namespace WindowsForms
         private void ConfigureColumns()
         {
             usersDataGridView.AutoGenerateColumns = false;
-            AddColumn("FullName", "Full name", 200);
+            AddColumn("FullName", "Nombre completo", 200);
             AddColumn("Email", "Email", 220);
-            AddColumn("Role", "Role", 110);
-            AddColumn("GroupName", "Permission group", 130);
-            AddColumn("IsActive", "Active", 60);
-            AddColumn("LastLoginAt", "Last login", 140, "dd/MM/yyyy HH:mm");
-            AddColumn("CreatedAt", "Created at", 140, "dd/MM/yyyy HH:mm");
+            AddColumn("Role", "Rol", 110);
+            AddColumn("GroupName", "Grupo de permisos", 130);
+            AddColumn("IsActive", "Activo", 60);
+            AddColumn("LastLoginAt", "Último acceso", 140, "dd/MM/yyyy HH:mm");
+            AddColumn("CreatedAt", "Fecha de alta", 140, "dd/MM/yyyy HH:mm");
         }
 
         private async void UserList_Load(object sender, EventArgs e)
@@ -86,7 +86,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error updating user: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudo modificar el usuario: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -102,11 +102,11 @@ namespace WindowsForms
             int? sessionUserId = AuthServiceProvider.Instance.GetUserId();
             if (user.Id == sessionUserId)
             {
-                MessageBox.Show("You cannot delete your own user.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("No podés eliminar tu propio usuario.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            var result = MessageBox.Show($"Are you sure you want to delete this item: {user.FullName}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = MessageBox.Show($"¿Eliminar {user.FullName}?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result != DialogResult.Yes) return;
 
             try
@@ -116,7 +116,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error deleting user: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudo eliminar el usuario: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -142,7 +142,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading users: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudieron cargar los usuarios: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -154,7 +154,7 @@ namespace WindowsForms
         {
             if (usersDataGridView.SelectedRows.Count == 0)
             {
-                MessageBox.Show("Please select a user first.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Primero seleccione un usuario.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
             }
             return (UserDTO)usersDataGridView.SelectedRows[0].DataBoundItem;

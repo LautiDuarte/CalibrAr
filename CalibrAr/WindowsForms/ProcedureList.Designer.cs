@@ -58,7 +58,7 @@
             deleteButton.Name = "deleteButton";
             deleteButton.Size = new Size(75, 23);
             deleteButton.TabIndex = 1;
-            deleteButton.Text = "Delete";
+            deleteButton.Text = "Eliminar";
             deleteButton.UseVisualStyleBackColor = true;
             deleteButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             deleteButton.Click += deleteButton_Click;
@@ -69,7 +69,7 @@
             updateButton.Name = "updateButton";
             updateButton.Size = new Size(75, 23);
             updateButton.TabIndex = 2;
-            updateButton.Text = "Update";
+            updateButton.Text = "Modificar";
             updateButton.UseVisualStyleBackColor = true;
             updateButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             updateButton.Click += updateButton_Click;
@@ -80,7 +80,7 @@
             createButton.Name = "createButton";
             createButton.Size = new Size(75, 23);
             createButton.TabIndex = 3;
-            createButton.Text = "Create";
+            createButton.Text = "Crear";
             createButton.UseVisualStyleBackColor = true;
             createButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             createButton.Click += createButton_Click;
@@ -95,7 +95,7 @@
             Controls.Add(deleteButton);
             Controls.Add(proceduresDataGridView);
             Name = "ProcedureList";
-            Text = "ProcedureList";
+            Text = "Procedimientos";
             Load += ProcedureList_Load;
             ((System.ComponentModel.ISupportInitialize)errorProvider1).EndInit();
             ((System.ComponentModel.ISupportInitialize)proceduresDataGridView).EndInit();

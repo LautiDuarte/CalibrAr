@@ -58,7 +58,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudieron cargar los datos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -110,23 +110,23 @@ namespace WindowsForms
             if (string.IsNullOrWhiteSpace(this.nominalValueTextBox.Text))
             {
                 isValid = false;
-                errorProvider.SetError(nominalValueTextBox, "Nominal value is required");
+                errorProvider.SetError(nominalValueTextBox, "El valor nominal es obligatorio");
             }
             else if (!decimal.TryParse(this.nominalValueTextBox.Text, out decimal nominal))
             {
                 isValid = false;
-                errorProvider.SetError(nominalValueTextBox, "Nominal value must be a number");
+                errorProvider.SetError(nominalValueTextBox, "El valor nominal debe ser un número");
             }
 
             if (string.IsNullOrWhiteSpace(this.measuredValueTextBox.Text))
             {
                 isValid = false;
-                errorProvider.SetError(measuredValueTextBox, "Measured value is required");
+                errorProvider.SetError(measuredValueTextBox, "El valor medido es obligatorio");
             }
             else if (!decimal.TryParse(this.measuredValueTextBox.Text, out decimal measured))
             {
                 isValid = false;
-                errorProvider.SetError(measuredValueTextBox, "Measured value must be a number");
+                errorProvider.SetError(measuredValueTextBox, "El valor medido debe ser un número");
             }
 
             return isValid;

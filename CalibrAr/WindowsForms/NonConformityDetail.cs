@@ -73,7 +73,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudieron cargar los datos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -83,12 +83,14 @@ namespace WindowsForms
 
         private void LoadOrigins()
         {
+            EnumText.ApplyTo(originComboBox);
             originComboBox.DataSource = Enum.GetValues(typeof(OriginDTO));
             originComboBox.SelectedIndex = -1;
         }
 
         private void LoadStatuses()
         {
+            EnumText.ApplyTo(statusComboBox);
             statusComboBox.DataSource = Enum.GetValues(typeof(NonConformityStatusDTO));
             statusComboBox.SelectedIndex = -1;
         }
@@ -233,7 +235,7 @@ namespace WindowsForms
             int? sessionUserId = AuthServiceProvider.Instance.GetUserId();
             if (this.Mode == FormMode.Create && sessionUserId == null)
             {
-                MessageBox.Show("Current user not found. Please check your session.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("No se encontró el usuario actual. Revisá tu sesión.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -286,7 +288,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error saving non conformity: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudo guardar la no conformidad: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -314,25 +316,25 @@ namespace WindowsForms
             if (string.IsNullOrWhiteSpace(codeTextBox.Text))
             {
                 isValid = false;
-                errorProvider.SetError(codeTextBox, "Code is required");
+                errorProvider.SetError(codeTextBox, "El código es obligatorio");
             }
 
             if (instrumentComboBox.SelectedValue == null)
             {
                 isValid = false;
-                errorProvider.SetError(instrumentComboBox, "Instrument is required");
+                errorProvider.SetError(instrumentComboBox, "El instrumento es obligatorio");
             }
 
             if (string.IsNullOrWhiteSpace(descriptionTextBox.Text))
             {
                 isValid = false;
-                errorProvider.SetError(descriptionTextBox, "Description is required");
+                errorProvider.SetError(descriptionTextBox, "La descripción es obligatoria");
             }
 
             if (originComboBox.SelectedItem == null)
             {
                 isValid = false;
-                errorProvider.SetError(originComboBox, "Origin is required");
+                errorProvider.SetError(originComboBox, "El origen es obligatorio");
             }
 
             if (this.Mode == FormMode.Update)
@@ -340,20 +342,20 @@ namespace WindowsForms
                 if (!isClosed && statusComboBox.SelectedItem == null)
                 {
                     isValid = false;
-                    errorProvider.SetError(statusComboBox, "Status is required");
+                    errorProvider.SetError(statusComboBox, "El estado es obligatorio");
                 }
 
                 if (detectedByUserComboBox.SelectedValue == null)
                 {
                     isValid = false;
-                    errorProvider.SetError(detectedByUserComboBox, "Detected by is required");
+                    errorProvider.SetError(detectedByUserComboBox, "Indique quién detectó la no conformidad");
                 }
 
                 if (isClosed && closedByUserComboBox.SelectedValue is int closedById && closedById != 0
                     && closedAtDateTimePicker.Value < openedAtDateTimePicker.Value)
                 {
                     isValid = false;
-                    errorProvider.SetError(closedAtDateTimePicker, "Closed at cannot be earlier than Opened at");
+                    errorProvider.SetError(closedAtDateTimePicker, "La fecha de cierre no puede ser anterior a la de apertura");
                 }
             }
 

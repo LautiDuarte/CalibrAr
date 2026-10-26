@@ -110,7 +110,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error saving user: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudo guardar el usuario: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -140,30 +140,30 @@ namespace WindowsForms
             if (string.IsNullOrWhiteSpace(fullNameTextBox.Text))
             {
                 isValid = false;
-                errorProvider.SetError(fullNameTextBox, "Full name is required");
+                errorProvider.SetError(fullNameTextBox, "El nombre completo es obligatorio");
             }
 
             if (string.IsNullOrWhiteSpace(emailTextBox.Text))
             {
                 isValid = false;
-                errorProvider.SetError(emailTextBox, "Email is required");
+                errorProvider.SetError(emailTextBox, "El email es obligatorio");
             }
             else if (!IsValidEmail(emailTextBox.Text.Trim()))
             {
                 isValid = false;
-                errorProvider.SetError(emailTextBox, "Email format is not valid");
+                errorProvider.SetError(emailTextBox, "El formato del email no es válido");
             }
 
             if (roleComboBox.SelectedItem == null)
             {
                 isValid = false;
-                errorProvider.SetError(roleComboBox, "Role is required");
+                errorProvider.SetError(roleComboBox, "El rol es obligatorio");
             }
 
             if (this.Mode == FormMode.Create && string.IsNullOrWhiteSpace(passwordTextBox.Text))
             {
                 isValid = false;
-                errorProvider.SetError(passwordTextBox, "Password is required");
+                errorProvider.SetError(passwordTextBox, "La contraseña es obligatoria");
             }
 
             return isValid;

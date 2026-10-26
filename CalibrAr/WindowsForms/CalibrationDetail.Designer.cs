@@ -75,7 +75,7 @@
             instrumentLabel.Name = "instrumentLabel";
             instrumentLabel.Size = new Size(65, 15);
             instrumentLabel.TabIndex = 0;
-            instrumentLabel.Text = "Instrument";
+            instrumentLabel.Text = "Instrumento";
             // 
             // instrumentComboBox
             // 
@@ -93,7 +93,7 @@
             procedureLabel.Name = "procedureLabel";
             procedureLabel.Size = new Size(61, 15);
             procedureLabel.TabIndex = 2;
-            procedureLabel.Text = "Procedure";
+            procedureLabel.Text = "Procedimiento";
             // 
             // procedureComboBox
             // 
@@ -110,7 +110,7 @@
             calibrationDateLabel.Name = "calibrationDateLabel";
             calibrationDateLabel.Size = new Size(92, 15);
             calibrationDateLabel.TabIndex = 4;
-            calibrationDateLabel.Text = "Calibration Date";
+            calibrationDateLabel.Text = "Fecha de calibración";
             // 
             // calibrationDateTimePicker
             // 
@@ -126,7 +126,7 @@
             interventionTypeLabel.Name = "interventionTypeLabel";
             interventionTypeLabel.Size = new Size(98, 15);
             interventionTypeLabel.TabIndex = 6;
-            interventionTypeLabel.Text = "Intervention Type";
+            interventionTypeLabel.Text = "Tipo de intervención";
             // 
             // interventionTypeComboBox
             // 
@@ -143,7 +143,7 @@
             isExternalCheckBox.Name = "isExternalCheckBox";
             isExternalCheckBox.Size = new Size(79, 19);
             isExternalCheckBox.TabIndex = 8;
-            isExternalCheckBox.Text = "Is External";
+            isExternalCheckBox.Text = "Calibración externa";
             isExternalCheckBox.UseVisualStyleBackColor = true;
             isExternalCheckBox.CheckedChanged += isExternalCheckBox_Checked;
             // 
@@ -154,7 +154,7 @@
             externalLabLabel.Name = "externalLabLabel";
             externalLabLabel.Size = new Size(71, 15);
             externalLabLabel.TabIndex = 9;
-            externalLabLabel.Text = "External Lab";
+            externalLabLabel.Text = "Laboratorio externo";
             // 
             // externalLabTextBox
             // 
@@ -170,7 +170,7 @@
             certificateNumberLabel.Name = "certificateNumberLabel";
             certificateNumberLabel.Size = new Size(108, 15);
             certificateNumberLabel.TabIndex = 11;
-            certificateNumberLabel.Text = "Certificate Number";
+            certificateNumberLabel.Text = "N° de certificado";
             // 
             // certificateNumberTextBox
             // 
@@ -186,7 +186,7 @@
             resultLabel.Name = "resultLabel";
             resultLabel.Size = new Size(39, 15);
             resultLabel.TabIndex = 13;
-            resultLabel.Text = "Result";
+            resultLabel.Text = "Resultado";
             // 
             // resultComboBox
             // 
@@ -203,7 +203,7 @@
             restrictionDetailLabel.Name = "restrictionDetailLabel";
             restrictionDetailLabel.Size = new Size(96, 15);
             restrictionDetailLabel.TabIndex = 15;
-            restrictionDetailLabel.Text = "Restriction Detail";
+            restrictionDetailLabel.Text = "Detalle de restricciones";
             // 
             // restrictionDetailTextBox
             // 
@@ -219,7 +219,7 @@
             performedByUserLabel.Name = "performedByUserLabel";
             performedByUserLabel.Size = new Size(79, 15);
             performedByUserLabel.TabIndex = 19;
-            performedByUserLabel.Text = "Performed By";
+            performedByUserLabel.Text = "Realizada por";
             // 
             // performedByUserComboBox
             // 
@@ -236,7 +236,7 @@
             approvedByUserLabel.Name = "approvedByUserLabel";
             approvedByUserLabel.Size = new Size(75, 15);
             approvedByUserLabel.TabIndex = 21;
-            approvedByUserLabel.Text = "Approved By";
+            approvedByUserLabel.Text = "Aprobada por";
             // 
             // approvedByUserComboBox
             // 
@@ -253,7 +253,7 @@
             notesLabel.Name = "notesLabel";
             notesLabel.Size = new Size(38, 15);
             notesLabel.TabIndex = 23;
-            notesLabel.Text = "Notes";
+            notesLabel.Text = "Notas";
             // 
             // notesTextBox
             // 
@@ -268,7 +268,7 @@
             cancelButton.Name = "cancelButton";
             cancelButton.Size = new Size(75, 23);
             cancelButton.TabIndex = 25;
-            cancelButton.Text = "Cancel";
+            cancelButton.Text = "Cancelar";
             cancelButton.UseVisualStyleBackColor = true;
             cancelButton.Click += cancelButton_Click;
             // 
@@ -278,7 +278,7 @@
             saveButton.Name = "saveButton";
             saveButton.Size = new Size(75, 23);
             saveButton.TabIndex = 26;
-            saveButton.Text = "Save";
+            saveButton.Text = "Guardar";
             saveButton.UseVisualStyleBackColor = true;
             saveButton.Click += saveButton_Click;
             // 
@@ -290,7 +290,7 @@
             measurementsLabel.Name = "measurementsLabel";
             measurementsLabel.Size = new Size(90, 15);
             measurementsLabel.TabIndex = 27;
-            measurementsLabel.Text = "Measurements";
+            measurementsLabel.Text = "Mediciones";
             // 
             // measurementsDataGridView
             // 
@@ -311,7 +311,7 @@
             addMeasurementButton.Name = "addMeasurementButton";
             addMeasurementButton.Size = new Size(75, 23);
             addMeasurementButton.TabIndex = 29;
-            addMeasurementButton.Text = "Add";
+            addMeasurementButton.Text = "Agregar";
             addMeasurementButton.UseVisualStyleBackColor = true;
             addMeasurementButton.Click += addMeasurementButton_Click;
             // 
@@ -321,7 +321,7 @@
             updateMeasurementButton.Name = "updateMeasurementButton";
             updateMeasurementButton.Size = new Size(75, 23);
             updateMeasurementButton.TabIndex = 30;
-            updateMeasurementButton.Text = "Update";
+            updateMeasurementButton.Text = "Modificar";
             updateMeasurementButton.UseVisualStyleBackColor = true;
             updateMeasurementButton.Click += updateMeasurementButton_Click;
             // 
@@ -331,7 +331,7 @@
             deleteMeasurementButton.Name = "deleteMeasurementButton";
             deleteMeasurementButton.Size = new Size(75, 23);
             deleteMeasurementButton.TabIndex = 31;
-            deleteMeasurementButton.Text = "Delete";
+            deleteMeasurementButton.Text = "Eliminar";
             deleteMeasurementButton.UseVisualStyleBackColor = true;
             deleteMeasurementButton.Click += deleteMeasurementButton_Click;
             // 
@@ -343,7 +343,7 @@
             totalMeasurementsLabel.Name = "totalMeasurementsLabel";
             totalMeasurementsLabel.Size = new Size(123, 15);
             totalMeasurementsLabel.TabIndex = 32;
-            totalMeasurementsLabel.Text = "Total measurements:";
+            totalMeasurementsLabel.Text = "Total de mediciones:";
             // 
             // outOfToleranceLabel
             // 
@@ -353,7 +353,7 @@
             outOfToleranceLabel.Name = "outOfToleranceLabel";
             outOfToleranceLabel.Size = new Size(102, 15);
             outOfToleranceLabel.TabIndex = 33;
-            outOfToleranceLabel.Text = "Out of tolerance:";
+            outOfToleranceLabel.Text = "Fuera de tolerancia:";
             // 
             // referenceStandardsLabel
             // 
@@ -362,7 +362,7 @@
             referenceStandardsLabel.Name = "referenceStandardsLabel";
             referenceStandardsLabel.Size = new Size(114, 15);
             referenceStandardsLabel.TabIndex = 34;
-            referenceStandardsLabel.Text = "Reference Standards";
+            referenceStandardsLabel.Text = "Patrones de referencia";
             // 
             // referenceStandardsCheckedListBox
             // 
@@ -418,7 +418,7 @@
             Controls.Add(measurementsLabel);
             Name = "CalibrationDetail";
             StartPosition = FormStartPosition.CenterParent;
-            Text = "CalibrationDetail";
+            Text = "Calibración";
             Load += CalibrationDetail_Load;
             ((System.ComponentModel.ISupportInitialize)measurementsDataGridView).EndInit();
             ((System.ComponentModel.ISupportInitialize)errorProvider).EndInit();

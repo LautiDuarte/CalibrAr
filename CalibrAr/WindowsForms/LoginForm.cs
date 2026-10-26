@@ -17,7 +17,7 @@ namespace WindowsForms
                 try
                 {
                     loginButton.Enabled = false;
-                    loginButton.Text = "Logging in...";
+                    loginButton.Text = "Iniciando sesión...";
 
                     var authService = AuthServiceProvider.Instance;
                     bool success = await authService.LoginAsync(emailTextBox.Text, passwordTextBox.Text);
@@ -29,7 +29,7 @@ namespace WindowsForms
                     }
                     else
                     {
-                        MessageBox.Show("Incorrect email or password.", "Authentication Error",
+                        MessageBox.Show("Email o contraseña incorrectos.", "Error de autenticación",
                             MessageBoxButtons.OK, MessageBoxIcon.Error);
                         passwordTextBox.Clear();
                         passwordTextBox.Focus();
@@ -37,13 +37,13 @@ namespace WindowsForms
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("An error occurred during login: " + ex.Message, "Error",
+                    MessageBox.Show("Ocurrió un error al iniciar sesión: " + ex.Message, "Error",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 finally
                 {
                     loginButton.Enabled = true;
-                    loginButton.Text = "Log In";
+                    loginButton.Text = "Iniciar sesión";
                 }
             }
         }
@@ -63,13 +63,13 @@ namespace WindowsForms
 
             if (string.IsNullOrWhiteSpace(emailTextBox.Text))
             {
-                errorProvider.SetError(emailTextBox, "Email is required");
+                errorProvider.SetError(emailTextBox, "El email es obligatorio");
                 isValid = false;
             }
 
             if (string.IsNullOrWhiteSpace(passwordTextBox.Text))
             {
-                errorProvider.SetError(passwordTextBox, "Password is required");
+                errorProvider.SetError(passwordTextBox, "La contraseña es obligatoria");
                 isValid = false;
             }
 

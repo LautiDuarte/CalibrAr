@@ -60,7 +60,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"An error occurred while initializing the form: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Ocurrió un error al abrir el formulario: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -101,7 +101,7 @@ namespace WindowsForms
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error creating area: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"No se pudo crear el área: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 finally
                 {
@@ -137,12 +137,12 @@ namespace WindowsForms
             if (this.nameTextBox.Text == string.Empty)
             {
                 isValid = false;
-                errorProvider.SetError(nameTextBox, "Name is required");
+                errorProvider.SetError(nameTextBox, "El nombre es obligatorio");
             }
             if (this.locationComboBox.SelectedValue == null)
             {
                 isValid = false;
-                errorProvider.SetError(locationComboBox, "Location is required");
+                errorProvider.SetError(locationComboBox, "La ubicación es obligatoria");
             }
 
             return isValid;

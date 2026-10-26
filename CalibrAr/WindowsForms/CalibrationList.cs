@@ -21,6 +21,7 @@ namespace WindowsForms
         {
             InitializeComponent();
             ConfigureColumns();
+            EnumText.ApplyTo(calibrationsDataGridView, "InterventionType", "Result");
 
         }
 
@@ -40,7 +41,7 @@ namespace WindowsForms
             this.calibrationsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "InstrumentCode",
-                HeaderText = "Instrument",
+                HeaderText = "Instrumento",
                 DataPropertyName = "InstrumentCode",
                 Width = 120
             });
@@ -48,7 +49,7 @@ namespace WindowsForms
             this.calibrationsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "ProcedureName",
-                HeaderText = "Procedure",
+                HeaderText = "Procedimiento",
                 DataPropertyName = "ProcedureName",
                 Width = 200
             });
@@ -56,7 +57,7 @@ namespace WindowsForms
             this.calibrationsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "CalibrationDate",
-                HeaderText = "Calibration date",
+                HeaderText = "Fecha",
                 DataPropertyName = "CalibrationDate",
                 Width = 150,
                 DefaultCellStyle = { Format = "dd/MM/yyyy HH:mm:ss" }
@@ -65,15 +66,15 @@ namespace WindowsForms
             this.calibrationsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "InterventionType",
-                HeaderText = "Intervention type",
+                HeaderText = "Tipo de intervención",
                 DataPropertyName = "InterventionType",
                 Width = 200
             });
 
-            this.calibrationsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
+            this.calibrationsDataGridView.Columns.Add(new DataGridViewCheckBoxColumn
             {
                 Name = "IsExternal",
-                HeaderText = "Is external",
+                HeaderText = "Externa",
                 DataPropertyName = "IsExternal",
                 Width = 80
             });
@@ -81,7 +82,7 @@ namespace WindowsForms
             this.calibrationsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "ExternalLab",
-                HeaderText = "External lab",
+                HeaderText = "Laboratorio externo",
                 DataPropertyName = "ExternalLab",
                 Width = 200
             });
@@ -89,7 +90,7 @@ namespace WindowsForms
             this.calibrationsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "CertificateNumber",
-                HeaderText = "Certificate number",
+                HeaderText = "N° de certificado",
                 DataPropertyName = "CertificateNumber",
                 Width = 150
             });
@@ -97,7 +98,7 @@ namespace WindowsForms
             this.calibrationsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Result",
-                HeaderText = "Result",
+                HeaderText = "Resultado",
                 DataPropertyName = "Result",
                 Width = 150
             });
@@ -105,7 +106,7 @@ namespace WindowsForms
             this.calibrationsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "RestrictionDetail",
-                HeaderText = "Restriction detail",
+                HeaderText = "Detalle de restricciones",
                 DataPropertyName = "RestrictionDetail",
                 Width = 200
             });
@@ -113,7 +114,7 @@ namespace WindowsForms
             this.calibrationsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "PerformedByUserName",
-                HeaderText = "Performed by",
+                HeaderText = "Realizada por",
                 DataPropertyName = "PerformedByUserName",
                 Width = 200
             });
@@ -121,7 +122,7 @@ namespace WindowsForms
             this.calibrationsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "ApprovedByUserName",
-                HeaderText = "Approved by",
+                HeaderText = "Aprobada por",
                 DataPropertyName = "ApprovedByUserName",
                 Width = 200
             });
@@ -129,7 +130,7 @@ namespace WindowsForms
             this.calibrationsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Notes",
-                HeaderText = "Notes",
+                HeaderText = "Notas",
                 DataPropertyName = "Notes",
                 Width = 200
             });
@@ -137,7 +138,7 @@ namespace WindowsForms
             this.calibrationsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "CreatedAt",
-                HeaderText = "Created at",
+                HeaderText = "Fecha de alta",
                 DataPropertyName = "CreatedAt",
                 Width = 150,
                 DefaultCellStyle = { Format = "dd/MM/yyyy HH:mm:ss" }
@@ -202,7 +203,7 @@ namespace WindowsForms
             int? approverId = AuthServiceProvider.Instance.GetUserId();
             if (approverId == null) return;
             var result = MessageBox.Show(
-                $"Are you sure you want to approve this calibration: {calibration.InstrumentCode} {calibration.CalibrationDate:dd/MM/yyyy}?",
+                $"¿Aprobar la calibración de {calibration.InstrumentCode} {calibration.CalibrationDate:dd/MM/yyyy}?",
                 "Confirm approval",
                 MessageBoxButtons.OKCancel,
                 MessageBoxIcon.Question);
@@ -216,7 +217,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error approving calibration: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudo aprobar la calibración: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -271,7 +272,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error updating calibration: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudo modificar la calibración: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -284,7 +285,7 @@ namespace WindowsForms
             CalibrationDTO? calibration = this.SelectedItem();
             if (calibration == null) return;
 
-            var result = MessageBox.Show($"¿Are you sure you want to delete this item: {calibration.InstrumentCode} {calibration.CalibrationDate:dd/MM/yyyy}?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = MessageBox.Show($"¿Eliminar {calibration.InstrumentCode} {calibration.CalibrationDate:dd/MM/yyyy}?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
             {
@@ -295,7 +296,7 @@ namespace WindowsForms
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error deleting calibration: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"No se pudo eliminar la calibración: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 finally
                 {
@@ -335,7 +336,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading calibrations: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudieron cargar las calibraciones: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -348,7 +349,7 @@ namespace WindowsForms
             CalibrationDTO? calibration;
             if (calibrationsDataGridView.SelectedRows.Count == 0)
             {
-                MessageBox.Show("Please select an calibration first.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Primero seleccione una calibración.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
             }
 

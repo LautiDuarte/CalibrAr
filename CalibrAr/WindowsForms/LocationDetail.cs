@@ -59,7 +59,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudieron cargar los datos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -90,7 +90,7 @@ namespace WindowsForms
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error creating location: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"No se pudo crear la ubicación: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 finally
                 {
@@ -119,13 +119,13 @@ namespace WindowsForms
 
             if (this.nameTextBox.Text == string.Empty)
             {
-                errorProvider.SetError(nameTextBox, "Name is required.");
+                errorProvider.SetError(nameTextBox, "El nombre es obligatorio.");
                 isValid = false;
             }
 
             if (this.addressTextBox.Text == string.Empty)
             {
-                errorProvider.SetError(addressTextBox, "Address is required.");
+                errorProvider.SetError(addressTextBox, "La dirección es obligatoria.");
                 isValid = false;
             }
             return isValid;

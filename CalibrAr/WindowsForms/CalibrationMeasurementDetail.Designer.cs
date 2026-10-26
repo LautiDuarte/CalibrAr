@@ -51,7 +51,7 @@
             nominalValueLabel.Name = "nominalValueLabel";
             nominalValueLabel.Size = new Size(84, 15);
             nominalValueLabel.TabIndex = 0;
-            nominalValueLabel.Text = "Nominal Value";
+            nominalValueLabel.Text = "Valor nominal";
             // 
             // nominalValueTextBox
             // 
@@ -68,7 +68,7 @@
             measuredValueLabel.Name = "measuredValueLabel";
             measuredValueLabel.Size = new Size(90, 15);
             measuredValueLabel.TabIndex = 2;
-            measuredValueLabel.Text = "Measured Value";
+            measuredValueLabel.Text = "Valor medido";
             // 
             // measuredValueTextBox
             // 
@@ -105,7 +105,7 @@
             isWithinToleranceCheckBox.Size = new Size(115, 19);
             isWithinToleranceCheckBox.TabIndex = 6;
             isWithinToleranceCheckBox.TabStop = false;
-            isWithinToleranceCheckBox.Text = "Within Tolerance";
+            isWithinToleranceCheckBox.Text = "Dentro de tolerancia";
             isWithinToleranceCheckBox.UseVisualStyleBackColor = true;
             // 
             // notesLabel
@@ -115,7 +115,7 @@
             notesLabel.Name = "notesLabel";
             notesLabel.Size = new Size(38, 15);
             notesLabel.TabIndex = 7;
-            notesLabel.Text = "Notes";
+            notesLabel.Text = "Notas";
             // 
             // notesTextBox
             // 
@@ -130,7 +130,7 @@
             cancelButton.Name = "cancelButton";
             cancelButton.Size = new Size(75, 23);
             cancelButton.TabIndex = 9;
-            cancelButton.Text = "Cancel";
+            cancelButton.Text = "Cancelar";
             cancelButton.UseVisualStyleBackColor = true;
             cancelButton.Click += cancelButton_Click;
             // 
@@ -140,7 +140,7 @@
             saveButton.Name = "saveButton";
             saveButton.Size = new Size(75, 23);
             saveButton.TabIndex = 10;
-            saveButton.Text = "Save";
+            saveButton.Text = "Guardar";
             saveButton.UseVisualStyleBackColor = true;
             saveButton.Click += saveButton_Click;
             // 
@@ -169,7 +169,7 @@
             MinimizeBox = false;
             Name = "CalibrationMeasurementDetail";
             StartPosition = FormStartPosition.CenterParent;
-            Text = "Calibration Measurement - Detail";
+            Text = "Medición";
             ((System.ComponentModel.ISupportInitialize)errorProvider).EndInit();
             ResumeLayout(false);
             PerformLayout();

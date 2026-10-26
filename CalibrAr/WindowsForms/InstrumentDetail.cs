@@ -72,7 +72,7 @@ namespace WindowsForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudieron cargar los datos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -82,6 +82,7 @@ namespace WindowsForms
 
         private void LoadStatus()
         {
+            EnumText.ApplyTo(statusComboBox);
             statusComboBox.DataSource = Enum.GetValues(typeof(InstrumentStatusDTO));
             statusComboBox.SelectedIndex = -1;
         }
@@ -145,7 +146,7 @@ namespace WindowsForms
                     }
                     else
                     {
-                        MessageBox.Show("Max allowed error must be a number.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("El error máximo debe ser un número.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return;
                     }
 
@@ -160,7 +161,7 @@ namespace WindowsForms
                     }
                     else
                     {
-                        MessageBox.Show("Calibration frequency (months) must be a number", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("La frecuencia (meses) debe ser un número", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return;
                     }
 
@@ -180,7 +181,7 @@ namespace WindowsForms
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error creating instrument: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"No se pudo crear el instrumento: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 finally
                 {
@@ -253,31 +254,31 @@ namespace WindowsForms
             if (this.codeTextBox.Text == string.Empty)
             {
                 isValid = false;
-                errorProvider.SetError(codeTextBox, "Code is required");
+                errorProvider.SetError(codeTextBox, "El código es obligatorio");
             }
 
             if (this.nameTextBox.Text == string.Empty)
             {
                 isValid = false;
-                errorProvider.SetError(nameTextBox, "Name is required");
+                errorProvider.SetError(nameTextBox, "El nombre es obligatorio");
             }
 
             if (this.statusComboBox.SelectedItem == null && Mode == FormMode.Update)
             {
                 isValid = false;
-                errorProvider.SetError(statusComboBox, "Status is required");
+                errorProvider.SetError(statusComboBox, "El estado es obligatorio");
             }
 
             if (this.instrumentTypeComboBox.SelectedValue == null)
             {
                 isValid = false;
-                errorProvider.SetError(instrumentTypeComboBox, "Instrument Type is required");
+                errorProvider.SetError(instrumentTypeComboBox, "El tipo de instrumento es obligatorio");
             }
 
             if (this.areaComboBox.SelectedValue == null)
             {
                 isValid = false;
-                errorProvider.SetError(areaComboBox, "Area is required");
+                errorProvider.SetError(areaComboBox, "El área es obligatoria");
             }
 
             return isValid;

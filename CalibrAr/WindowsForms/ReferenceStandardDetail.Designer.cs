@@ -24,23 +24,23 @@
             ((System.ComponentModel.ISupportInitialize)errorProvider).BeginInit();
             SuspendLayout();
             // description
-            descriptionLabel.AutoSize = true; descriptionLabel.Location = new Point(40, 15); descriptionLabel.Name = "descriptionLabel"; descriptionLabel.TabIndex = 0; descriptionLabel.Text = "Description";
+            descriptionLabel.AutoSize = true; descriptionLabel.Location = new Point(40, 15); descriptionLabel.Name = "descriptionLabel"; descriptionLabel.TabIndex = 0; descriptionLabel.Text = "Descripción";
             descriptionTextBox.Location = new Point(200, 12); descriptionTextBox.Name = "descriptionTextBox"; descriptionTextBox.Size = new Size(250, 23); descriptionTextBox.TabIndex = 1;
             // certifyingBody
-            certifyingBodyLabel.AutoSize = true; certifyingBodyLabel.Location = new Point(40, 44); certifyingBodyLabel.Name = "certifyingBodyLabel"; certifyingBodyLabel.TabIndex = 2; certifyingBodyLabel.Text = "Certifying Body";
+            certifyingBodyLabel.AutoSize = true; certifyingBodyLabel.Location = new Point(40, 44); certifyingBodyLabel.Name = "certifyingBodyLabel"; certifyingBodyLabel.TabIndex = 2; certifyingBodyLabel.Text = "Organismo certificante";
             certifyingBodyTextBox.Location = new Point(200, 41); certifyingBodyTextBox.Name = "certifyingBodyTextBox"; certifyingBodyTextBox.Size = new Size(250, 23); certifyingBodyTextBox.TabIndex = 3;
             // certificateNumber
-            certificateNumberLabel.AutoSize = true; certificateNumberLabel.Location = new Point(40, 73); certificateNumberLabel.Name = "certificateNumberLabel"; certificateNumberLabel.TabIndex = 4; certificateNumberLabel.Text = "Certificate Number";
+            certificateNumberLabel.AutoSize = true; certificateNumberLabel.Location = new Point(40, 73); certificateNumberLabel.Name = "certificateNumberLabel"; certificateNumberLabel.TabIndex = 4; certificateNumberLabel.Text = "N° de certificado";
             certificateNumberTextBox.Location = new Point(200, 70); certificateNumberTextBox.Name = "certificateNumberTextBox"; certificateNumberTextBox.Size = new Size(250, 23); certificateNumberTextBox.TabIndex = 5;
             // certificateIssuedAt
-            certificateIssuedAtLabel.AutoSize = true; certificateIssuedAtLabel.Location = new Point(40, 102); certificateIssuedAtLabel.Name = "certificateIssuedAtLabel"; certificateIssuedAtLabel.TabIndex = 6; certificateIssuedAtLabel.Text = "Certificate Issued At";
+            certificateIssuedAtLabel.AutoSize = true; certificateIssuedAtLabel.Location = new Point(40, 102); certificateIssuedAtLabel.Name = "certificateIssuedAtLabel"; certificateIssuedAtLabel.TabIndex = 6; certificateIssuedAtLabel.Text = "Fecha de emisión";
             certificateIssuedAtDateTimePicker.Format = DateTimePickerFormat.Short; certificateIssuedAtDateTimePicker.Location = new Point(200, 99); certificateIssuedAtDateTimePicker.Name = "certificateIssuedAtDateTimePicker"; certificateIssuedAtDateTimePicker.Size = new Size(250, 23); certificateIssuedAtDateTimePicker.TabIndex = 7;
             // certificateExpiresAt
-            certificateExpiresAtLabel.AutoSize = true; certificateExpiresAtLabel.Location = new Point(40, 131); certificateExpiresAtLabel.Name = "certificateExpiresAtLabel"; certificateExpiresAtLabel.TabIndex = 8; certificateExpiresAtLabel.Text = "Certificate Expires At";
+            certificateExpiresAtLabel.AutoSize = true; certificateExpiresAtLabel.Location = new Point(40, 131); certificateExpiresAtLabel.Name = "certificateExpiresAtLabel"; certificateExpiresAtLabel.TabIndex = 8; certificateExpiresAtLabel.Text = "Fecha de vencimiento";
             certificateExpiresAtDateTimePicker.Format = DateTimePickerFormat.Short; certificateExpiresAtDateTimePicker.Location = new Point(200, 128); certificateExpiresAtDateTimePicker.Name = "certificateExpiresAtDateTimePicker"; certificateExpiresAtDateTimePicker.Size = new Size(250, 23); certificateExpiresAtDateTimePicker.TabIndex = 9;
             // buttons
-            saveButton.Location = new Point(294, 172); saveButton.Name = "saveButton"; saveButton.Size = new Size(75, 23); saveButton.TabIndex = 10; saveButton.Text = "Save"; saveButton.UseVisualStyleBackColor = true; saveButton.Click += saveButton_Click;
-            cancelButton.Location = new Point(375, 172); cancelButton.Name = "cancelButton"; cancelButton.Size = new Size(75, 23); cancelButton.TabIndex = 11; cancelButton.Text = "Cancel"; cancelButton.UseVisualStyleBackColor = true; cancelButton.Click += cancelButton_Click;
+            saveButton.Location = new Point(294, 172); saveButton.Name = "saveButton"; saveButton.Size = new Size(75, 23); saveButton.TabIndex = 10; saveButton.Text = "Guardar"; saveButton.UseVisualStyleBackColor = true; saveButton.Click += saveButton_Click;
+            cancelButton.Location = new Point(375, 172); cancelButton.Name = "cancelButton"; cancelButton.Size = new Size(75, 23); cancelButton.TabIndex = 11; cancelButton.Text = "Cancelar"; cancelButton.UseVisualStyleBackColor = true; cancelButton.Click += cancelButton_Click;
             // errorProvider
             errorProvider.ContainerControl = this;
             // ReferenceStandardDetail
@@ -53,7 +53,7 @@
                 certificateExpiresAtLabel, certificateExpiresAtDateTimePicker, saveButton, cancelButton });
             Name = "ReferenceStandardDetail";
             StartPosition = FormStartPosition.CenterParent;
-            Text = "Reference standard";
+            Text = "Patrón de referencia";
             ((System.ComponentModel.ISupportInitialize)errorProvider).EndInit();
             ResumeLayout(false);
             PerformLayout();

@@ -51,7 +51,7 @@
             createButton.Name = "createButton";
             createButton.Size = new Size(75, 23);
             createButton.TabIndex = 1;
-            createButton.Text = "Create";
+            createButton.Text = "Crear";
             createButton.UseVisualStyleBackColor = true;
             createButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             createButton.Click += createButton_Click;
@@ -62,7 +62,7 @@
             updateButton.Name = "updateButton";
             updateButton.Size = new Size(75, 23);
             updateButton.TabIndex = 2;
-            updateButton.Text = "Update";
+            updateButton.Text = "Modificar";
             updateButton.UseVisualStyleBackColor = true;
             updateButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             updateButton.Click += updateButton_Click;
@@ -73,7 +73,7 @@
             deleteButton.Name = "deleteButton";
             deleteButton.Size = new Size(75, 23);
             deleteButton.TabIndex = 3;
-            deleteButton.Text = "Delete";
+            deleteButton.Text = "Eliminar";
             deleteButton.UseVisualStyleBackColor = true;
             deleteButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             deleteButton.Click += deleteButton_Click;
@@ -88,7 +88,7 @@
             Controls.Add(createButton);
             Controls.Add(instrumentsDataGridView);
             Name = "InstrumentList";
-            Text = "InstrumentList";
+            Text = "Instrumentos";
             Load += InstrumentList_Load;
             ((System.ComponentModel.ISupportInitialize)instrumentsDataGridView).EndInit();
             ResumeLayout(false);

@@ -47,11 +47,11 @@
             nameLabel.Name = "nameLabel";
             nameLabel.Size = new Size(39, 15);
             nameLabel.TabIndex = 0;
-            nameLabel.Text = "Name";
+            nameLabel.Text = "Nombre";
             // 
             // nameTextBox
             // 
-            nameTextBox.Location = new Point(81, 24);
+            nameTextBox.Location = new Point(120, 24);
             nameTextBox.Name = "nameTextBox";
             nameTextBox.Size = new Size(100, 23);
             nameTextBox.TabIndex = 1;
@@ -63,11 +63,11 @@
             addressLabel.Name = "addressLabel";
             addressLabel.Size = new Size(49, 15);
             addressLabel.TabIndex = 2;
-            addressLabel.Text = "Address";
+            addressLabel.Text = "Dirección";
             // 
             // addressTextBox
             // 
-            addressTextBox.Location = new Point(91, 58);
+            addressTextBox.Location = new Point(120, 58);
             addressTextBox.Name = "addressTextBox";
             addressTextBox.Size = new Size(100, 23);
             addressTextBox.TabIndex = 3;
@@ -78,7 +78,7 @@
             cancelButton.Name = "cancelButton";
             cancelButton.Size = new Size(75, 23);
             cancelButton.TabIndex = 4;
-            cancelButton.Text = "Cancel";
+            cancelButton.Text = "Cancelar";
             cancelButton.UseVisualStyleBackColor = true;
             cancelButton.Click += cancelButton_Click;
             // 
@@ -88,7 +88,7 @@
             saveButton.Name = "saveButton";
             saveButton.Size = new Size(75, 23);
             saveButton.TabIndex = 5;
-            saveButton.Text = "Save";
+            saveButton.Text = "Guardar";
             saveButton.UseVisualStyleBackColor = true;
             saveButton.Click += saveButton_Click;
             // 
@@ -108,7 +108,7 @@
             Controls.Add(nameTextBox);
             Controls.Add(nameLabel);
             Name = "LocationDetail";
-            Text = "LocationDetail";
+            Text = "Ubicación";
             Load += LocationDetail_Load;
             ((System.ComponentModel.ISupportInitialize)errorProvider).EndInit();
             ResumeLayout(false);
