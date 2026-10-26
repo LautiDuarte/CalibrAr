@@ -57,6 +57,10 @@ namespace WindowsForms
             calibrationDateTimePicker.MaxDate = DateTime.Today.AddDays(1).AddTicks(-1);
             ConfigureColumns();
 
+            // El botón "Ver documento" solo se habilita si el procedimiento elegido tiene link.
+            procedureComboBox.SelectedIndexChanged += (sender, e) => UpdateDocumentButton();
+            viewDocumentButton.Click += (sender, e) => DocumentLink.Open((procedureComboBox.SelectedItem as ProcedureDTO)?.DocumentUrl);
+
         }
 
         public CalibrationDetail(FormMode mode, CalibrationDTO calibration) : this()
@@ -178,6 +182,12 @@ namespace WindowsForms
             var procedures = await procedureApiClient.GetAllAsync();
             allProcedures = procedures.ToList();
             FilterProcedures();
+        }
+
+        private void UpdateDocumentButton()
+        {
+            viewDocumentButton.Enabled = procedureComboBox.SelectedItem is ProcedureDTO procedure
+                && !string.IsNullOrWhiteSpace(procedure.DocumentUrl);
         }
 
         private void FilterProcedures()
@@ -510,7 +520,7 @@ namespace WindowsForms
                                  && (u.Id != performedById || u.Role.ToString() == "Administrador"))
                                 || u.Id == approvedById)
                     .ToList();
-                approvers.Insert(0, new UserDTO { Id = 0, FullName = "(None)" });
+                approvers.Insert(0, new UserDTO { Id = 0, FullName = "(Ninguno)" });
 
                 approvedByUserComboBox.DataSource = approvers;
                 approvedByUserComboBox.DisplayMember = "FullName";
