@@ -129,3 +129,8 @@ h1:focus {
     .form-section:first-child {
         margin-top: 0;
     }
+
+/* Filas de lista que abren el detalle al tocarlas */
+.clickable-row {
+    cursor: pointer;
+}
