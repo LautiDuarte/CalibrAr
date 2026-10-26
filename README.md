@@ -95,6 +95,13 @@ Algunas cosas que hace la versión web (Blazor) y que tuvimos que respetar:
 - En una calibración, el resultado se elige después de cargar las mediciones y se sugiere según ellas (si alguna está fuera de tolerancia avisa). En las internas el procedimiento es obligatorio y los patrones vencidos o inactivos no se pueden elegir. Una calibración aprobada queda en solo lectura hasta que se le quita la aprobación.
 - Si el servidor rechaza algo (por ejemplo, borrar una ubicación que tiene áreas, o repetir un código de instrumento), el mensaje se muestra arriba en un cuadro rojo.
 
+Algunas reglas que valida la API (valen para las dos interfaces):
+
+- No se puede usar un patrón de referencia con el certificado vencido: se compara con la fecha de la calibración, así las calibraciones viejas se pueden seguir editando.
+- No se puede eliminar una calibración que tiene una no conformidad asociada (hay que eliminar primero la no conformidad).
+- Un procedimiento puede repetir el código, pero no la combinación de código y versión. Una versión nueva se carga como otro procedimiento con el mismo código, y el anterior se deja inactivo.
+- La contraseña de un usuario nuevo tiene que tener entre 8 y 30 caracteres.
+
 ## Reportes
 
 Hay dos reportes, en las dos interfaces, los dos con botón para **descargar el PDF**:
@@ -120,10 +127,8 @@ Para poder probar y mostrar la aplicación, cuando la base está vacía la WebAP
 Cosas que charlamos y no llegamos a hacer:
 
 - Un campo con el link al PDF del procedimiento, para poder abrirlo desde la calibración.
-- Que la API también rechace un patrón vencido en una calibración y exija el procedimiento en las internas (hoy lo controla solo la web).
-- Que el código y la versión de un procedimiento sean únicos: una versión nueva sería un procedimiento nuevo con el mismo código, y el anterior queda inactivo.
+- Que la API también exija el procedimiento en las calibraciones internas (hoy lo controla solo la web).
 - Que el código de las no conformidades se genere solo (NC-0001, NC-0002...).
 - Sacar el "tipo de intervención" de la calibración: el mantenimiento no encaja con las mediciones y el resultado.
-- Que borrar una calibración que tiene una no conformidad devuelva un mensaje claro (hoy da un error genérico del servidor).
-- Una contraseña con largo mínimo y que cada usuario pueda cambiar la suya.
+- Que cada usuario pueda cambiar su propia contraseña.
 - Que las reglas de autoprotección de usuarios (no borrarse ni cambiarse el rol) y el usuario que registra un cambio de estado salgan del token y no de un dato que manda el cliente.
