@@ -6,7 +6,15 @@
     <div class="row g-3 mb-3">
         <div class="col-sm-4">
             <label for="code" class="form-label">Código</label>
-            <InputText id="code" class="form-control" @bind-Value="Model.Code" />
+            @if (IsEdit)
+            {
+                <InputText id="code" class="form-control" @bind-Value="Model.Code" readonly />
+            }
+            else
+            {
+                @* El código lo asigna el servidor al guardar. *@
+                <input id="code" class="form-control" value="Se asigna al guardar" disabled />
+            }
             <ValidationMessage For="() => Model.Code" />
         </div>
         <div class="col-sm-8">
@@ -164,7 +172,7 @@
 
     public class NonConformityFormModel
     {
-        [Required(ErrorMessage = "El código es obligatorio.")]
+        // Vacío al crear: lo genera el servidor.
         [StringLength(50, ErrorMessage = "El código no puede superar los 50 caracteres.")]
         public string Code { get; set; } = string.Empty;
 

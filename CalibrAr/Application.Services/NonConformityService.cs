@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Data;
 using DTOs;
@@ -30,13 +31,18 @@ namespace Application.Services
             await EnsureCalibrationExistsAsync(dto.CalibrationId, dto.InstrumentId);
             await EnsureUserExistsAsync(dto.DetectedByUserId);
 
+            // Si no llega código lo genera el servidor (NC-0001, NC-0002...); si llega uno, se respeta.
+            var code = string.IsNullOrWhiteSpace(dto.Code) ? await GenerateCodeAsync() : dto.Code.Trim();
+            await EnsureCodeIsUniqueAsync(code, 0);
+
             var createdAt = DateTime.Now;
             var origin = ParseEnum<Origin>(dto.Origin, nameof(dto.Origin));
-            NonConformity nonConformity = new NonConformity(0, dto.Code, dto.Description, origin, NonConformityStatus.Open, dto.CorrectiveAction, createdAt, null, createdAt, dto.InstrumentId, dto.CalibrationId, dto.DetectedByUserId, null);
+            NonConformity nonConformity = new NonConformity(0, code, dto.Description, origin, NonConformityStatus.Open, dto.CorrectiveAction, createdAt, null, createdAt, dto.InstrumentId, dto.CalibrationId, dto.DetectedByUserId, null);
 
             await nonConformityRepository.AddAsync(nonConformity);
 
             dto.Id = nonConformity.Id;
+            dto.Code = nonConformity.Code;
             dto.Status = nonConformity.Status.ToString();
             dto.OpenedAt = nonConformity.OpenedAt;
             dto.ClosedAt = null;
@@ -78,6 +84,7 @@ namespace Application.Services
             await EnsureCalibrationExistsAsync(dto.CalibrationId, dto.InstrumentId);
             await EnsureUserExistsAsync(dto.DetectedByUserId);
             await EnsureUserExistsAsync(dto.ClosedByUserId);
+            await EnsureCodeIsUniqueAsync(dto.Code, dto.Id);
 
             var origin = ParseEnum<Origin>(dto.Origin, nameof(dto.Origin));
             var status = ParseEnum<NonConformityStatus>(dto.Status, nameof(dto.Status));
@@ -120,6 +127,31 @@ namespace Application.Services
             var instrument = await instrumentRepository.GetAsync(instrumentId);
             if (instrument == null)
                 throw new KeyNotFoundException($"There is no instrument with id {instrumentId}.");
+        }
+
+        // El siguiente número después del más alto que ya exista con formato NC-<número>.
+        private async Task<string> GenerateCodeAsync()
+        {
+            var nonConformities = await nonConformityRepository.GetAllAsync();
+
+            int highest = 0;
+            foreach (var nonConformity in nonConformities)
+            {
+                var match = Regex.Match(nonConformity.Code ?? string.Empty, @"^NC-(\d+)$", RegexOptions.IgnoreCase);
+                if (match.Success && int.TryParse(match.Groups[1].Value, out var number) && number > highest)
+                    highest = number;
+            }
+
+            return $"NC-{highest + 1:D4}";
+        }
+
+        private async Task EnsureCodeIsUniqueAsync(string? code, int currentId)
+        {
+            var normalizedCode = (code ?? string.Empty).Trim();
+
+            var nonConformities = await nonConformityRepository.GetAllAsync();
+            if (nonConformities.Any(n => n.Id != currentId && string.Equals(n.Code.Trim(), normalizedCode, StringComparison.OrdinalIgnoreCase)))
+                throw new InvalidOperationException($"Ya existe una no conformidad con el código '{normalizedCode}'.");
         }
 
         private async Task EnsureCalibrationExistsAsync(int? calibrationId, int instrumentId)

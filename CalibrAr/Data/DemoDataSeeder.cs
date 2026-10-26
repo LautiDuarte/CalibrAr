@@ -171,17 +171,17 @@ namespace Data
             context.SaveChanges();
 
             context.NonConformities.AddRange(
-                new NonConformity(0, "NC-001", "El manómetro quedó fuera de tolerancia en la última calibración. Se retira de uso hasta analizar la causa.",
+                new NonConformity(0, "NC-0001", "El manómetro quedó fuera de tolerancia en la última calibración. Se retira de uso hasta analizar la causa.",
                     Origin.NonConformantResult, NonConformityStatus.UnderAnalysis, null, man2.AddDays(1), null, man2.AddDays(1),
                     instruments["MAN-002"].Id, man2Calibration.Id, operatorUser.Id, null),
-                new NonConformity(0, "NC-002", "Se encontró la mirilla del manómetro rota durante el uso. Está en reparación.",
+                new NonConformity(0, "NC-0002", "Se encontró la mirilla del manómetro rota durante el uso. Está en reparación.",
                     Origin.PhysicalDamage, NonConformityStatus.Open, null, today.AddDays(-20), null, today.AddDays(-20),
                     instruments["MAN-004"].Id, null, operatorUser.Id, null),
-                new NonConformity(0, "NC-003", "El termómetro dio fuera de tolerancia y no se pudo ajustar.",
+                new NonConformity(0, "NC-0003", "El termómetro dio fuera de tolerancia y no se pudo ajustar.",
                     Origin.NonConformantResult, NonConformityStatus.Closed, "Se dio de baja el instrumento y se reemplazó por el TER-002.",
                     ter4.AddDays(1), ter4.AddDays(15), ter4.AddDays(1),
                     instruments["TER-004"].Id, ter4Calibration.Id, operatorUser.Id, admin.Id),
-                new NonConformity(0, "NC-004", "La calibración del termómetro venció y todavía no se renovó.",
+                new NonConformity(0, "NC-0004", "La calibración del termómetro venció y todavía no se renovó.",
                     Origin.CalibrationExpired, NonConformityStatus.Open, null, today.AddDays(-7), null, today.AddDays(-7),
                     instruments["TER-003"].Id, null, operatorUser.Id, null));
 
