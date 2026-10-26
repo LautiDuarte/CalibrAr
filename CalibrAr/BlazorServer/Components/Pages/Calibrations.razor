@@ -283,10 +283,7 @@ else
         }
         catch (Exception ex)
         {
-            // La API todavía no avisa cuando una no conformidad usa la calibración: responde un error genérico del servidor.
-            errorMessage = ApiError.IsServerError(ex)
-                ? "No se pudo eliminar la calibración. Si tiene una no conformidad asociada, eliminá primero esa no conformidad."
-                : ApiError.Message(ex);
+            errorMessage = ApiError.Message(ex);
         }
     }
 }

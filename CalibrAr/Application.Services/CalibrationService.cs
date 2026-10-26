@@ -17,8 +17,9 @@ namespace Application.Services
         private readonly IProcedureRepository procedureRepository;
         private readonly IUserRepository userRepository;
         private readonly IReferenceStandardRepository referenceStandardRepository;
+        private readonly INonConformityRepository nonConformityRepository;
         private readonly IInstrumentService instrumentService;
-        
+
 
         public CalibrationService(
             ICalibrationRepository calibrationRepository,
@@ -27,8 +28,10 @@ namespace Application.Services
             IProcedureRepository procedureRepository,
             IUserRepository userRepository,
             IReferenceStandardRepository referenceStandardRepository,
+            INonConformityRepository nonConformityRepository,
             IInstrumentService instrumentService)
         {
+            this.nonConformityRepository = nonConformityRepository;
             this.calibrationRepository = calibrationRepository;
             this.instrumentRepository = instrumentRepository;
             this.instrumentTypeRepository = instrumentTypeRepository;
@@ -53,7 +56,7 @@ namespace Application.Services
 
             var maxAllowedError = await ResolveMaxAllowedErrorAsync(instrument);
             calibration.SetMeasurements(BuildMeasurements(dto.Measurements, 0, maxAllowedError, resetIds: true));
-            calibration.SetReferenceStandards(await GetReferenceStandardsAsync(dto));
+            calibration.SetReferenceStandards(await GetReferenceStandardsAsync(dto, now));
 
             await calibrationRepository.AddAsync(calibration);
             await RefreshInstrumentCalibrationDatesAsync(dto.InstrumentId);
@@ -73,6 +76,10 @@ namespace Application.Services
             var existing = await calibrationRepository.GetAsync(id);
             if (existing == null)
                 return false;
+
+            var nonConformities = await nonConformityRepository.GetAllAsync();
+            if (nonConformities.Any(n => n.CalibrationId == id))
+                throw new InvalidOperationException("No se puede eliminar la calibración porque tiene una no conformidad asociada. Elimine primero la no conformidad.");
 
             var deleted = await calibrationRepository.DeleteAsync(id);
             if (deleted)
@@ -125,7 +132,7 @@ namespace Application.Services
 
             var maxAllowedError = await ResolveMaxAllowedErrorAsync(instrument);
             calibration.SetMeasurements(BuildMeasurements(dto.Measurements, dto.Id, maxAllowedError, resetIds: false));
-            calibration.SetReferenceStandards(await GetReferenceStandardsAsync(dto));
+            calibration.SetReferenceStandards(await GetReferenceStandardsAsync(dto, dto.CalibrationDate));
 
             var updated = await calibrationRepository.UpdateAsync(calibration);
             if (!updated)
@@ -192,7 +199,9 @@ namespace Application.Services
         }
 
         // Los patrones aplican solo a calibraciones internas (trazabilidad metrológica)
-        private async Task<List<ReferenceStandard>> GetReferenceStandardsAsync(CalibrationDTO dto)
+        // El certificado del patrón tiene que estar vigente el día de la calibración (no hoy), así una calibración
+        // vieja hecha con un patrón que en su momento valía se puede seguir editando.
+        private async Task<List<ReferenceStandard>> GetReferenceStandardsAsync(CalibrationDTO dto, DateTime calibrationDate)
         {
             var result = new List<ReferenceStandard>();
             if (dto.IsExternal)
@@ -202,6 +211,10 @@ namespace Application.Services
             {
                 var standard = await referenceStandardRepository.GetAsync(id)
                     ?? throw new KeyNotFoundException($"There is no reference standard with id {id}.");
+
+                if (standard.CertificateExpiresAt.Date < calibrationDate.Date)
+                    throw new ArgumentException($"El certificado del patrón '{standard.Description}' venció el {standard.CertificateExpiresAt:dd/MM/yyyy}: no se puede usar en la calibración.");
+
                 result.Add(standard);
             }
             return result;
