@@ -27,12 +27,13 @@ namespace Application.Services
 
             var createdAt = DateTime.Now;
             var isActive = true;
-            Procedure procedure = new Procedure(0, dto.Code, dto.Name, dto.VersionNumber, dto.ApprovedAt, isActive, createdAt, dto.InstrumentTypeId);
+            Procedure procedure = new Procedure(0, dto.Code, dto.Name, dto.VersionNumber, dto.ApprovedAt, isActive, createdAt, dto.InstrumentTypeId, dto.DocumentUrl);
 
             await procedureRepository.AddAsync(procedure);
 
             dto.Id = procedure.Id;
             dto.CreatedAt = procedure.CreatedAt;
+            dto.DocumentUrl = procedure.DocumentUrl;
             dto.IsActive = isActive;
             dto.InstrumentTypeName = procedure.InstrumentType?.Name;
 
@@ -58,6 +59,7 @@ namespace Application.Services
                 Name = procedure.Name,
                 VersionNumber = procedure.VersionNumber,
                 ApprovedAt = procedure.ApprovedAt,
+                DocumentUrl = procedure.DocumentUrl,
                 IsActive = procedure.IsActive,
                 CreatedAt = procedure.CreatedAt,
                 InstrumentTypeId = procedure.InstrumentTypeId,
@@ -75,6 +77,7 @@ namespace Application.Services
                 Name = procedure.Name,
                 VersionNumber = procedure.VersionNumber,
                 ApprovedAt = procedure.ApprovedAt,
+                DocumentUrl = procedure.DocumentUrl,
                 IsActive = procedure.IsActive,
                 CreatedAt = procedure.CreatedAt,
                 InstrumentTypeId = procedure.InstrumentTypeId,
@@ -91,7 +94,7 @@ namespace Application.Services
             await EnsureInstrumentTypeExistsAsync(dto.InstrumentTypeId);
             await EnsureCodeAndVersionAreUniqueAsync(dto.Code, dto.VersionNumber, dto.Id);
 
-            Procedure procedure = new Procedure(dto.Id, dto.Code, dto.Name, dto.VersionNumber, dto.ApprovedAt, dto.IsActive, existing.CreatedAt, dto.InstrumentTypeId);
+            Procedure procedure = new Procedure(dto.Id, dto.Code, dto.Name, dto.VersionNumber, dto.ApprovedAt, dto.IsActive, existing.CreatedAt, dto.InstrumentTypeId, dto.DocumentUrl);
             return await procedureRepository.UpdateAsync(procedure);
         }
 

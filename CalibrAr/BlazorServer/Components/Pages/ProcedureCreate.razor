@@ -62,6 +62,7 @@ else
                 Code = model.Code.Trim(),
                 Name = model.Name.Trim(),
                 VersionNumber = model.VersionNumber.Trim(),
+                DocumentUrl = string.IsNullOrWhiteSpace(model.DocumentUrl) ? null : model.DocumentUrl.Trim(),
                 ApprovedAt = model.ApprovedAt.Date,
                 InstrumentTypeId = model.InstrumentTypeId,
                 InstrumentTypeName = string.Empty

@@ -37,10 +37,10 @@ namespace Data
             context.Areas.AddRange(lab, production, quality, maintenance);
 
             // PC-001 tiene dos versiones: la vieja quedó inactiva y solo la usan calibraciones anteriores.
-            var pressureProcedure = new Procedure(0, "PC-001", "Calibración de manómetros", "3", today.AddMonths(-10), true, now, pressure.Id);
+            var pressureProcedure = new Procedure(0, "PC-001", "Calibración de manómetros", "3", today.AddMonths(-10), true, now, pressure.Id, "https://example.com/procedimientos/PC-001-v3.pdf");
             var oldPressureProcedure = new Procedure(0, "PC-001", "Calibración de manómetros", "2", today.AddMonths(-26), false, now, pressure.Id);
-            var temperatureProcedure = new Procedure(0, "PC-002", "Calibración de termómetros", "2", today.AddMonths(-14), true, now, temperature.Id);
-            var flowProcedure = new Procedure(0, "PC-003", "Calibración de medidores de flujo", "1", today.AddMonths(-8), true, now, flow.Id);
+            var temperatureProcedure = new Procedure(0, "PC-002", "Calibración de termómetros", "2", today.AddMonths(-14), true, now, temperature.Id, "https://example.com/procedimientos/PC-002-v2.pdf");
+            var flowProcedure = new Procedure(0, "PC-003", "Calibración de medidores de flujo", "1", today.AddMonths(-8), true, now, flow.Id, "https://example.com/procedimientos/PC-003-v1.pdf");
             context.Procedures.AddRange(pressureProcedure, oldPressureProcedure, temperatureProcedure, flowProcedure);
 
             var pressureStandard = new ReferenceStandard(0, "Calibrador de presión patrón, 0 a 100 psi", "INTI", "C-2025-118",

@@ -29,7 +29,7 @@
         </div>
     </div>
 
-    <div class="@(IsEdit ? "mb-3" : "mb-4")">
+    <div class="mb-3">
         <label for="instrumentType" class="form-label">Tipo de instrumento</label>
         <InputSelect id="instrumentType" class="form-select" @bind-Value="Model.InstrumentTypeId">
             <option value="0">Seleccione un tipo</option>
@@ -40,6 +40,13 @@
         </InputSelect>
         <div class="form-text">Se ofrece en las calibraciones de instrumentos de este tipo.</div>
         <ValidationMessage For="() => Model.InstrumentTypeId" />
+    </div>
+
+    <div class="@(IsEdit ? "mb-3" : "mb-4")">
+        <label for="documentUrl" class="form-label">Documento (opcional)</label>
+        <InputText id="documentUrl" class="form-control" @bind-Value="Model.DocumentUrl" placeholder="https://..." />
+        <div class="form-text">Link al PDF del procedimiento (por ejemplo, de una carpeta compartida).</div>
+        <ValidationMessage For="() => Model.DocumentUrl" />
     </div>
 
     @if (IsEdit)
@@ -91,11 +98,21 @@
         [Range(1, int.MaxValue, ErrorMessage = "Seleccione un tipo de instrumento.")]
         public int InstrumentTypeId { get; set; }
 
+        [StringLength(500, ErrorMessage = "El link no puede superar los 500 caracteres.")]
+        public string? DocumentUrl { get; set; }
+
         public bool IsActive { get; set; } = true;
 
         // WinForms no deja elegir una fecha de aprobación futura; acá se pide lo mismo.
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            // Vacío es válido (el link es opcional); si hay algo tiene que ser una dirección http o https.
+            // No se usa [Url] porque considera inválido el texto vacío.
+            if (!string.IsNullOrWhiteSpace(DocumentUrl)
+                && !(Uri.TryCreate(DocumentUrl.Trim(), UriKind.Absolute, out var uri)
+                     && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)))
+                yield return new ValidationResult("El link no es válido (tiene que empezar con http:// o https://).", new[] { nameof(DocumentUrl) });
+
             if (ApprovedAt == default)
                 yield return new ValidationResult("La fecha de aprobación es obligatoria.", new[] { nameof(ApprovedAt) });
             else if (ApprovedAt.Date > DateTime.Today)

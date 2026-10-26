@@ -245,6 +245,7 @@ namespace Data
                 entity.Property(e => e.Code).IsRequired().HasMaxLength(50);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.VersionNumber).IsRequired().HasMaxLength(20);
+                entity.Property(e => e.DocumentUrl).HasMaxLength(500);
                 entity.Property(e => e.ApprovedAt).IsRequired();
                 entity.Property(e => e.IsActive).IsRequired();
                 entity.Property(e => e.CreatedAt).IsRequired();
