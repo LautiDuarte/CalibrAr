@@ -23,6 +23,7 @@ namespace Application.Services
         public async Task<ProcedureDTO> AddAsync(ProcedureDTO dto)
         {
             await EnsureInstrumentTypeExistsAsync(dto.InstrumentTypeId);
+            await EnsureCodeAndVersionAreUniqueAsync(dto.Code, dto.VersionNumber, 0);
 
             var createdAt = DateTime.Now;
             var isActive = true;
@@ -88,9 +89,24 @@ namespace Application.Services
                 return false;
 
             await EnsureInstrumentTypeExistsAsync(dto.InstrumentTypeId);
+            await EnsureCodeAndVersionAreUniqueAsync(dto.Code, dto.VersionNumber, dto.Id);
 
             Procedure procedure = new Procedure(dto.Id, dto.Code, dto.Name, dto.VersionNumber, dto.ApprovedAt, dto.IsActive, existing.CreatedAt, dto.InstrumentTypeId);
             return await procedureRepository.UpdateAsync(procedure);
+        }
+
+        // Un mismo código puede repetirse en distintas versiones (una versión nueva es otro procedimiento con el
+        // mismo código), pero no la combinación código + versión.
+        private async Task EnsureCodeAndVersionAreUniqueAsync(string? code, string? versionNumber, int currentId)
+        {
+            var normalizedCode = (code ?? string.Empty).Trim();
+            var normalizedVersion = (versionNumber ?? string.Empty).Trim();
+
+            var procedures = await procedureRepository.GetAllAsync();
+            if (procedures.Any(p => p.Id != currentId
+                                    && string.Equals(p.Code.Trim(), normalizedCode, StringComparison.OrdinalIgnoreCase)
+                                    && string.Equals(p.VersionNumber.Trim(), normalizedVersion, StringComparison.OrdinalIgnoreCase)))
+                throw new InvalidOperationException($"Ya existe un procedimiento con el código '{normalizedCode}' en la versión '{normalizedVersion}'.");
         }
 
         private async Task EnsureInstrumentTypeExistsAsync(int instrumentTypeId)
