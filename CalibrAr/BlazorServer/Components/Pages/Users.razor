@@ -118,7 +118,7 @@ else
         try
         {
             // La API necesita saber quién pide el borrado para aplicar sus reglas de autoprotección.
-            await UserApiClient.DeleteAsync(user.Id, currentUserId);
+            await UserApiClient.DeleteAsync(user.Id);
             errorMessage = null;
             await LoadUsers();
             Flash.Success($"Usuario \"{user.FullName}\" eliminado.");

@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Application.Services;
 using DTOs;
 
@@ -35,6 +36,26 @@ namespace WebAPI
             .WithOpenApi()
             .RequireAuthorization("InstrumentsRead");
 
+            // Búsqueda con filtros combinables: los que no se mandan, no filtran
+            app.MapGet("/instruments/search", async (string? text, string? status, int? areaId, bool? hideDecommissioned, IInstrumentService instrumentService) =>
+            {
+                try
+                {
+                    var dtos = await instrumentService.SearchAsync(text, status, areaId, hideDecommissioned ?? false);
+
+                    return Results.Ok(dtos);
+                }
+                catch (ArgumentException ex)
+                {
+                    return Results.BadRequest(new { error = ex.Message });
+                }
+            })
+            .WithName("SearchInstruments")
+            .Produces<IEnumerable<InstrumentDTO>>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentsRead");
+
             app.MapPost("/instruments", async (InstrumentDTO dto, IInstrumentService instrumentService) =>
             {
                 try
@@ -62,11 +83,12 @@ namespace WebAPI
             .WithOpenApi()
             .RequireAuthorization("InstrumentsCreate");
 
-            app.MapPut("/instruments", async (InstrumentDTO dto, IInstrumentService instrumentService) =>
+            app.MapPut("/instruments", async (InstrumentDTO dto, ClaimsPrincipal user, IInstrumentService instrumentService) =>
             {
                 try
                 {
-                    var updated = await instrumentService.UpdateAsync(dto);
+                    // Quién cambió el estado (para el historial) sale del token
+                    var updated = await instrumentService.UpdateAsync(dto, user.GetUserId());
 
                     if (!updated)
                     {

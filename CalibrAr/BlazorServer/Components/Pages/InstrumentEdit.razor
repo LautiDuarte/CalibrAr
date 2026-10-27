@@ -89,7 +89,6 @@ else
                 Brand = model.Brand,
                 Model = model.Model,
                 Status = model.Status,
-                ChangedByUserId = await CurrentUser.GetIdAsync(),
                 MaxAllowedError = model.MaxAllowedError,
                 CalibrationFrequencyMonths = model.CalibrationFrequencyMonths,
                 InstrumentTypeId = model.InstrumentTypeId,

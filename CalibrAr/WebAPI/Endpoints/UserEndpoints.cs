@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Application.Services;
 using DTOs;
 
@@ -64,11 +65,17 @@ namespace WebAPI
             .WithOpenApi()
             .RequireAuthorization("UsersCreate");
 
-            app.MapPut("/users", async (UserDTO dto, IUserService userService) =>
+            app.MapPut("/users", async (UserDTO dto, ClaimsPrincipal user, IUserService userService) =>
             {
+                int? requesterUserId = user.GetUserId();
+                if (requesterUserId == null)
+                {
+                    return Results.Unauthorized();
+                }
+
                 try
                 {
-                    var updated = await userService.UpdateAsync(dto);
+                    var updated = await userService.UpdateAsync(dto, requesterUserId.Value);
 
                     if (!updated)
                     {
@@ -98,11 +105,17 @@ namespace WebAPI
             .WithOpenApi()
             .RequireAuthorization("UsersUpdate");
 
-            app.MapDelete("/users/{id}", async (int id, int? requesterUserId, IUserService userService) =>
+            app.MapDelete("/users/{id}", async (int id, ClaimsPrincipal user, IUserService userService) =>
             {
+                int? requesterUserId = user.GetUserId();
+                if (requesterUserId == null)
+                {
+                    return Results.Unauthorized();
+                }
+
                 try
                 {
-                    var deleted = await userService.DeleteAsync(id, requesterUserId);
+                    var deleted = await userService.DeleteAsync(id, requesterUserId.Value);
                     return deleted ? Results.NoContent() : Results.NotFound();
                 }
                 catch (ArgumentException ex) { return Results.BadRequest(new { error = ex.Message }); }

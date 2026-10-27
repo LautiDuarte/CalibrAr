@@ -47,7 +47,7 @@ namespace Application.Services
             return dto;
         }
 
-        public async Task<bool> DeleteAsync(int id, int? requesterUserId = null)
+        public async Task<bool> DeleteAsync(int id, int requesterUserId)
         {
             var existing = await userRepository.GetAsync(id);
             if (existing == null)
@@ -81,7 +81,7 @@ namespace Application.Services
             return users.Select(MapToDto);
         }
 
-        public async Task<bool> UpdateAsync(UserDTO dto)
+        public async Task<bool> UpdateAsync(UserDTO dto, int requesterUserId)
         {
             var existing = await userRepository.GetAsync(dto.Id);
             if (existing == null)
@@ -90,7 +90,7 @@ namespace Application.Services
             var role = ParseRole(dto.Role);
 
             // Nadie puede cambiarse el rol ni desactivarse a sí mismo
-            if (dto.RequestedByUserId == dto.Id)
+            if (requesterUserId == dto.Id)
             {
                 if (role != existing.Role)
                     throw new ArgumentException("You cannot change your own role.", nameof(dto.Role));

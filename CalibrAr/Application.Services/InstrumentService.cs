@@ -17,9 +17,11 @@ namespace Application.Services
         private readonly IInstrumentTypeRepository instrumentTypeRepository;
         private readonly IInstrumentStatusHistoryRepository instrumentStatusHistoryRepository;
         private readonly IAreaRepository areaRepository;
+        private readonly ISearchRepository searchRepository;
 
-        public InstrumentService(IInstrumentRepository instrumentRepository, IInstrumentTypeRepository instrumentTypeRepository, IAreaRepository areaRepository, IInstrumentStatusHistoryRepository instrumentStatusHistoryRepository)
+        public InstrumentService(IInstrumentRepository instrumentRepository, IInstrumentTypeRepository instrumentTypeRepository, IAreaRepository areaRepository, IInstrumentStatusHistoryRepository instrumentStatusHistoryRepository, ISearchRepository searchRepository)
         {
+            this.searchRepository = searchRepository;
             this.instrumentRepository = instrumentRepository;
             this.instrumentTypeRepository = instrumentTypeRepository;
             this.areaRepository = areaRepository;
@@ -78,7 +80,21 @@ namespace Application.Services
             return instrumentsUpToDate.Select(MapToDto);
         }
 
-        public async Task<bool> UpdateAsync(InstrumentDTO dto)
+        // Los filtros se resuelven en la base (SearchRepository, ADO.NET); acá solo se cargan y mapean los resultados
+        public async Task<IEnumerable<InstrumentDTO>> SearchAsync(string? text, string? status, int? areaId, bool hideDecommissioned)
+        {
+            InstrumentStatus? parsedStatus = string.IsNullOrWhiteSpace(status) ? null : ParseStatus(status);
+
+            var ids = await searchRepository.SearchInstrumentIdsAsync(text, parsedStatus, areaId, hideDecommissioned);
+            if (ids.Count == 0)
+                return Enumerable.Empty<InstrumentDTO>();
+
+            var instruments = await instrumentRepository.GetByIdsAsync(ids);
+            var instrumentsUpToDate = await CheckCalibrationExpiredAsync(instruments);
+            return instrumentsUpToDate.Select(MapToDto);
+        }
+
+        public async Task<bool> UpdateAsync(InstrumentDTO dto, int? changedByUserId = null)
         {
             var existing = await instrumentRepository.GetAsync(dto.Id);
             if (existing == null)
@@ -110,7 +126,7 @@ namespace Application.Services
             Instrument instrumentUpToDate = await IsActiveCheck(instrument);
             var updated = await instrumentRepository.UpdateAsync(instrumentUpToDate);
             if (updated && previousStatus != status)
-                await RegisterStatusChangeAsync(dto.Id, previousStatus, status, dto.ChangedByUserId);
+                await RegisterStatusChangeAsync(dto.Id, previousStatus, status, changedByUserId);
             return updated;
         }
 

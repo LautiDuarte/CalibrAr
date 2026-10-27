@@ -198,8 +198,8 @@ else
 
         try
         {
-            // La API necesita saber quién la cierra; la fecha de cierre la pone ella.
-            await NonConformityApiClient.CloseAsync(nonConformity.Id, userId.Value);
+            // Quién la cierra y la fecha de cierre los pone la API.
+            await NonConformityApiClient.CloseAsync(nonConformity.Id);
             errorMessage = null;
             await LoadNonConformities();
             Flash.Success($"No conformidad \"{nonConformity.Code}\" cerrada.");

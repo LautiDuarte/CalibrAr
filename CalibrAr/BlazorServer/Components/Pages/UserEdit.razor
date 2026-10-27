@@ -74,7 +74,7 @@ else
         saving = true;
         try
         {
-            // RequestedByUserId le dice a la API quién pide el cambio: con eso aplica las reglas
+            // La API sabe quién pide el cambio por el token y con eso aplica las reglas
             // de que nadie se cambie el rol ni se desactive a sí mismo.
             // La contraseña no viaja: la API no permite cambiarla desde acá.
             await UserApiClient.UpdateAsync(new UserDTO
@@ -85,8 +85,7 @@ else
                 Role = model.Role,
                 IsActive = model.IsActive,
                 LastLoginAt = lastLoginAt,
-                CreatedAt = createdAt,
-                RequestedByUserId = currentUserId
+                CreatedAt = createdAt
             });
             Flash.Success("Usuario actualizado.");
             NavigationManager.NavigateTo("users");

@@ -91,13 +91,12 @@ namespace API.Clients
             }
         }
 
-        public async Task DeleteAsync(int id, int? requesterUserId = null)
+        public async Task DeleteAsync(int id)
         {
             try
             {
                 using var client = await CreateHttpClientAsync();
-                string url = requesterUserId.HasValue ? $"users/{id}?requesterUserId={requesterUserId.Value}" : $"users/{id}";
-                HttpResponseMessage response = await client.DeleteAsync(url);
+                HttpResponseMessage response = await client.DeleteAsync($"users/{id}");
                 if (!response.IsSuccessStatusCode)
                 {
                     ThrowIfUnauthorized(response);

@@ -109,7 +109,6 @@ else
         {
             // La API actualiza el instrumento completo: se manda lo que ya tenía, solo con el estado nuevo.
             instrument!.Status = newStatus;
-            instrument.ChangedByUserId = await CurrentUser.GetIdAsync();
             await InstrumentApiClient.UpdateAsync(instrument);
             Flash.Success($"Estado de \"{instrument.Code}\" actualizado a {InstrumentForm.StatusText(newStatus)}.");
             NavigationManager.NavigateTo("instruments");

@@ -42,6 +42,45 @@ namespace API.Clients
             }
         }
 
+        // El filtrado lo hace el servidor en la base; los parámetros en null no filtran
+        public async Task<List<CalibrationDTO>> SearchAsync(DateTime? from = null, DateTime? to = null, string? result = null, int? instrumentId = null,
+            string? text = null, string? interventionType = null, bool? approved = null)
+        {
+            try
+            {
+                string query = BuildQuery(
+                    ("from", from?.ToString("yyyy-MM-dd")),
+                    ("to", to?.ToString("yyyy-MM-dd")),
+                    ("result", result),
+                    ("instrumentId", instrumentId?.ToString()),
+                    ("text", text),
+                    ("interventionType", interventionType),
+                    ("approved", approved?.ToString().ToLowerInvariant()));
+
+                using var client = await CreateHttpClientAsync();
+                HttpResponseMessage response = await client.GetAsync("calibrations/search" + query);
+                if (response.IsSuccessStatusCode)
+                {
+                    var calibrations = await response.Content.ReadFromJsonAsync<List<CalibrationDTO>>();
+                    return calibrations ?? throw new Exception("La respuesta del servidor para la busqueda de calibraciones vino vacia.");
+                }
+                else
+                {
+                    ThrowIfUnauthorized(response);
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Failed to search calibrations. Status code: {response.StatusCode}, Error: {errorContent}");
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new Exception($"An error occurred while searching calibrations: {ex.Message}.", ex);
+            }
+            catch (TaskCanceledException ex)
+            {
+                throw new Exception($"Request timed out while searching calibrations: {ex.Message}.", ex);
+            }
+        }
+
         public async Task<List<CalibrationDTO>> GetAllAsync()
         {
             try
@@ -139,12 +178,13 @@ namespace API.Clients
             }
         }
 
-        public async Task ApproveAsync(int id, int approverUserId)
+        // Quién aprueba lo define la API con el token
+        public async Task ApproveAsync(int id)
         {
             try
             {
                 using var client = await CreateHttpClientAsync();
-                HttpResponseMessage response = await client.PutAsync($"calibrations/{id}/approve/{approverUserId}", null);
+                HttpResponseMessage response = await client.PutAsync($"calibrations/{id}/approve", null);
                 if (!response.IsSuccessStatusCode)
                 {
                     ThrowIfUnauthorized(response);

@@ -9,10 +9,7 @@ namespace Application.Services
 {
     public interface IInstrumentStatusHistoryService
     {
-        Task<InstrumentStatusHistoryDTO> AddAsync(InstrumentStatusHistoryDTO dto);
-        Task<bool> DeleteAsync(int id);
         Task<InstrumentStatusHistoryDTO?> GetAsync(int id);
         Task<IEnumerable<InstrumentStatusHistoryDTO>> GetAllAsync();
-        Task<bool> UpdateAsync(InstrumentStatusHistoryDTO dto);
     }
 }

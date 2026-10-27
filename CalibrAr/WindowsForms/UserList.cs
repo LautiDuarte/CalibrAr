@@ -112,7 +112,7 @@ namespace WindowsForms
             try
             {
                 DisableControls();
-                await userApiClient.DeleteAsync(user.Id, sessionUserId);
+                await userApiClient.DeleteAsync(user.Id);
             }
             catch (Exception ex)
             {

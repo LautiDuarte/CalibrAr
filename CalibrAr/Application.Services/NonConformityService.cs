@@ -25,11 +25,11 @@ namespace Application.Services
             this.userRepository = userRepository;
         }
 
-        public async Task<NonConformityDTO> AddAsync(NonConformityDTO dto)
+        public async Task<NonConformityDTO> AddAsync(NonConformityDTO dto, int userId)
         {
             await EnsureInstrumentExistsAsync(dto.InstrumentId);
             await EnsureCalibrationExistsAsync(dto.CalibrationId, dto.InstrumentId);
-            await EnsureUserExistsAsync(dto.DetectedByUserId);
+            await EnsureUserExistsAsync(userId);
 
             // Si no llega código lo genera el servidor (NC-0001, NC-0002...); si llega uno, se respeta.
             var code = string.IsNullOrWhiteSpace(dto.Code) ? await GenerateCodeAsync() : dto.Code.Trim();
@@ -37,11 +37,12 @@ namespace Application.Services
 
             var createdAt = DateTime.Now;
             var origin = ParseEnum<Origin>(dto.Origin, nameof(dto.Origin));
-            NonConformity nonConformity = new NonConformity(0, code, dto.Description, origin, NonConformityStatus.Open, dto.CorrectiveAction, createdAt, null, createdAt, dto.InstrumentId, dto.CalibrationId, dto.DetectedByUserId, null);
+            NonConformity nonConformity = new NonConformity(0, code, dto.Description, origin, NonConformityStatus.Open, dto.CorrectiveAction, createdAt, null, createdAt, dto.InstrumentId, dto.CalibrationId, userId, null);
 
             await nonConformityRepository.AddAsync(nonConformity);
 
             dto.Id = nonConformity.Id;
+            dto.DetectedByUserId = userId;
             dto.Code = nonConformity.Code;
             dto.Status = nonConformity.Status.ToString();
             dto.OpenedAt = nonConformity.OpenedAt;
@@ -82,28 +83,31 @@ namespace Application.Services
 
             await EnsureInstrumentExistsAsync(dto.InstrumentId);
             await EnsureCalibrationExistsAsync(dto.CalibrationId, dto.InstrumentId);
-            await EnsureUserExistsAsync(dto.DetectedByUserId);
-            await EnsureUserExistsAsync(dto.ClosedByUserId);
             await EnsureCodeIsUniqueAsync(dto.Code, dto.Id);
 
             var origin = ParseEnum<Origin>(dto.Origin, nameof(dto.Origin));
             var status = ParseEnum<NonConformityStatus>(dto.Status, nameof(dto.Status));
 
-            // Cerrada <=> tiene ClosedBy. Al reabrir (ClosedBy null) se limpia ClosedAt y el estado vuelve a Open
-            DateTime? closedAt;
-            if (dto.ClosedByUserId.HasValue)
+            // Quién detectó y quién cerró no se definen desde acá: el detector no cambia y cerrar se hace
+            // solo con CloseAsync. Lo único que admite esta edición es reabrir una cerrada mandando ClosedBy en null.
+            var closedByUserId = existing.ClosedByUserId;
+            var closedAt = existing.ClosedAt;
+            if (existing.ClosedByUserId.HasValue && !dto.ClosedByUserId.HasValue)
+            {
+                closedByUserId = null;
+                closedAt = null;
+                status = NonConformityStatus.Open;
+            }
+            else if (existing.ClosedByUserId.HasValue)
             {
                 status = NonConformityStatus.Closed;
-                closedAt = dto.ClosedAt ?? DateTime.Now;
             }
-            else
+            else if (status == NonConformityStatus.Closed)
             {
-                closedAt = null;
-                if (status == NonConformityStatus.Closed)
-                    status = NonConformityStatus.Open;
+                status = NonConformityStatus.Open;
             }
 
-            NonConformity nonConformity = new NonConformity(dto.Id, dto.Code, dto.Description, origin, status, dto.CorrectiveAction, dto.OpenedAt, closedAt, existing.CreatedAt, dto.InstrumentId, dto.CalibrationId, dto.DetectedByUserId, dto.ClosedByUserId);
+            NonConformity nonConformity = new NonConformity(dto.Id, dto.Code, dto.Description, origin, status, dto.CorrectiveAction, dto.OpenedAt, closedAt, existing.CreatedAt, dto.InstrumentId, dto.CalibrationId, existing.DetectedByUserId, closedByUserId);
             return await nonConformityRepository.UpdateAsync(nonConformity);
         }
 

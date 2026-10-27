@@ -124,7 +124,7 @@ namespace WindowsForms
             try
             {
                 DisableControls();
-                await nonConformityApiClient.CloseAsync(nonConformity.Id, closerId.Value);
+                await nonConformityApiClient.CloseAsync(nonConformity.Id);
             }
             catch (Exception ex)
             {

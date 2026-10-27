@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Application.Services;
 using DTOs;
 
@@ -35,11 +36,17 @@ namespace WebAPI
             .WithOpenApi()
             .RequireAuthorization("NonConformitiesRead");
 
-            app.MapPost("/nonconformities", async (NonConformityDTO dto, INonConformityService nonConformityService) =>
+            app.MapPost("/nonconformities", async (NonConformityDTO dto, ClaimsPrincipal user, INonConformityService nonConformityService) =>
             {
+                int? userId = user.GetUserId();
+                if (userId == null)
+                {
+                    return Results.Unauthorized();
+                }
+
                 try
                 {
-                    NonConformityDTO created = await nonConformityService.AddAsync(dto);
+                    NonConformityDTO created = await nonConformityService.AddAsync(dto, userId.Value);
 
                     return Results.Created($"/nonconformities/{created.Id}", created);
                 }
@@ -95,11 +102,17 @@ namespace WebAPI
             .WithOpenApi()
             .RequireAuthorization("NonConformitiesUpdate");
 
-            app.MapPut("/nonconformities/{id}/close/{closerUserId}", async (int id, int closerUserId, INonConformityService nonConformityService) =>
+            app.MapPut("/nonconformities/{id}/close", async (int id, ClaimsPrincipal user, INonConformityService nonConformityService) =>
             {
+                int? closerUserId = user.GetUserId();
+                if (closerUserId == null)
+                {
+                    return Results.Unauthorized();
+                }
+
                 try
                 {
-                    var closed = await nonConformityService.CloseAsync(id, closerUserId);
+                    var closed = await nonConformityService.CloseAsync(id, closerUserId.Value);
                     return closed ? Results.NoContent() : Results.NotFound();
                 }
                 catch (ArgumentException ex) { return Results.BadRequest(new { error = ex.Message }); }

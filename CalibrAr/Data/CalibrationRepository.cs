@@ -64,6 +64,22 @@ namespace Data
                 .ToListAsync();
         }
 
+        // Devuelve las entidades en el mismo orden en que vienen los ids
+        public async Task<IEnumerable<Calibration>> GetByIdsAsync(IReadOnlyList<int> ids)
+        {
+            var found = await context.Calibrations
+                .Include(c => c.Measurements)
+                .Include(c => c.ReferenceStandards)
+                .Include(c => c.Instrument)
+                .Include(c => c.Procedure)
+                .Include(c => c.PerformedByUser)
+                .Include(c => c.ApprovedByUser)
+                .Where(c => ids.Contains(c.Id))
+                .ToDictionaryAsync(c => c.Id);
+
+            return ids.Where(found.ContainsKey).Select(id => found[id]).ToList();
+        }
+
         public async Task<bool> UpdateAsync(Calibration calibration)
         {
             var existing = await context.Calibrations
