@@ -243,8 +243,6 @@ namespace WindowsForms
             if (calibrationsDataGridView.Rows[e.RowIndex].DataBoundItem is not CalibrationDTO calibration) return;
             if (!CanApprove(calibration)) return;
 
-            int? approverId = AuthServiceProvider.Instance.GetUserId();
-            if (approverId == null) return;
             var result = MessageBox.Show(
                 $"¿Aprobar la calibración de {calibration.InstrumentCode} {calibration.CalibrationDate:dd/MM/yyyy}?",
                 "Confirmar aprobación",

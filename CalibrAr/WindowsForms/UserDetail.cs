@@ -85,6 +85,7 @@ namespace WindowsForms
         private async void saveButton_Click(object sender, EventArgs e)
         {
             if (!ValidateUser()) return;
+            if (roleComboBox.SelectedItem is not UserRoleDTO role) return;
 
             try
             {
@@ -92,7 +93,7 @@ namespace WindowsForms
 
                 User.FullName = fullNameTextBox.Text.Trim();
                 User.Email = emailTextBox.Text.Trim();
-                User.Role = roleComboBox.SelectedItem!.ToString()!;
+                User.Role = role.ToString();
 
                 if (this.Mode == FormMode.Update)
                 {

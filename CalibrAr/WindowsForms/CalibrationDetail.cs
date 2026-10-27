@@ -21,11 +21,8 @@ namespace WindowsForms
         private readonly InstrumentTypeApiClient instrumentTypeApiClient = new(AuthServiceProvider.Instance);
         private readonly ProcedureApiClient procedureApiClient = new(AuthServiceProvider.Instance);
         private readonly UserApiClient userApiClient = new(AuthServiceProvider.Instance);
-        private static readonly string[] rolesThatCanPerform = { "Administrador", "Responsable", "Operador" };
-        private static readonly string[] rolesThatCanApprove = { "Administrador", "Responsable" };
 
         private CalibrationDTO calibration = new CalibrationDTO();
-        private int? currentUserId;
         private FormMode mode;
         private List<ProcedureDTO> allProcedures = new List<ProcedureDTO>();
         private List<UserDTO> allUsers = new List<UserDTO>();
@@ -231,17 +228,8 @@ namespace WindowsForms
 
         private async Task LoadUsers()
         {
-            if (this.Mode == FormMode.Create)
-            {
-                currentUserId = AuthServiceProvider.Instance.GetUserId();
-
-                if (currentUserId == null)
-                {
-                    MessageBox.Show("No se encontró el usuario actual. Revisá tu sesión.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    this.Close();
-                }
-                return;
-            }
+            // En Create no hace falta la lista: el realizador lo toma la API del token
+            if (this.Mode == FormMode.Create) return;
 
             allUsers = (await userApiClient.GetAllAsync()).ToList();
         }
@@ -316,30 +304,8 @@ namespace WindowsForms
                         ? null
                         : (int?)(int)procedureComboBox.SelectedValue;
 
-                    if (this.Mode == FormMode.Create)
-                    {
-                        this.Calibration.PerformedByUserId = currentUserId;
-                        this.Calibration.ApprovedByUserId = null;
-                    }
-                    else
-                    {
-                        this.Calibration.PerformedByUserId = performedByUserComboBox.SelectedValue == null
-                            ? null
-                            : (int?)(int)performedByUserComboBox.SelectedValue;
-
-                        // Solo si el combo está visible (calibración aprobada). "(None)" = 0 => desaprobar
-                        if (approvedByUserComboBox.Visible)
-                        {
-                            if (approvedByUserComboBox.SelectedValue is int approvedId)
-                            {
-                                this.Calibration.ApprovedByUserId = approvedId == 0 ? null : approvedId;
-                            }
-                            else
-                            {
-                                this.Calibration.ApprovedByUserId = null;
-                            }
-                        }
-                    }
+                    // Realizador y aprobador no se mandan desde acá: el realizador es el usuario del token
+                    // y la aprobación se hace solo con el botón "Aprobar" de la lista.
 
                     if (this.Mode == FormMode.Update)
                     {
@@ -519,27 +485,14 @@ namespace WindowsForms
                 int? performedById = this.Calibration.PerformedByUserId;
                 int? approvedById = this.Calibration.ApprovedByUserId;
 
-                // Performed by: usuarios que pueden crear (más el actual, por si cambió de rol)
-                performedByUserComboBox.DataSource = allUsers
-                    .Where(u => rolesThatCanPerform.Contains(u.Role.ToString()) || u.Id == performedById)
-                    .ToList();
+                // Solo lectura: se muestra quién realizó y quién aprobó, sin posibilidad de cambiarlo
+                performedByUserComboBox.DataSource = allUsers.Where(u => u.Id == performedById).ToList();
                 performedByUserComboBox.DisplayMember = "FullName";
                 performedByUserComboBox.ValueMember = "Id";
-                performedByUserComboBox.SelectedValue = performedById ?? -1;
 
-                // Approved by: usuarios que pueden aprobar, sin quien realizó la calibración,
-                // más el aprobador actual, y "(None)" para desaprobar
-                var approvers = allUsers
-                    .Where(u => (rolesThatCanApprove.Contains(u.Role.ToString())
-                                 && (u.Id != performedById || u.Role.ToString() == "Administrador"))
-                                || u.Id == approvedById)
-                    .ToList();
-                approvers.Insert(0, new UserDTO { Id = 0, FullName = "(Ninguno)" });
-
-                approvedByUserComboBox.DataSource = approvers;
+                approvedByUserComboBox.DataSource = allUsers.Where(u => u.Id == approvedById).ToList();
                 approvedByUserComboBox.DisplayMember = "FullName";
                 approvedByUserComboBox.ValueMember = "Id";
-                approvedByUserComboBox.SelectedValue = approvedById ?? 0;
 
                 bool isApproved = approvedById.HasValue;
                 approvedByUserLabel.Visible = isApproved;
@@ -668,8 +621,8 @@ namespace WindowsForms
             certificateNumberTextBox.Enabled = true;
             resultComboBox.Enabled = true;
             restrictionDetailTextBox.Enabled = true;
-            performedByUserComboBox.Enabled = true;
-            approvedByUserComboBox.Enabled = true;
+            performedByUserComboBox.Enabled = false; // solo lectura
+            approvedByUserComboBox.Enabled = false;  // solo lectura
             notesTextBox.Enabled = true;
             addMeasurementButton.Enabled = true;
             updateMeasurementButton.Enabled = measurementsLocales.Count > 0;

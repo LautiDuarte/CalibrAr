@@ -174,7 +174,6 @@ namespace WindowsForms
 
                     this.Instrument.InstrumentTypeId = instrumentTypeId;
                     this.Instrument.AreaId = areaId;
-                    this.Instrument.ChangedByUserId = AuthServiceProvider.Instance.GetUserId();
                     if (this.Mode == FormMode.Update)
                     {
                         await instrumentApiClient.UpdateAsync(this.Instrument);
