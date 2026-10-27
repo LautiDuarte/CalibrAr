@@ -13,7 +13,7 @@ namespace WindowsForms
 {
     public partial class CalibrationMeasurementDetail : Form
     {
-        private CalibrationMeasurementDTO measurement;
+        private CalibrationMeasurementDTO measurement = new();
         private FormMode mode;
         private decimal maxAllowedError;
 
@@ -68,10 +68,10 @@ namespace WindowsForms
 
         private void saveButton_Click(object sender, EventArgs e)
         {
-            if (this.ValidateMeasurement())
+            if (this.ValidateMeasurement(out decimal nominal, out decimal measured))
             {
-                this.Measurement.NominalValue = decimal.Parse(nominalValueTextBox.Text);
-                this.Measurement.MeasuredValue = decimal.Parse(measuredValueTextBox.Text);
+                this.Measurement.NominalValue = nominal;
+                this.Measurement.MeasuredValue = measured;
                 this.Measurement.Error = this.Measurement.MeasuredValue - this.Measurement.NominalValue;
                 this.Measurement.IsWithinTolerance = Math.Abs(this.Measurement.Error) <= maxAllowedError;
                 this.Measurement.Notes = notesTextBox.Text;
@@ -100,9 +100,11 @@ namespace WindowsForms
             mode = value;
         }
 
-        private bool ValidateMeasurement()
+        private bool ValidateMeasurement(out decimal nominal, out decimal measured)
         {
             bool isValid = true;
+            nominal = 0;
+            measured = 0;
 
             errorProvider.SetError(nominalValueTextBox, string.Empty);
             errorProvider.SetError(measuredValueTextBox, string.Empty);
@@ -112,7 +114,7 @@ namespace WindowsForms
                 isValid = false;
                 errorProvider.SetError(nominalValueTextBox, "El valor nominal es obligatorio");
             }
-            else if (!decimal.TryParse(this.nominalValueTextBox.Text, out decimal nominal))
+            else if (!DecimalParser.TryParse(this.nominalValueTextBox.Text, out nominal))
             {
                 isValid = false;
                 errorProvider.SetError(nominalValueTextBox, "El valor nominal debe ser un número");
@@ -123,7 +125,7 @@ namespace WindowsForms
                 isValid = false;
                 errorProvider.SetError(measuredValueTextBox, "El valor medido es obligatorio");
             }
-            else if (!decimal.TryParse(this.measuredValueTextBox.Text, out decimal measured))
+            else if (!DecimalParser.TryParse(this.measuredValueTextBox.Text, out measured))
             {
                 isValid = false;
                 errorProvider.SetError(measuredValueTextBox, "El valor medido debe ser un número");
@@ -140,8 +142,8 @@ namespace WindowsForms
 
         private void UpdateCalculatedValues()
         {
-            if (decimal.TryParse(nominalValueTextBox.Text, out decimal nominal)
-                && decimal.TryParse(measuredValueTextBox.Text, out decimal measured))
+            if (DecimalParser.TryParse(nominalValueTextBox.Text, out decimal nominal)
+                && DecimalParser.TryParse(measuredValueTextBox.Text, out decimal measured))
             {
                 decimal error = measured - nominal;
                 errorTextBox.Text = error.ToString("F3");

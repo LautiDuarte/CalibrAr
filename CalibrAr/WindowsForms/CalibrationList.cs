@@ -16,6 +16,7 @@ namespace WindowsForms
     public partial class CalibrationList : Form
     {
         private readonly CalibrationApiClient calibrationApiClient = new(AuthServiceProvider.Instance);
+        private readonly InstrumentApiClient instrumentApiClient = new(AuthServiceProvider.Instance);
 
         public CalibrationList()
         {
@@ -147,7 +148,7 @@ namespace WindowsForms
             {
                 Name = "Approve",
                 HeaderText = string.Empty,
-                Text = "Approve",
+                Text = "Aprobar",
                 UseColumnTextForButtonValue = true,
                 Width = 80
             });
@@ -156,11 +157,53 @@ namespace WindowsForms
         private async void CalibrationList_Load(object sender, EventArgs e)
         {
             ConfigureButtonPermissions();
+            await LoadFilters();
+            await LoadCalibrations();
+        }
+
+        private async Task LoadFilters()
+        {
+            try
+            {
+                EnumText.ApplyTo(resultFilterComboBox);
+                resultFilterComboBox.DataSource = Enum.GetValues(typeof(ResultDTO));
+                resultFilterComboBox.SelectedIndex = -1;
+
+                var instruments = await instrumentApiClient.GetAllAsync();
+                instrumentFilterComboBox.DataSource = instruments.ToList();
+                instrumentFilterComboBox.DisplayMember = "Code";
+                instrumentFilterComboBox.ValueMember = "Id";
+                instrumentFilterComboBox.SelectedIndex = -1;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"No se pudieron cargar los filtros: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async void SearchButton_Click(object sender, EventArgs e)
+        {
+            if (fromDateTimePicker.Checked && toDateTimePicker.Checked
+                && fromDateTimePicker.Value.Date > toDateTimePicker.Value.Date)
+            {
+                MessageBox.Show("La fecha \"Desde\" no puede ser posterior a \"Hasta\".", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            await LoadCalibrations();
+        }
+
+        private async void ClearButton_Click(object sender, EventArgs e)
+        {
+            fromDateTimePicker.Checked = false;
+            toDateTimePicker.Checked = false;
+            resultFilterComboBox.SelectedIndex = -1;
+            instrumentFilterComboBox.SelectedIndex = -1;
             await LoadCalibrations();
         }
 
 
-        private bool CanApprove(CalibrationDTO calibration)
+        private static bool CanApprove(CalibrationDTO calibration)
         {
             if (calibration.ApprovedByUserId.HasValue)
                 return false;
@@ -180,7 +223,7 @@ namespace WindowsForms
             return isAdmin || calibration.PerformedByUserId != authService.GetUserId();
         }
 
-        private void calibrationsDataGridView_CellPainting(object? sender, DataGridViewCellPaintingEventArgs e)
+        private void CalibrationsDataGridView_CellPainting(object? sender, DataGridViewCellPaintingEventArgs e)
         {
             if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
             if (calibrationsDataGridView.Columns[e.ColumnIndex].Name != "Approve") return;
@@ -193,7 +236,7 @@ namespace WindowsForms
             }
         }
 
-        private async void calibrationsDataGridView_CellContentClick(object? sender, DataGridViewCellEventArgs e)
+        private async void CalibrationsDataGridView_CellContentClick(object? sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
             if (calibrationsDataGridView.Columns[e.ColumnIndex].Name != "Approve") return;
@@ -204,7 +247,7 @@ namespace WindowsForms
             if (approverId == null) return;
             var result = MessageBox.Show(
                 $"¿Aprobar la calibración de {calibration.InstrumentCode} {calibration.CalibrationDate:dd/MM/yyyy}?",
-                "Confirm approval",
+                "Confirmar aprobación",
                 MessageBoxButtons.OKCancel,
                 MessageBoxIcon.Question);
 
@@ -246,7 +289,7 @@ namespace WindowsForms
             deleteButton.Tag = canDelete;
         }
 
-        private async void createButton_Click(object sender, EventArgs e)
+        private async void CreateButton_Click(object sender, EventArgs e)
         {
             CalibrationDTO newCalibration = new CalibrationDTO();
             CalibrationDetail calibrationDetail = new CalibrationDetail(FormMode.Create, newCalibration);
@@ -255,7 +298,7 @@ namespace WindowsForms
             await LoadCalibrations();
         }
 
-        private async void updateButton_Click(object sender, EventArgs e)
+        private async void UpdateButton_Click(object sender, EventArgs e)
         {
             CalibrationDTO? selected = this.SelectedItem();
             if (selected == null) return;
@@ -280,7 +323,7 @@ namespace WindowsForms
             }
         }
 
-        private async void deleteButton_Click(object sender, EventArgs e)
+        private async void DeleteButton_Click(object sender, EventArgs e)
         {
             CalibrationDTO? calibration = this.SelectedItem();
             if (calibration == null) return;
@@ -312,7 +355,14 @@ namespace WindowsForms
                 DisableControls();
                 this.calibrationsDataGridView.DataSource = null;
 
-                IEnumerable<CalibrationDTO> calibrations = await calibrationApiClient.GetAllAsync();
+                // El filtrado lo resuelve el servidor; un criterio en null significa "no filtrar por eso".
+                // "Hasta" se manda como el final de ese día para que incluya las calibraciones del mismo día.
+                DateTime? from = fromDateTimePicker.Checked ? fromDateTimePicker.Value.Date : null;
+                DateTime? to = toDateTimePicker.Checked ? toDateTimePicker.Value.Date.AddDays(1).AddTicks(-1) : null;
+                string? result = resultFilterComboBox.SelectedItem?.ToString();
+                int? instrumentId = instrumentFilterComboBox.SelectedValue as int?;
+
+                IEnumerable<CalibrationDTO> calibrations = await calibrationApiClient.SearchAsync(from, to, result, instrumentId);
 
                 this.calibrationsDataGridView.DataSource = calibrations;
                 // Solo manejar Enabled/Disabled si los botones son visibles (tienen permisos)
@@ -353,7 +403,7 @@ namespace WindowsForms
                 return null;
             }
 
-            calibration = (CalibrationDTO)calibrationsDataGridView.SelectedRows[0].DataBoundItem;
+            calibration = calibrationsDataGridView.SelectedRows[0].DataBoundItem as CalibrationDTO;
             return calibration;
         }
 
@@ -363,12 +413,24 @@ namespace WindowsForms
             updateButton.Enabled = false;
             deleteButton.Enabled = false;
             calibrationsDataGridView.Enabled = false;
+            fromDateTimePicker.Enabled = false;
+            toDateTimePicker.Enabled = false;
+            resultFilterComboBox.Enabled = false;
+            instrumentFilterComboBox.Enabled = false;
+            searchButton.Enabled = false;
+            clearButton.Enabled = false;
         }
 
         private void EnableControls()
         {
             createButton.Enabled = true;
             calibrationsDataGridView.Enabled = true;
+            fromDateTimePicker.Enabled = true;
+            toDateTimePicker.Enabled = true;
+            resultFilterComboBox.Enabled = true;
+            instrumentFilterComboBox.Enabled = true;
+            searchButton.Enabled = true;
+            clearButton.Enabled = true;
         }
     }
 }

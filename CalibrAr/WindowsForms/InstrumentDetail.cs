@@ -140,7 +140,7 @@ namespace WindowsForms
                     {
                         this.Instrument.MaxAllowedError = null;
                     }
-                    else if (decimal.TryParse(maxAllowedErrorTextBox.Text, out var maxErrValue))
+                    else if (DecimalParser.TryParse(maxAllowedErrorTextBox.Text, out var maxErrValue))
                     {
                         this.Instrument.MaxAllowedError = maxErrValue;
                     }
@@ -165,8 +165,16 @@ namespace WindowsForms
                         return;
                     }
 
-                    this.Instrument.InstrumentTypeId = (int)instrumentTypeComboBox.SelectedValue;
-                    this.Instrument.AreaId = (int)areaComboBox.SelectedValue;
+                    if (instrumentTypeComboBox.SelectedValue is not int instrumentTypeId
+                        || areaComboBox.SelectedValue is not int areaId)
+                    {
+                        MessageBox.Show("Seleccioná el tipo de instrumento y el área.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    this.Instrument.InstrumentTypeId = instrumentTypeId;
+                    this.Instrument.AreaId = areaId;
+                    this.Instrument.ChangedByUserId = AuthServiceProvider.Instance.GetUserId();
                     if (this.Mode == FormMode.Update)
                     {
                         await instrumentApiClient.UpdateAsync(this.Instrument);

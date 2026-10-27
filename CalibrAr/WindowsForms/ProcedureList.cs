@@ -239,16 +239,16 @@ namespace WindowsForms
             DocumentLink.Open(procedure.DocumentUrl);
         }
 
-        private ProcedureDTO SelectedItem()
+        private ProcedureDTO? SelectedItem()
         {
-            ProcedureDTO procedure;
+            ProcedureDTO? procedure;
             if (proceduresDataGridView.SelectedRows.Count == 0)
             {
                 MessageBox.Show("Primero seleccione un procedimiento.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
             }
 
-            procedure = (ProcedureDTO)proceduresDataGridView.SelectedRows[0].DataBoundItem;
+            procedure = proceduresDataGridView.SelectedRows[0].DataBoundItem as ProcedureDTO;
             return procedure;
         }
 

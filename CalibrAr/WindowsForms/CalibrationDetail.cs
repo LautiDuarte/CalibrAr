@@ -56,6 +56,7 @@ namespace WindowsForms
             InitializeComponent();
             calibrationDateTimePicker.MaxDate = DateTime.Today.AddDays(1).AddTicks(-1);
             ConfigureColumns();
+            measurementsDataGridView.CellFormatting += measurementsDataGridView_CellFormatting;
 
             // El botón "Ver documento" solo se habilita si el procedimiento elegido tiene link.
             procedureComboBox.SelectedIndexChanged += (sender, e) => UpdateDocumentButton();
@@ -76,7 +77,6 @@ namespace WindowsForms
                 this.Calibration = calibration;
                 this.Mode = mode;
 
-                ConfigureColumns();
                 measurementsLocales = new List<CalibrationMeasurementDTO>();
                 LoadInterventionTypes();
                 LoadResults();
@@ -136,7 +136,8 @@ namespace WindowsForms
                 Name = "IsWithinTolerance",
                 HeaderText = "Dentro de tolerancia",
                 DataPropertyName = "IsWithinTolerance",
-                Width = 80
+                Width = 80,
+                ReadOnly = true
             });
 
             this.measurementsDataGridView.Columns.Add(new DataGridViewTextBoxColumn
@@ -146,6 +147,19 @@ namespace WindowsForms
                 DataPropertyName = "Notes",
                 Width = 100
             });
+        }
+
+        // El booleano se muestra como "Sí" / "No" en lugar de True / False
+        private void measurementsDataGridView_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+            if (measurementsDataGridView.Columns[e.ColumnIndex].Name != "IsWithinTolerance") return;
+
+            if (e.Value is bool isWithinTolerance)
+            {
+                e.Value = isWithinTolerance ? "Sí" : "No";
+                e.FormattingApplied = true;
+            }
         }
 
         private void LoadInterventionTypes()
@@ -566,7 +580,8 @@ namespace WindowsForms
                 performedByUserLabel.Visible = true;
                 approvedByUserComboBox.Visible = true;
                 approvedByUserLabel.Visible = true;
-            } else
+            }
+            else
             {
                 calibrationDateTimePicker.Visible = false;
                 calibrationDateLabel.Visible = false;

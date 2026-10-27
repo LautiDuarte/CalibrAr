@@ -248,7 +248,8 @@ namespace WindowsForms
 
                 // Vacío al crear: la API genera el código. Al editar se conserva el que ya tenía.
                 NonConformity.Code = this.Mode == FormMode.Create ? string.Empty : codeTextBox.Text.Trim();
-                NonConformity.InstrumentId = (int)instrumentComboBox.SelectedValue;
+                if (instrumentComboBox.SelectedValue is not int instrumentId) return;
+                NonConformity.InstrumentId = instrumentId;
                 NonConformity.CalibrationId = calibrationComboBox.SelectedValue is int calibrationId && calibrationId != 0
                     ? calibrationId
                     : null;
@@ -263,13 +264,14 @@ namespace WindowsForms
                 }
                 else
                 {
+                    if (detectedByUserComboBox.SelectedValue is not int detectedById) return;
                     NonConformity.OpenedAt = openedAtDateTimePicker.Value;
-                    NonConformity.DetectedByUserId = (int)detectedByUserComboBox.SelectedValue;
+                    NonConformity.DetectedByUserId = detectedById;
 
                     if (isClosed)
                     {
                         // "(None)" = 0 => reabrir. El back limpia ClosedAt y pasa el estado a Open
-                        int closedById = (int)closedByUserComboBox.SelectedValue;
+                        if (closedByUserComboBox.SelectedValue is not int closedById) return;
                         NonConformity.ClosedByUserId = closedById == 0 ? null : closedById;
                         NonConformity.ClosedAt = closedById == 0 ? null : closedAtDateTimePicker.Value;
                     }

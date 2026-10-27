@@ -16,6 +16,7 @@ namespace WindowsForms
     public partial class InstrumentList : Form
     {
         private readonly InstrumentApiClient instrumentApiClient = new(AuthServiceProvider.Instance);
+        private readonly AreaApiClient areaApiClient = new(AuthServiceProvider.Instance);
 
         public InstrumentList()
         {
@@ -165,6 +166,46 @@ namespace WindowsForms
         private async void InstrumentList_Load(object sender, EventArgs e)
         {
             ConfigureButtonPermissions();
+            await LoadFilters();
+            await LoadInstruments();
+        }
+
+        private async Task LoadFilters()
+        {
+            try
+            {
+                EnumText.ApplyTo(statusFilterComboBox);
+                statusFilterComboBox.DataSource = Enum.GetValues(typeof(InstrumentStatusDTO));
+                statusFilterComboBox.SelectedIndex = -1;
+
+                var areas = await areaApiClient.GetAllAsync();
+                areaFilterComboBox.DataSource = areas
+                    .Select(a => new
+                    {
+                        a.Id,
+                        DisplayName = $"{a.Name} ({a.LocationName})"
+                    })
+                    .ToList();
+                areaFilterComboBox.DisplayMember = "DisplayName";
+                areaFilterComboBox.ValueMember = "Id";
+                areaFilterComboBox.SelectedIndex = -1;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"No se pudieron cargar los filtros: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async void SearchButton_Click(object sender, EventArgs e)
+        {
+            await LoadInstruments();
+        }
+
+        private async void ClearButton_Click(object sender, EventArgs e)
+        {
+            searchTextBox.Clear();
+            statusFilterComboBox.SelectedIndex = -1;
+            areaFilterComboBox.SelectedIndex = -1;
             await LoadInstruments();
         }
 
@@ -188,7 +229,7 @@ namespace WindowsForms
             deleteButton.Tag = canDelete;
         }
 
-        private async void createButton_Click(object sender, EventArgs e)
+        private async void CreateButton_Click(object sender, EventArgs e)
         {
             InstrumentDTO newInstrument = new InstrumentDTO();
             InstrumentDetail instrumentDetail = new InstrumentDetail(FormMode.Create, newInstrument);
@@ -197,7 +238,7 @@ namespace WindowsForms
             await LoadInstruments();
         }
 
-        private async void updateButton_Click(object sender, EventArgs e)
+        private async void UpdateButton_Click(object sender, EventArgs e)
         {
             InstrumentDTO? selected = this.SelectedItem();
             if (selected == null) return;
@@ -222,7 +263,7 @@ namespace WindowsForms
             }
         }
 
-        private async void deleteButton_Click(object sender, EventArgs e)
+        private async void DeleteButton_Click(object sender, EventArgs e)
         {
             InstrumentDTO? instrument = this.SelectedItem();
             if (instrument == null) return;
@@ -254,7 +295,12 @@ namespace WindowsForms
                 DisableControls();
                 this.instrumentsDataGridView.DataSource = null;
 
-                IEnumerable<InstrumentDTO> instruments = await instrumentApiClient.GetAllAsync();
+                // El filtrado lo resuelve el servidor; un criterio en null significa "no filtrar por eso"
+                string? text = string.IsNullOrWhiteSpace(searchTextBox.Text) ? null : searchTextBox.Text.Trim();
+                string? status = statusFilterComboBox.SelectedItem?.ToString();
+                int? areaId = areaFilterComboBox.SelectedValue as int?;
+
+                IEnumerable<InstrumentDTO> instruments = await instrumentApiClient.SearchAsync(text, status, areaId);
 
                 this.instrumentsDataGridView.DataSource = instruments;
                 // Solo manejar Enabled/Disabled si los botones son visibles (tienen permisos)
@@ -294,7 +340,7 @@ namespace WindowsForms
                 return null;
             }
 
-            return (InstrumentDTO)instrumentsDataGridView.SelectedRows[0].DataBoundItem;
+            return instrumentsDataGridView.SelectedRows[0].DataBoundItem as InstrumentDTO;
         }
 
         private void DisableControls()
@@ -303,12 +349,22 @@ namespace WindowsForms
             updateButton.Enabled = false;
             deleteButton.Enabled = false;
             instrumentsDataGridView.Enabled = false;
+            searchTextBox.Enabled = false;
+            statusFilterComboBox.Enabled = false;
+            areaFilterComboBox.Enabled = false;
+            searchButton.Enabled = false;
+            clearButton.Enabled = false;
         }
 
         private void EnableControls()
         {
             createButton.Enabled = true;
             instrumentsDataGridView.Enabled = true;
+            searchTextBox.Enabled = true;
+            statusFilterComboBox.Enabled = true;
+            areaFilterComboBox.Enabled = true;
+            searchButton.Enabled = true;
+            clearButton.Enabled = true;
         }
     }
 }
