@@ -22,14 +22,14 @@
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("Id must be greater than 0.", nameof(id));
+                throw new ArgumentException("El id debe ser mayor que 0.");
             Id = id;
         }
 
         public void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("The name cannot be null or empty.", nameof(name));
+                throw new ArgumentException("El nombre no puede estar vacío.");
             Name = name;
         }
 
@@ -46,7 +46,7 @@
         public void SetCreatedAt(DateTime createdAt)
         {
             if (createdAt == default)
-                throw new ArgumentException("The creation date cannot be null.", nameof(createdAt));
+                throw new ArgumentException("La fecha de creación no puede estar vacía.");
             CreatedAt = createdAt;
         }
     }

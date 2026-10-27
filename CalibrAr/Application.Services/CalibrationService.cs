@@ -58,7 +58,9 @@ namespace Application.Services
             Calibration calibration = new Calibration(0, now, interventionType, dto.IsExternal, dto.ExternalLab, dto.CertificateNumber, result, dto.RestrictionDetail, dto.Notes, now, dto.InstrumentId, dto.ProcedureId, userId, null);
 
             var maxAllowedError = await ResolveMaxAllowedErrorAsync(instrument);
-            calibration.SetMeasurements(BuildMeasurements(dto.Measurements, 0, maxAllowedError, resetIds: true));
+            var measurements = BuildMeasurements(dto.Measurements, 0, maxAllowedError, resetIds: true);
+            EnsureResultMatchesMeasurements(result, measurements);
+            calibration.SetMeasurements(measurements);
             calibration.SetReferenceStandards(await GetReferenceStandardsAsync(dto, now));
 
             await calibrationRepository.AddAsync(calibration);
@@ -152,7 +154,7 @@ namespace Application.Services
             }
 
             if (dto.CalibrationDate.Date > DateTime.Today)
-                throw new ArgumentException("The calibration date cannot be in the future.", nameof(dto.CalibrationDate));
+                throw new ArgumentException("La fecha de la calibración no puede ser futura.");
 
             var interventionType = ParseEnum<InterventionType>(dto.InterventionType, nameof(dto.InterventionType));
             var result = ParseEnum<Result>(dto.Result, nameof(dto.Result));
@@ -160,7 +162,9 @@ namespace Application.Services
             Calibration calibration = new Calibration(dto.Id, dto.CalibrationDate, interventionType, dto.IsExternal, dto.ExternalLab, dto.CertificateNumber, result, dto.RestrictionDetail, dto.Notes, existing.CreatedAt, dto.InstrumentId, dto.ProcedureId, existing.PerformedByUserId, approvedByUserId);
 
             var maxAllowedError = await ResolveMaxAllowedErrorAsync(instrument);
-            calibration.SetMeasurements(BuildMeasurements(dto.Measurements, dto.Id, maxAllowedError, resetIds: false));
+            var measurements = BuildMeasurements(dto.Measurements, dto.Id, maxAllowedError, resetIds: false);
+            EnsureResultMatchesMeasurements(result, measurements);
+            calibration.SetMeasurements(measurements);
             calibration.SetReferenceStandards(await GetReferenceStandardsAsync(dto, dto.CalibrationDate));
 
             var updated = await calibrationRepository.UpdateAsync(calibration);
@@ -181,7 +185,7 @@ namespace Application.Services
                 return false;
 
             if (existing.ApprovedByUserId.HasValue)
-                throw new InvalidOperationException("The calibration is already approved.");
+                throw new InvalidOperationException("La calibración ya está aprobada.");
 
             await ValidateApproverAsync(approverUserId, existing.PerformedByUserId);
 
@@ -202,10 +206,10 @@ namespace Application.Services
         private async Task EnsureCanApproveAsync(int userId)
         {
             var user = await userRepository.GetAsync(userId)
-                ?? throw new KeyNotFoundException($"There is no user with id {userId}.");
+                ?? throw new KeyNotFoundException($"No existe un usuario con id {userId}.");
 
             if (user.Role != UserRole.Administrador && user.Role != UserRole.Responsable)
-                throw new ArgumentException("The user does not have permission to approve calibrations.");
+                throw new ArgumentException("El usuario no tiene permiso para aprobar calibraciones.");
         }
 
         // Reglas para aprobar: el aprobador debe ser Administrador o Responsable,
@@ -214,13 +218,13 @@ namespace Application.Services
         {
             var approver = await userRepository.GetAsync(approverUserId);
             if (approver == null)
-                throw new KeyNotFoundException($"There is no user with id {approverUserId}.");
+                throw new KeyNotFoundException($"No existe un usuario con id {approverUserId}.");
 
             if (approver.Role != UserRole.Administrador && approver.Role != UserRole.Responsable)
-                throw new ArgumentException("The user does not have permission to approve calibrations.");
+                throw new ArgumentException("El usuario no tiene permiso para aprobar calibraciones.");
 
             if (approver.Id == performedByUserId && approver.Role != UserRole.Administrador)
-                throw new ArgumentException("Only an administrator can approve a calibration that they performed.");
+                throw new ArgumentException("Quien realizó la calibración solo puede aprobarla si es administrador.");
         }
 
         // La última calibración real (fecha máxima) manda; InstrumentService aplica la regla de fechas
@@ -249,7 +253,7 @@ namespace Application.Services
             foreach (var id in dto.ReferenceStandardIds.Distinct())
             {
                 var standard = await referenceStandardRepository.GetAsync(id)
-                    ?? throw new KeyNotFoundException($"There is no reference standard with id {id}.");
+                    ?? throw new KeyNotFoundException($"No existe un patrón de referencia con id {id}.");
 
                 if (standard.CertificateExpiresAt.Date < calibrationDate.Date)
                     throw new ArgumentException($"El certificado del patrón '{standard.Description}' venció el {standard.CertificateExpiresAt:dd/MM/yyyy}: no se puede usar en la calibración.");
@@ -261,9 +265,12 @@ namespace Application.Services
 
         private async Task<Instrument> GetInstrumentOrThrowAsync(int instrumentId)
         {
+            if (instrumentId <= 0)
+                throw new ArgumentException("Debe seleccionar un instrumento.");
+
             var instrument = await instrumentRepository.GetAsync(instrumentId);
             if (instrument == null)
-                throw new KeyNotFoundException($"There is no instrument with id {instrumentId}.");
+                throw new KeyNotFoundException($"No existe un instrumento con id {instrumentId}.");
             return instrument;
         }
 
@@ -277,12 +284,19 @@ namespace Application.Services
             return type?.MaxAllowedError;
         }
 
+        // Una medición fuera de tolerancia no puede terminar en un resultado "Conforme"
+        private static void EnsureResultMatchesMeasurements(Result result, IEnumerable<CalibrationMeasurement> measurements)
+        {
+            if (result == Result.Conformant && measurements.Any(m => !m.IsWithinTolerance))
+                throw new ArgumentException("El resultado no puede ser Conforme: hay mediciones fuera de tolerancia. Elija Conforme con restricciones o No conforme.");
+        }
+
         private static List<CalibrationMeasurement> BuildMeasurements(IEnumerable<CalibrationMeasurementDTO>? dtos, int calibrationId, decimal? maxAllowedError, bool resetIds)
         {
             var list = dtos?.ToList() ?? new List<CalibrationMeasurementDTO>();
 
             if (list.Count > 0 && !maxAllowedError.HasValue)
-                throw new ArgumentException("Neither the instrument nor its type define a maximum allowed error, so the measurements cannot be evaluated.", nameof(dtos));
+                throw new ArgumentException("Ni el instrumento ni su tipo definen un error máximo permitido, por lo que no se pueden evaluar las mediciones.");
 
             return list.Select(m =>
             {
@@ -298,7 +312,7 @@ namespace Application.Services
                 return;
             var procedure = await procedureRepository.GetAsync(procedureId.Value);
             if (procedure == null)
-                throw new KeyNotFoundException($"There is no procedure with id {procedureId}.");
+                throw new KeyNotFoundException($"No existe un procedimiento con id {procedureId}.");
         }
 
         private async Task EnsureUserExistsAsync(int? userId)
@@ -307,13 +321,13 @@ namespace Application.Services
                 return;
             var user = await userRepository.GetAsync(userId.Value);
             if (user == null)
-                throw new KeyNotFoundException($"There is no user with id {userId}.");
+                throw new KeyNotFoundException($"No existe un usuario con id {userId}.");
         }
 
         private static TEnum ParseEnum<TEnum>(string value, string paramName) where TEnum : struct
         {
             if (!Enum.TryParse<TEnum>(value, out var parsed))
-                throw new ArgumentException($"The value '{value}' is not valid", paramName);
+                throw new ArgumentException($"El valor '{value}' no es válido.");
             return parsed;
         }
 

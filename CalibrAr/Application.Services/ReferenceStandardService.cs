@@ -36,7 +36,7 @@ namespace Application.Services
         public async Task<bool> DeleteAsync(int id)
         {
             if (await referenceStandardRepository.IsUsedAsync(id))
-                throw new InvalidOperationException("The reference standard is used in one or more calibrations and cannot be deleted.");
+                throw new InvalidOperationException("El patrón de referencia se usa en una o más calibraciones y no se puede eliminar.");
 
             return await referenceStandardRepository.DeleteAsync(id);
         }

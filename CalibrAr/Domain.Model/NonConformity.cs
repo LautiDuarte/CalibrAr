@@ -103,21 +103,21 @@ namespace Domain.Model
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("Id must be greater than 0.", nameof(id));
+                throw new ArgumentException("El id debe ser mayor que 0.");
             Id = id;
         }
 
         public void SetCode(string code)
         {
             if (string.IsNullOrWhiteSpace(code))
-                throw new ArgumentException("The code cannot be null or empty.", nameof(code));
+                throw new ArgumentException("El código no puede estar vacío.");
             Code = code;
         }
 
         public void SetDescription(string description)
         {
             if (string.IsNullOrWhiteSpace(description))
-                throw new ArgumentException("The description cannot be null or empty.", nameof(description));
+                throw new ArgumentException("La descripción no puede estar vacía.");
             Description = description;
         }
 
@@ -139,28 +139,28 @@ namespace Domain.Model
         public void SetOpenedAt(DateTime openedAt)
         {
             if (openedAt == default)
-                throw new ArgumentException("The opening date cannot be null.", nameof(openedAt));
+                throw new ArgumentException("La fecha de apertura no puede estar vacía.");
             OpenedAt = openedAt;
         }
 
         public void SetClosedAt(DateTime? closedAt)
         {
             if (closedAt.HasValue && closedAt.Value < OpenedAt)
-                throw new ArgumentException("The closing date cannot be earlier than the opening date.", nameof(closedAt));
+                throw new ArgumentException("La fecha de cierre no puede ser anterior a la de apertura.");
             ClosedAt = closedAt;
         }
 
         public void SetCreatedAt(DateTime createdAt)
         {
             if (createdAt == default)
-                throw new ArgumentException("The creation date cannot be null.", nameof(createdAt));
+                throw new ArgumentException("La fecha de creación no puede estar vacía.");
             CreatedAt = createdAt;
         }
 
         public void SetInstrumentId(int instrumentId)
         {
             if (instrumentId <= 0)
-                throw new ArgumentException("Instrument Id must be greater than 0.", nameof(instrumentId));
+                throw new ArgumentException("El id del instrumento debe ser mayor que 0.");
             if (_instrument != null && _instrument.Id != instrumentId)
                 Instrument = null;
             InstrumentId = instrumentId;
@@ -169,7 +169,7 @@ namespace Domain.Model
         public void SetCalibrationId(int? calibrationId)
         {
             if (calibrationId.HasValue && calibrationId <= 0)
-                throw new ArgumentException("Calibration Id must be greater than 0.", nameof(calibrationId));
+                throw new ArgumentException("El id de la calibración debe ser mayor que 0.");
             if (_calibration != null && _calibration.Id != calibrationId)
                 Calibration = null;
             CalibrationId = calibrationId;
@@ -178,7 +178,7 @@ namespace Domain.Model
         public void SetDetectedByUserId(int detectedByUserId)
         {
             if (detectedByUserId <= 0)
-                throw new ArgumentException("The Id from the user who detected de non conformity must be greater than 0.", nameof(detectedByUserId));
+                throw new ArgumentException("El id del usuario que detectó la no conformidad debe ser mayor que 0.");
             if (_detectedByUser != null && _detectedByUser.Id != detectedByUserId)
                 DetectedByUser = null;
             DetectedByUserId = detectedByUserId;
@@ -187,7 +187,7 @@ namespace Domain.Model
         public void SetClosedByUserId(int? closedByUserId)
         {
             if (closedByUserId.HasValue && closedByUserId <= 0)
-                throw new ArgumentException("The id from the user who closed the non conformity must be greater than 0.", nameof(closedByUserId));
+                throw new ArgumentException("El id del usuario que cerró la no conformidad debe ser mayor que 0.");
             if (_closedByUser != null && _closedByUser.Id != closedByUserId)
                 ClosedByUser = null;
             ClosedByUserId = closedByUserId;

@@ -32,17 +32,17 @@ namespace Domain.Model
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("Id must be greater than 0.", nameof(id));
+                throw new ArgumentException("El id debe ser mayor que 0.");
             Id = id;
         }
 
         public void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("The name cannot be null or empty.", nameof(name));
+                throw new ArgumentException("El nombre no puede estar vacío.");
 
             if (name.Length > 50)
-                throw new ArgumentException("The name cannot exceed 50 characters.", nameof(name));
+                throw new ArgumentException("El nombre no puede superar los 50 caracteres.");
 
             Name = name;
         }
@@ -50,20 +50,20 @@ namespace Domain.Model
         public void SetDescription(string description)
         {
             if (string.IsNullOrWhiteSpace(description))
-                throw new ArgumentException("The description cannot be null or empty.", nameof(description));
+                throw new ArgumentException("La descripción no puede estar vacía.");
 
             if (description.Length > 200)
-                throw new ArgumentException("The description cannot exceed 200 characters.", nameof(description));
+                throw new ArgumentException("La descripción no puede superar los 200 caracteres.");
             Description = description;
         }
 
         public void SetCategory(string category)
         {
             if (string.IsNullOrWhiteSpace(category))
-                throw new ArgumentException("The category cannot be null or empty.", nameof(category));
+                throw new ArgumentException("La categoría no puede estar vacía.");
 
             if (category.Length > 30)
-                throw new ArgumentException("The category cannot exceed 30 characters.", nameof(category));
+                throw new ArgumentException("La categoría no puede superar los 30 caracteres.");
 
             Category = category;
         }

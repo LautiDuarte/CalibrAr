@@ -142,7 +142,7 @@ namespace Data
                 }
 
                 var tracked = existing.Measurements.FirstOrDefault(x => x.Id == m.Id)
-                    ?? throw new KeyNotFoundException($"Measurement {m.Id} does not belong to calibration {existing.Id}.");
+                    ?? throw new KeyNotFoundException($"La medición {m.Id} no pertenece a la calibración {existing.Id}.");
 
                 tracked.SetNominalValue(m.NominalValue);
                 tracked.SetMeasuredValue(m.MeasuredValue);

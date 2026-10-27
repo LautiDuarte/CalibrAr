@@ -118,7 +118,7 @@ namespace Application.Services
                 return false;
 
             if (existing.ClosedByUserId.HasValue)
-                throw new InvalidOperationException("The non conformity is already closed.");
+                throw new InvalidOperationException("La no conformidad ya está cerrada.");
 
             await EnsureUserExistsAsync(closerUserId);
 
@@ -128,9 +128,12 @@ namespace Application.Services
 
         private async Task EnsureInstrumentExistsAsync(int instrumentId)
         {
+            if (instrumentId <= 0)
+                throw new ArgumentException("Debe seleccionar un instrumento.");
+
             var instrument = await instrumentRepository.GetAsync(instrumentId);
             if (instrument == null)
-                throw new KeyNotFoundException($"There is no instrument with id {instrumentId}.");
+                throw new KeyNotFoundException($"No existe un instrumento con id {instrumentId}.");
         }
 
         // El siguiente número después del más alto que ya exista con formato NC-<número>.
@@ -164,9 +167,9 @@ namespace Application.Services
                 return;
             var calibration = await calibrationRepository.GetAsync(calibrationId.Value);
             if (calibration == null)
-                throw new KeyNotFoundException($"There is no calibration with id {calibrationId}.");
+                throw new KeyNotFoundException($"No existe una calibración con id {calibrationId}.");
             if (calibration.InstrumentId != instrumentId)
-                throw new ArgumentException("The calibration does not belong to the selected instrument.", nameof(calibrationId));
+                throw new ArgumentException("La calibración no pertenece al instrumento seleccionado.");
         }
 
         private async Task EnsureUserExistsAsync(int? userId)
@@ -175,13 +178,13 @@ namespace Application.Services
                 return;
             var user = await userRepository.GetAsync(userId.Value);
             if (user == null)
-                throw new KeyNotFoundException($"There is no user with id {userId}.");
+                throw new KeyNotFoundException($"No existe un usuario con id {userId}.");
         }
 
         private static TEnum ParseEnum<TEnum>(string value, string paramName) where TEnum : struct
         {
             if (!Enum.TryParse<TEnum>(value, out var parsed))
-                throw new ArgumentException($"The value '{value}' is not valid.", paramName);
+                throw new ArgumentException($"El valor '{value}' no es válido.");
             return parsed;
         }
 

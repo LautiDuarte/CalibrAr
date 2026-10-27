@@ -42,14 +42,14 @@ namespace Domain.Model
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("Id must be greater than 0.", nameof(id));
+                throw new ArgumentException("El id debe ser mayor que 0.");
             Id = id;
         }
 
         public void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Name cannot be null or empty.", nameof(name));
+                throw new ArgumentException("El nombre no puede estar vacío.");
             Name = name;
         }
 
@@ -66,14 +66,14 @@ namespace Domain.Model
         public void SetCreatedAt(DateTime createdAt)
         {
             if (createdAt == default)
-                throw new ArgumentException("CreatedAt cannot be null.", nameof(createdAt));
+                throw new ArgumentException("La fecha de creación no puede estar vacía.");
             CreatedAt = createdAt;
         }
 
         public void SetLocationId(int locationId)
         {
             if (locationId <= 0)
-                throw new ArgumentException("LocationId must be greater than 0.", nameof(locationId));
+                throw new ArgumentException("El id de la ubicación debe ser mayor que 0.");
 
             // Si el objeto cargado ya no corresponde al nuevo id, se invalida
             if (_location != null && _location.Id != locationId)

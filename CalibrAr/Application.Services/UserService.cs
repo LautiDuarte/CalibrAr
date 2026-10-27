@@ -21,7 +21,7 @@ namespace Application.Services
         public async Task<UserDTO> AddAsync(UserDTO dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Password))
-                throw new ArgumentException("Password is required to create a user.", nameof(dto.Password));
+                throw new ArgumentException("La contraseña es obligatoria para crear un usuario.");
 
             if (dto.Password.Length < 8)
                 throw new ArgumentException("La contraseña debe tener al menos 8 caracteres.");
@@ -54,12 +54,12 @@ namespace Application.Services
                 return false;
 
             if (requesterUserId == id)
-                throw new ArgumentException("You cannot delete your own user.");
+                throw new ArgumentException("No puede eliminar su propio usuario.");
 
             await EnsureAnotherAdministratorRemainsAsync(existing);
 
             if (await userRepository.IsReferencedAsync(id))
-                throw new InvalidOperationException("The user is referenced by calibrations, non conformities or status history and cannot be deleted. Deactivate it instead.");
+                throw new InvalidOperationException("El usuario figura en calibraciones, no conformidades o en el historial de estados y no se puede eliminar. Desactívelo en su lugar.");
 
             return await userRepository.DeleteAsync(id);
         }
@@ -93,9 +93,9 @@ namespace Application.Services
             if (requesterUserId == dto.Id)
             {
                 if (role != existing.Role)
-                    throw new ArgumentException("You cannot change your own role.", nameof(dto.Role));
+                    throw new ArgumentException("No puede cambiar su propio rol.");
                 if (!dto.IsActive)
-                    throw new ArgumentException("You cannot deactivate your own user.", nameof(dto.IsActive));
+                    throw new ArgumentException("No puede desactivar su propio usuario.");
             }
 
             // Si deja de ser administrador activo, tiene que quedar otro
@@ -116,7 +116,7 @@ namespace Application.Services
         {
             var normalized = email?.Trim() ?? string.Empty;
             if (await userRepository.ExistsByEmailAsync(normalized, excludeId))
-                throw new InvalidOperationException($"There is already a user with email '{normalized}'.");
+                throw new InvalidOperationException($"Ya existe un usuario con el email '{normalized}'.");
         }
 
         // El sistema no puede quedar sin administradores activos
@@ -124,7 +124,7 @@ namespace Application.Services
         {
             if (existing.Role == UserRole.Administrador && existing.IsActive
                 && await userRepository.CountOtherActiveAdministratorsAsync(existing.Id) == 0)
-                throw new InvalidOperationException("There must be at least one active administrator.");
+                throw new InvalidOperationException("Tiene que haber al menos un administrador activo.");
         }
 
         // El grupo de permisos se asigna según el rol (nombres del seed de CalibrArContext)
@@ -136,16 +136,16 @@ namespace Application.Services
                 UserRole.Responsable => "Responsible",
                 UserRole.Operador => "Operator",
                 UserRole.Auditor => "Auditor",
-                _ => throw new ArgumentException($"The role '{role}' is not valid.", nameof(role))
+                _ => throw new ArgumentException($"El rol '{role}' no es válido.")
             };
             return await userRepository.GetGroupByNameAsync(groupName)
-                ?? throw new KeyNotFoundException($"There is no permission group named '{groupName}'.");
+                ?? throw new KeyNotFoundException($"No existe el grupo de permisos '{groupName}'.");
         }
 
         private static UserRole ParseRole(string role)
         {
             if (!Enum.TryParse<UserRole>(role, out var parsed))
-                throw new ArgumentException($"The role '{role}' is not valid.", nameof(role));
+                throw new ArgumentException($"El rol '{role}' no es válido.");
             return parsed;
         }
 
