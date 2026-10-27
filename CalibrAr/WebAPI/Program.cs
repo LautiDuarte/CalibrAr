@@ -86,6 +86,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey)),
             ClockSkew = TimeSpan.Zero
         };
+
+        // Un token firmado sigue siendo válido hasta que vence, aunque el usuario se haya borrado
+        // o desactivado: por eso se confirma en la base en cada pedido.
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                int? userId = context.Principal?.GetUserId();
+                var userRepository = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
+                var user = userId == null ? null : await userRepository.GetAsync(userId.Value);
+
+                if (user == null || !user.IsActive)
+                    context.Fail("El usuario ya no está habilitado.");
+            }
+        };
     });
 
 builder.Services.AddAuthorization(options =>

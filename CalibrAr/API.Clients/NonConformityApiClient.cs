@@ -139,12 +139,13 @@ namespace API.Clients
             }
         }
 
-        public async Task CloseAsync(int id, int closerUserId)
+        // Quién cierra lo define la API con el token
+        public async Task CloseAsync(int id)
         {
             try
             {
                 using var client = await CreateHttpClientAsync();
-                HttpResponseMessage response = await client.PutAsync($"nonConformities/{id}/close/{closerUserId}", null);
+                HttpResponseMessage response = await client.PutAsync($"nonConformities/{id}/close", null);
                 if (!response.IsSuccessStatusCode)
                 {
                     ThrowIfUnauthorized(response);

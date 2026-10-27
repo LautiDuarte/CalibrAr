@@ -139,12 +139,13 @@ namespace API.Clients
             }
         }
 
-        public async Task ApproveAsync(int id, int approverUserId)
+        // Quién aprueba lo define la API con el token
+        public async Task ApproveAsync(int id)
         {
             try
             {
                 using var client = await CreateHttpClientAsync();
-                HttpResponseMessage response = await client.PutAsync($"calibrations/{id}/approve/{approverUserId}", null);
+                HttpResponseMessage response = await client.PutAsync($"calibrations/{id}/approve", null);
                 if (!response.IsSuccessStatusCode)
                 {
                     ThrowIfUnauthorized(response);

@@ -97,7 +97,6 @@ namespace WindowsForms
                 if (this.Mode == FormMode.Update)
                 {
                     User.IsActive = isActiveCheckBox.Checked;
-                    User.RequestedByUserId = AuthServiceProvider.Instance.GetUserId();
                     await userApiClient.UpdateAsync(User);
                 }
                 else

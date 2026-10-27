@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Application.Services;
 using DTOs;
 
@@ -35,11 +36,17 @@ namespace WebAPI
             .WithOpenApi()
             .RequireAuthorization("CalibrationsRead");
 
-            app.MapPost("/calibrations", async (CalibrationDTO dto, ICalibrationService calibrationService) =>
+            app.MapPost("/calibrations", async (CalibrationDTO dto, ClaimsPrincipal user, ICalibrationService calibrationService) =>
             {
+                int? userId = user.GetUserId();
+                if (userId == null)
+                {
+                    return Results.Unauthorized();
+                }
+
                 try
                 {
-                    CalibrationDTO created = await calibrationService.AddAsync(dto);
+                    CalibrationDTO created = await calibrationService.AddAsync(dto, userId.Value);
 
                     return Results.Created($"/calibrations/{created.Id}", created);
                 }
@@ -58,11 +65,17 @@ namespace WebAPI
             .WithOpenApi()
             .RequireAuthorization("CalibrationsCreate");
 
-            app.MapPut("/calibrations", async (CalibrationDTO dto, ICalibrationService calibrationService) =>
+            app.MapPut("/calibrations", async (CalibrationDTO dto, ClaimsPrincipal user, ICalibrationService calibrationService) =>
             {
+                int? userId = user.GetUserId();
+                if (userId == null)
+                {
+                    return Results.Unauthorized();
+                }
+
                 try
                 {
-                    var updated = await calibrationService.UpdateAsync(dto);
+                    var updated = await calibrationService.UpdateAsync(dto, userId.Value);
 
                     if (!updated)
                     {
@@ -79,11 +92,16 @@ namespace WebAPI
                 {
                     return Results.NotFound(new { error = ex.Message });
                 }
+                catch (InvalidOperationException ex)
+                {
+                    return Results.Conflict(new { error = ex.Message });
+                }
             })
             .WithName("UpdateCalibration")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status409Conflict)
             .WithOpenApi()
             .RequireAuthorization("CalibrationsUpdate");
 
@@ -111,11 +129,17 @@ namespace WebAPI
             .WithOpenApi()
             .RequireAuthorization("CalibrationsDelete");
 
-            app.MapPut("/calibrations/{id}/approve/{approverUserId}", async (int id, int approverUserId, ICalibrationService calibrationService) =>
+            app.MapPut("/calibrations/{id}/approve", async (int id, ClaimsPrincipal user, ICalibrationService calibrationService) =>
             {
+                int? approverUserId = user.GetUserId();
+                if (approverUserId == null)
+                {
+                    return Results.Unauthorized();
+                }
+
                 try
                 {
-                    var approved = await calibrationService.ApproveAsync(id, approverUserId);
+                    var approved = await calibrationService.ApproveAsync(id, approverUserId.Value);
                     return approved ? Results.NoContent() : Results.NotFound();
                 }
                 catch (ArgumentException ex)

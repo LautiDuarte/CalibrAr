@@ -9,11 +9,11 @@ namespace Application.Services
 {
     public interface ICalibrationService
     {
-        Task<CalibrationDTO> AddAsync(CalibrationDTO dto);
+        Task<CalibrationDTO> AddAsync(CalibrationDTO dto, int userId);
         Task<bool> DeleteAsync(int id);
         Task<CalibrationDTO?> GetAsync(int id);
         Task<IEnumerable<CalibrationDTO>> GetAllAsync();
-        Task<bool> UpdateAsync(CalibrationDTO dto);
+        Task<bool> UpdateAsync(CalibrationDTO dto, int userId);
         Task<bool> ApproveAsync(int id, int approverUserId);
     }
 }

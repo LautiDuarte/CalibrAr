@@ -78,7 +78,7 @@ namespace Application.Services
             return instrumentsUpToDate.Select(MapToDto);
         }
 
-        public async Task<bool> UpdateAsync(InstrumentDTO dto)
+        public async Task<bool> UpdateAsync(InstrumentDTO dto, int? changedByUserId = null)
         {
             var existing = await instrumentRepository.GetAsync(dto.Id);
             if (existing == null)
@@ -110,7 +110,7 @@ namespace Application.Services
             Instrument instrumentUpToDate = await IsActiveCheck(instrument);
             var updated = await instrumentRepository.UpdateAsync(instrumentUpToDate);
             if (updated && previousStatus != status)
-                await RegisterStatusChangeAsync(dto.Id, previousStatus, status, dto.ChangedByUserId);
+                await RegisterStatusChangeAsync(dto.Id, previousStatus, status, changedByUserId);
             return updated;
         }
 

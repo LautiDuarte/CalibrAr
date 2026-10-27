@@ -213,7 +213,7 @@ namespace WindowsForms
             try
             {
                 DisableControls();
-                await calibrationApiClient.ApproveAsync(calibration.Id, approverId.Value);
+                await calibrationApiClient.ApproveAsync(calibration.Id);
             }
             catch (Exception ex)
             {

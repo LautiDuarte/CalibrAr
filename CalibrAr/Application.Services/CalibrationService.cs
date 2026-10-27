@@ -41,18 +41,18 @@ namespace Application.Services
             this.instrumentService = instrumentService;
         }
 
-        public async Task<CalibrationDTO> AddAsync(CalibrationDTO dto)
+        public async Task<CalibrationDTO> AddAsync(CalibrationDTO dto, int userId)
         {
             var instrument = await GetInstrumentOrThrowAsync(dto.InstrumentId);
             await EnsureProcedureExistsAsync(dto.ProcedureId);
-            await EnsureUserExistsAsync(dto.PerformedByUserId);
-            await EnsureUserExistsAsync(dto.ApprovedByUserId);
+            await EnsureUserExistsAsync(userId);
 
             var now = DateTime.Now;
             var interventionType = ParseEnum<InterventionType>(dto.InterventionType, nameof(dto.InterventionType));
             var result = ParseEnum<Result>(dto.Result, nameof(dto.Result));
 
-            Calibration calibration = new Calibration(0, now, interventionType, dto.IsExternal, dto.ExternalLab, dto.CertificateNumber, result, dto.RestrictionDetail, dto.Notes, now, dto.InstrumentId, dto.ProcedureId, dto.PerformedByUserId, dto.ApprovedByUserId);
+            // Quién la realizó lo define el token, y una calibración nueva siempre nace sin aprobar
+            Calibration calibration = new Calibration(0, now, interventionType, dto.IsExternal, dto.ExternalLab, dto.CertificateNumber, result, dto.RestrictionDetail, dto.Notes, now, dto.InstrumentId, dto.ProcedureId, userId, null);
 
             var maxAllowedError = await ResolveMaxAllowedErrorAsync(instrument);
             calibration.SetMeasurements(BuildMeasurements(dto.Measurements, 0, maxAllowedError, resetIds: true));
@@ -64,6 +64,8 @@ namespace Application.Services
             dto.Id = calibration.Id;
             dto.CalibrationDate = calibration.CalibrationDate;
             dto.CreatedAt = calibration.CreatedAt;
+            dto.PerformedByUserId = calibration.PerformedByUserId;
+            dto.ApprovedByUserId = null;
             dto.Measurements = calibration.Measurements.Select(MapMeasurementToDto).ToList();
             dto.ReferenceStandardIds = calibration.ReferenceStandards.Select(r => r.Id).ToList();
             FillNavigationNames(dto, calibration);
@@ -104,7 +106,7 @@ namespace Application.Services
             return calibrations.Select(MapToDto);
         }
 
-        public async Task<bool> UpdateAsync(CalibrationDTO dto)
+        public async Task<bool> UpdateAsync(CalibrationDTO dto, int userId)
         {
             var existing = await calibrationRepository.GetAsync(dto.Id);
             if (existing == null)
@@ -114,12 +116,16 @@ namespace Application.Services
 
             var instrument = await GetInstrumentOrThrowAsync(dto.InstrumentId);
             await EnsureProcedureExistsAsync(dto.ProcedureId);
-            await EnsureUserExistsAsync(dto.PerformedByUserId);
-            await EnsureUserExistsAsync(dto.ApprovedByUserId);
 
-            if (dto.ApprovedByUserId.HasValue && (dto.ApprovedByUserId != existing.ApprovedByUserId || dto.PerformedByUserId != existing.PerformedByUserId))
+            // La aprobación no se define desde acá (para eso está ApproveAsync) y el realizador no se cambia.
+            // Lo único que admite esta edición es quitar la aprobación mandándola en null.
+            int? approvedByUserId = null;
+            if (existing.ApprovedByUserId.HasValue)
             {
-                await ValidateApproverAsync(dto.ApprovedByUserId.Value, dto.PerformedByUserId);
+                if (dto.ApprovedByUserId.HasValue)
+                    throw new InvalidOperationException("La calibración está aprobada: hay que quitarle la aprobación antes de modificarla.");
+
+                await EnsureCanApproveAsync(userId);
             }
 
             if (dto.CalibrationDate.Date > DateTime.Today)
@@ -128,7 +134,7 @@ namespace Application.Services
             var interventionType = ParseEnum<InterventionType>(dto.InterventionType, nameof(dto.InterventionType));
             var result = ParseEnum<Result>(dto.Result, nameof(dto.Result));
 
-            Calibration calibration = new Calibration(dto.Id, dto.CalibrationDate, interventionType, dto.IsExternal, dto.ExternalLab, dto.CertificateNumber, result, dto.RestrictionDetail, dto.Notes, existing.CreatedAt, dto.InstrumentId, dto.ProcedureId, dto.PerformedByUserId, dto.ApprovedByUserId);
+            Calibration calibration = new Calibration(dto.Id, dto.CalibrationDate, interventionType, dto.IsExternal, dto.ExternalLab, dto.CertificateNumber, result, dto.RestrictionDetail, dto.Notes, existing.CreatedAt, dto.InstrumentId, dto.ProcedureId, existing.PerformedByUserId, approvedByUserId);
 
             var maxAllowedError = await ResolveMaxAllowedErrorAsync(instrument);
             calibration.SetMeasurements(BuildMeasurements(dto.Measurements, dto.Id, maxAllowedError, resetIds: false));
@@ -167,6 +173,16 @@ namespace Application.Services
             calibration.SetReferenceStandards(existing.ReferenceStandards);
 
             return await calibrationRepository.UpdateAsync(calibration);
+        }
+
+        // Quitar la aprobación lo puede hacer quien podría aprobar: Administrador o Responsable
+        private async Task EnsureCanApproveAsync(int userId)
+        {
+            var user = await userRepository.GetAsync(userId)
+                ?? throw new KeyNotFoundException($"There is no user with id {userId}.");
+
+            if (user.Role != UserRole.Administrador && user.Role != UserRole.Responsable)
+                throw new ArgumentException("The user does not have permission to approve calibrations.");
         }
 
         // Reglas para aprobar: el aprobador debe ser Administrador o Responsable,

@@ -17,6 +17,5 @@ namespace DTOs
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? GroupName { get; set; }
-        public int? RequestedByUserId { get; set; }
     }
 }

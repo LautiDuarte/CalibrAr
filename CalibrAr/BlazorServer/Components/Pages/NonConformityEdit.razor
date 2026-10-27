@@ -169,7 +169,7 @@ else if (instruments != null && calibrations != null && model != null)
         saving = true;
         try
         {
-            await NonConformityApiClient.CloseAsync(Id, userId.Value);
+            await NonConformityApiClient.CloseAsync(Id);
             Flash.Success($"No conformidad \"{nonConformity.Code}\" cerrada.");
             NavigationManager.NavigateTo("non-conformities");
         }

@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Application.Services;
 using DTOs;
 
@@ -62,11 +63,12 @@ namespace WebAPI
             .WithOpenApi()
             .RequireAuthorization("InstrumentsCreate");
 
-            app.MapPut("/instruments", async (InstrumentDTO dto, IInstrumentService instrumentService) =>
+            app.MapPut("/instruments", async (InstrumentDTO dto, ClaimsPrincipal user, IInstrumentService instrumentService) =>
             {
                 try
                 {
-                    var updated = await instrumentService.UpdateAsync(dto);
+                    // Quién cambió el estado (para el historial) sale del token
+                    var updated = await instrumentService.UpdateAsync(dto, user.GetUserId());
 
                     if (!updated)
                     {

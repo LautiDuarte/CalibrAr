@@ -248,7 +248,7 @@ else
 
         try
         {
-            await CalibrationApiClient.ApproveAsync(calibration.Id, currentUserId.Value);
+            await CalibrationApiClient.ApproveAsync(calibration.Id);
             errorMessage = null;
             await LoadCalibrations();
             Flash.Success($"Calibración de \"{calibration.InstrumentCode}\" aprobada.");
