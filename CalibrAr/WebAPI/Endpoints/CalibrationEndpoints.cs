@@ -36,6 +36,27 @@ namespace WebAPI
             .WithOpenApi()
             .RequireAuthorization("CalibrationsRead");
 
+            // Búsqueda con filtros combinables: los que no se mandan, no filtran
+            app.MapGet("/calibrations/search", async (DateTime? from, DateTime? to, string? result, int? instrumentId,
+                string? text, string? interventionType, bool? approved, ICalibrationService calibrationService) =>
+            {
+                try
+                {
+                    var dtos = await calibrationService.SearchAsync(from, to, result, instrumentId, text, interventionType, approved);
+
+                    return Results.Ok(dtos);
+                }
+                catch (ArgumentException ex)
+                {
+                    return Results.BadRequest(new { error = ex.Message });
+                }
+            })
+            .WithName("SearchCalibrations")
+            .Produces<IEnumerable<CalibrationDTO>>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .WithOpenApi()
+            .RequireAuthorization("CalibrationsRead");
+
             app.MapPost("/calibrations", async (CalibrationDTO dto, ClaimsPrincipal user, ICalibrationService calibrationService) =>
             {
                 int? userId = user.GetUserId();

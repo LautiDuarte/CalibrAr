@@ -17,9 +17,11 @@ namespace Application.Services
         private readonly IInstrumentTypeRepository instrumentTypeRepository;
         private readonly IInstrumentStatusHistoryRepository instrumentStatusHistoryRepository;
         private readonly IAreaRepository areaRepository;
+        private readonly ISearchRepository searchRepository;
 
-        public InstrumentService(IInstrumentRepository instrumentRepository, IInstrumentTypeRepository instrumentTypeRepository, IAreaRepository areaRepository, IInstrumentStatusHistoryRepository instrumentStatusHistoryRepository)
+        public InstrumentService(IInstrumentRepository instrumentRepository, IInstrumentTypeRepository instrumentTypeRepository, IAreaRepository areaRepository, IInstrumentStatusHistoryRepository instrumentStatusHistoryRepository, ISearchRepository searchRepository)
         {
+            this.searchRepository = searchRepository;
             this.instrumentRepository = instrumentRepository;
             this.instrumentTypeRepository = instrumentTypeRepository;
             this.areaRepository = areaRepository;
@@ -74,6 +76,20 @@ namespace Application.Services
             var instruments = await instrumentRepository.GetAllAsync();
             if (instruments == null || !instruments.Any())
                 return Enumerable.Empty<InstrumentDTO>();
+            var instrumentsUpToDate = await CheckCalibrationExpiredAsync(instruments);
+            return instrumentsUpToDate.Select(MapToDto);
+        }
+
+        // Los filtros se resuelven en la base (SearchRepository, ADO.NET); acá solo se cargan y mapean los resultados
+        public async Task<IEnumerable<InstrumentDTO>> SearchAsync(string? text, string? status, int? areaId, bool hideDecommissioned)
+        {
+            InstrumentStatus? parsedStatus = string.IsNullOrWhiteSpace(status) ? null : ParseStatus(status);
+
+            var ids = await searchRepository.SearchInstrumentIdsAsync(text, parsedStatus, areaId, hideDecommissioned);
+            if (ids.Count == 0)
+                return Enumerable.Empty<InstrumentDTO>();
+
+            var instruments = await instrumentRepository.GetByIdsAsync(ids);
             var instrumentsUpToDate = await CheckCalibrationExpiredAsync(instruments);
             return instrumentsUpToDate.Select(MapToDto);
         }

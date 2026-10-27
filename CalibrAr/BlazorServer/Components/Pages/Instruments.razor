@@ -32,15 +32,15 @@ else if (instruments.Count == 0)
 }
 else
 {
-    var filtered = FilteredInstruments;
+    var filtered = results;
 
     <div class="row g-2 mb-3">
         <div class="col-md-5">
             <input type="search" class="form-control" placeholder="Buscar por código, nombre, marca o modelo"
-                   @bind="searchText" @bind:event="oninput" />
+                   @bind="searchText" @bind:after="SearchAsync" />
         </div>
         <div class="col-md-3">
-            <select class="form-select" @bind="statusFilter">
+            <select class="form-select" @bind="statusFilter" @bind:after="SearchAsync">
                 <option value="">Todos los estados</option>
                 @foreach (var status in Enum.GetValues<InstrumentStatusDTO>())
                 {
@@ -49,11 +49,11 @@ else
             </select>
         </div>
         <div class="col-md-3">
-            <select class="form-select" @bind="areaFilter">
+            <select class="form-select" @bind="areaFilter" @bind:after="SearchAsync">
                 <option value="">Todas las áreas</option>
-                @foreach (var areaName in areaNames)
+                @foreach (var area in areas)
                 {
-                    <option value="@areaName">@areaName</option>
+                    <option value="@area.Id">@area.Name</option>
                 }
             </select>
         </div>
@@ -66,7 +66,7 @@ else
     </div>
 
     <div class="form-check mb-3">
-        <input type="checkbox" id="hideDecommissioned" class="form-check-input" @bind="hideDecommissioned" />
+        <input type="checkbox" id="hideDecommissioned" class="form-check-input" @bind="hideDecommissioned" @bind:after="SearchAsync" />
         <label for="hideDecommissioned" class="form-check-label">Ocultar dados de baja</label>
     </div>
 
@@ -125,8 +125,11 @@ else
 }
 
 @code {
+    // Lista completa: solo sirve para el total y para armar el desplegable de áreas.
+    // Lo que se muestra (results) lo busca el servidor con los filtros.
     private List<InstrumentDTO>? instruments;
-    private List<string> areaNames = new();
+    private List<InstrumentDTO> results = new();
+    private List<(int Id, string Name)> areas = new();
     private string? errorMessage;
 
     private string searchText = string.Empty;
@@ -142,25 +145,29 @@ else
     private bool HasFilters =>
         !string.IsNullOrWhiteSpace(searchText) || statusFilter != string.Empty || areaFilter != string.Empty || hideDecommissioned;
 
-    // Los filtros se aplican en memoria sobre la lista ya cargada, sin volver a llamar a la API.
-    private List<InstrumentDTO> FilteredInstruments => instruments!
-        .Where(i => (string.IsNullOrWhiteSpace(searchText) || Matches(i, searchText.Trim()))
-                    && (statusFilter == string.Empty || i.Status == statusFilter)
-                    && (areaFilter == string.Empty || i.AreaName == areaFilter)
-                    && (!hideDecommissioned || i.Status != nameof(InstrumentStatusDTO.Decommissioned)))
-        .ToList();
-
     // Con filtros activos el subtítulo cambia a "N de M instrumentos"; sin filtros queda en null y el
     // encabezado usa el conteo normal.
     private string? FilterSubtitle =>
-        instruments != null && HasFilters ? $"{FilteredInstruments.Count} de {instruments.Count} instrumentos" : null;
+        instruments != null && HasFilters ? $"{results.Count} de {instruments.Count} instrumentos" : null;
 
-    private static bool Matches(InstrumentDTO instrument, string text) =>
-        Contains(instrument.Code, text) || Contains(instrument.Name, text)
-        || Contains(instrument.Brand, text) || Contains(instrument.Model, text);
-
-    private static bool Contains(string? value, string text) =>
-        value != null && value.Contains(text, StringComparison.OrdinalIgnoreCase);
+    // Los filtros se resuelven en la base: se le pide la lista ya filtrada a la API.
+    private async Task SearchAsync()
+    {
+        try
+        {
+            int? areaId = int.TryParse(areaFilter, out var id) ? id : null;
+            results = await InstrumentApiClient.SearchAsync(searchText, statusFilter, areaId, hideDecommissioned);
+            errorMessage = null;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
 
     private static string BrandAndModel(InstrumentDTO instrument) =>
         string.Join(" ", new[] { instrument.Brand, instrument.Model }.Where(s => !string.IsNullOrWhiteSpace(s)));
@@ -168,12 +175,13 @@ else
     // Tocar la fila abre el detalle del instrumento.
     private void OpenDetails(InstrumentDTO instrument) => NavigationManager.NavigateTo($"instruments/{instrument.Id}");
 
-    private void ClearFilters()
+    private async Task ClearFilters()
     {
         searchText = string.Empty;
         statusFilter = string.Empty;
         areaFilter = string.Empty;
         hideDecommissioned = false;
+        await SearchAsync();
     }
 
     private async Task LoadInstruments()
@@ -182,16 +190,18 @@ else
         {
             instruments = await InstrumentApiClient.GetAllAsync();
 
-            areaNames = instruments
-                .Select(i => i.AreaName)
-                .Where(name => !string.IsNullOrEmpty(name))
+            areas = instruments
+                .Where(i => !string.IsNullOrEmpty(i.AreaName))
+                .Select(i => (i.AreaId, i.AreaName))
                 .Distinct()
-                .OrderBy(name => name)
+                .OrderBy(a => a.AreaName)
                 .ToList();
 
             // Si se eliminó el último instrumento de un área, ese filtro ya no tiene sentido.
-            if (!areaNames.Contains(areaFilter))
+            if (!areas.Any(a => a.Id.ToString() == areaFilter))
                 areaFilter = string.Empty;
+
+            await SearchAsync();
         }
         catch (UnauthorizedAccessException)
         {
@@ -201,6 +211,7 @@ else
         {
             errorMessage = ApiError.Message(ex);
             instruments = new List<InstrumentDTO>();
+            results = new List<InstrumentDTO>();
         }
     }
 

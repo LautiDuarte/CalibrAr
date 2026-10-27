@@ -71,6 +71,41 @@ namespace API.Clients
             }
         }
 
+        // El filtrado lo hace el servidor en la base; los parámetros en null no filtran
+        public async Task<List<InstrumentDTO>> SearchAsync(string? text = null, string? status = null, int? areaId = null, bool hideDecommissioned = false)
+        {
+            try
+            {
+                string query = BuildQuery(
+                    ("text", text),
+                    ("status", status),
+                    ("areaId", areaId?.ToString()),
+                    ("hideDecommissioned", hideDecommissioned ? "true" : null));
+
+                using var client = await CreateHttpClientAsync();
+                HttpResponseMessage response = await client.GetAsync("instruments/search" + query);
+                if (response.IsSuccessStatusCode)
+                {
+                    var instruments = await response.Content.ReadFromJsonAsync<List<InstrumentDTO>>();
+                    return instruments ?? throw new Exception("La respuesta del servidor para la busqueda de instrumentos vino vacia.");
+                }
+                else
+                {
+                    ThrowIfUnauthorized(response);
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Failed to search instruments. Status code: {response.StatusCode}, Error: {errorContent}");
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new Exception($"An error occurred while searching instruments: {ex.Message}.", ex);
+            }
+            catch (TaskCanceledException ex)
+            {
+                throw new Exception($"Request timed out while searching instruments: {ex.Message}.", ex);
+            }
+        }
+
         public async Task AddAsync(InstrumentDTO instrument)
         {
             try

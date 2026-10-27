@@ -13,6 +13,7 @@ namespace Application.Services
         Task<bool> DeleteAsync(int id);
         Task<InstrumentDTO?> GetAsync(int id);
         Task<IEnumerable<InstrumentDTO>> GetAllAsync();
+        Task<IEnumerable<InstrumentDTO>> SearchAsync(string? text, string? status, int? areaId, bool hideDecommissioned);
         Task<bool> UpdateAsync(InstrumentDTO dto, int? changedByUserId = null);
         Task RecalculateCalibrationScheduleAsync(int instrumentId, DateTime? lastCalibrationDate);
         Task RecalculateScheduleForTypeAsync(int instrumentTypeId);

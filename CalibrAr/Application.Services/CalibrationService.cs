@@ -19,6 +19,7 @@ namespace Application.Services
         private readonly IReferenceStandardRepository referenceStandardRepository;
         private readonly INonConformityRepository nonConformityRepository;
         private readonly IInstrumentService instrumentService;
+        private readonly ISearchRepository searchRepository;
 
 
         public CalibrationService(
@@ -29,8 +30,10 @@ namespace Application.Services
             IUserRepository userRepository,
             IReferenceStandardRepository referenceStandardRepository,
             INonConformityRepository nonConformityRepository,
-            IInstrumentService instrumentService)
+            IInstrumentService instrumentService,
+            ISearchRepository searchRepository)
         {
+            this.searchRepository = searchRepository;
             this.nonConformityRepository = nonConformityRepository;
             this.calibrationRepository = calibrationRepository;
             this.instrumentRepository = instrumentRepository;
@@ -103,6 +106,26 @@ namespace Application.Services
         public async Task<IEnumerable<CalibrationDTO>> GetAllAsync()
         {
             var calibrations = await calibrationRepository.GetAllAsync();
+            return calibrations.Select(MapToDto);
+        }
+
+        // Los filtros se resuelven en la base (SearchRepository, ADO.NET); acá solo se cargan y mapean los resultados
+        public async Task<IEnumerable<CalibrationDTO>> SearchAsync(DateTime? from, DateTime? to, string? result, int? instrumentId,
+            string? text, string? interventionType, bool? approved)
+        {
+            if (from.HasValue && to.HasValue && from.Value.Date > to.Value.Date)
+                throw new ArgumentException("La fecha desde no puede ser posterior a la fecha hasta.");
+
+            Result? parsedResult = string.IsNullOrWhiteSpace(result) ? null : ParseEnum<Result>(result, nameof(result));
+            InterventionType? parsedIntervention = string.IsNullOrWhiteSpace(interventionType)
+                ? null
+                : ParseEnum<InterventionType>(interventionType, nameof(interventionType));
+
+            var ids = await searchRepository.SearchCalibrationIdsAsync(text, from, to, parsedResult, parsedIntervention, approved, instrumentId);
+            if (ids.Count == 0)
+                return Enumerable.Empty<CalibrationDTO>();
+
+            var calibrations = await calibrationRepository.GetByIdsAsync(ids);
             return calibrations.Select(MapToDto);
         }
 

@@ -36,6 +36,26 @@ namespace WebAPI
             .WithOpenApi()
             .RequireAuthorization("InstrumentsRead");
 
+            // Búsqueda con filtros combinables: los que no se mandan, no filtran
+            app.MapGet("/instruments/search", async (string? text, string? status, int? areaId, bool? hideDecommissioned, IInstrumentService instrumentService) =>
+            {
+                try
+                {
+                    var dtos = await instrumentService.SearchAsync(text, status, areaId, hideDecommissioned ?? false);
+
+                    return Results.Ok(dtos);
+                }
+                catch (ArgumentException ex)
+                {
+                    return Results.BadRequest(new { error = ex.Message });
+                }
+            })
+            .WithName("SearchInstruments")
+            .Produces<IEnumerable<InstrumentDTO>>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentsRead");
+
             app.MapPost("/instruments", async (InstrumentDTO dto, IInstrumentService instrumentService) =>
             {
                 try

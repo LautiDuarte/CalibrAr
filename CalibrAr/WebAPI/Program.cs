@@ -53,6 +53,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICalibrationRepository, CalibrationRepository>();
 builder.Services.AddScoped<INonConformityRepository, NonConformityRepository>();
 builder.Services.AddScoped<IInstrumentStatusHistoryRepository, InstrumentStatusHistoryRepository>();
+builder.Services.AddScoped<ISearchRepository, SearchRepository>();
 
 builder.Services.AddScoped<IAreaService, AreaService>();
 builder.Services.AddScoped<ILocationService, LocationService>();

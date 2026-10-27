@@ -77,6 +77,17 @@ namespace API.Clients
             return defaultUrl;
         }
 
+        // Arma "?a=1&b=2" con los parámetros que tengan valor; los null no se mandan (= no filtran)
+        protected static string BuildQuery(params (string Name, string? Value)[] parameters)
+        {
+            var pairs = parameters
+                .Where(p => !string.IsNullOrWhiteSpace(p.Value))
+                .Select(p => $"{p.Name}={Uri.EscapeDataString(p.Value!)}");
+
+            string query = string.Join("&", pairs);
+            return query.Length == 0 ? string.Empty : "?" + query;
+        }
+
         // Ya no cierra la sesión: solo avisa con la excepción y cada UI decide qué hacer
         // (WinForms vuelve al login, Blazor redirige a /login).
         protected static void ThrowIfUnauthorized(HttpResponseMessage response)
