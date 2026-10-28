@@ -70,6 +70,8 @@ La base se siembra con 4 usuarios, uno por rol, cada uno con un conjunto de perm
 
 ## Autenticación (JWT)
 
+La clave con la que se firman los tokens **no está en el repositorio**. La WebAPI la busca en `JwtSettings:SecretKey`, que se puede definir con la variable de entorno `JwtSettings__SecretKey` o con user-secrets (`dotnet user-secrets set JwtSettings:SecretKey "<clave de al menos 32 caracteres>" --project CalibrAr/WebAPI`). Si no está definida y se corre en Development (lo normal al ejecutar desde Visual Studio), la API genera una clave al azar al arrancar, así que el proyecto corre sin configurar nada; la consecuencia es que al reiniciar la API los tokens anteriores dejan de valer y hay que volver a iniciar sesión. Fuera de Development, sin clave la API no arranca.
+
 `POST /auth/login` devuelve un token JWT con los permisos del usuario codificados como claims (`"permission": ["Areas.read", "Areas.create", ...]`). Todos los demás endpoints exigen ese token en el header `Authorization: Bearer <token>`, salvo el propio login.
 
 - **Desde WindowsForms**: el token se maneja solo, no hay nada que hacer a mano. Se guarda en memoria mientras la app está abierta (nunca en disco).
