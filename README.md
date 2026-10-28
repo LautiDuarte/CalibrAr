@@ -123,9 +123,7 @@ Para poder probar y mostrar la aplicación, cuando la base está vacía la WebAP
 ## Pendiente conocido
 
 - En `WindowsForms`, si el token vence con una lista abierta, se muestra un error genérico en vez de mandarte directo al login (la excepción de sesión vencida se la "traga" cada pantalla). Hay que hacer logout desde el menú y volver a entrar.
-- Hay unos 20 warnings de nulabilidad (CS86xx) en el código de `WindowsForms` y los servicios. No rompen nada pero hay que limpiarlos.
-- Los mensajes que vienen del dominio (por ejemplo "Cannot delete location...") están en inglés y se muestran así en las dos interfaces.
-- El dominio mezcla español e inglés (nombres de clases y algunos mensajes de validación en inglés, `UserRole` y otros mensajes en español) — es una decisión de idioma pendiente de unificar.
+- Los nombres de clases y propiedades del dominio están en inglés y los mensajes y textos de las pantallas en español; es una decisión de idioma que queda así.
 
 ## Mejoras futuras
 
@@ -135,4 +133,3 @@ Cosas que charlamos y no llegamos a hacer:
 - Que la API también exija el procedimiento en las calibraciones internas (hoy lo controla solo la web).
 - Sacar el "tipo de intervención" de la calibración: el mantenimiento no encaja con las mediciones y el resultado.
 - Que cada usuario pueda cambiar su propia contraseña.
-- Que las reglas de autoprotección de usuarios (no borrarse ni cambiarse el rol) y el usuario que registra un cambio de estado salgan del token y no de un dato que manda el cliente.
