@@ -29,16 +29,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to get reference standard with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo obtener el patrón de referencia con ID {id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while getting reference standard with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al obtener el patrón de referencia con ID {id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while getting reference standard with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al obtener el patrón de referencia con ID {id}: {ex.Message}.", ex);
             }
         }
 
@@ -57,16 +57,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to get reference standards. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudieron obtener los patrones de referencia. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while getting reference standards: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al obtener los patrones de referencia: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while getting reference standards: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al obtener los patrones de referencia: {ex.Message}.", ex);
             }
         }
 
@@ -80,16 +80,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to add reference standard. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo agregar el patrón de referencia. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while adding reference standard: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al agregar el patrón de referencia: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while adding reference standard: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al agregar el patrón de referencia: {ex.Message}.", ex);
             }
         }
 
@@ -103,16 +103,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to delete reference standard with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo eliminar el patrón de referencia con ID {id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while deleting reference standard with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al eliminar el patrón de referencia con ID {id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while deleting reference standard with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al eliminar el patrón de referencia con ID {id}: {ex.Message}.", ex);
             }
         }
 
@@ -126,16 +126,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to update reference standard with ID {referenceStandard.Id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo actualizar el patrón de referencia con ID {referenceStandard.Id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while updating reference standard with ID {referenceStandard.Id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al actualizar el patrón de referencia con ID {referenceStandard.Id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while updating reference standard with ID {referenceStandard.Id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al actualizar el patrón de referencia con ID {referenceStandard.Id}: {ex.Message}.", ex);
             }
         }
     }

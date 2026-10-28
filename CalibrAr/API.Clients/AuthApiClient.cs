@@ -40,7 +40,7 @@ namespace API.Clients
 
             // Cualquier otro código es una falla del servidor y no debe confundirse con una contraseña mal escrita.
             string errorContent = await response.Content.ReadAsStringAsync();
-            throw new Exception($"Login failed. Status code: {response.StatusCode}, Error: {errorContent}");
+            throw new Exception($"No se pudo iniciar sesión. Código de estado: {response.StatusCode}, Error: {errorContent}");
         }
     }
 }

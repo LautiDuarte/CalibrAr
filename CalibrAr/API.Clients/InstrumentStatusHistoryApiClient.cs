@@ -29,16 +29,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to get instrument status history with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo obtener el historial de estados con ID {id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while getting instrument status history with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al obtener el historial de estados con ID {id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while getting instrument status history with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al obtener el historial de estados con ID {id}: {ex.Message}.", ex);
             }
         }
 
@@ -57,16 +57,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to get instrument status histories. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudieron obtener los historiales de estados. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while getting instrument status histories: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al obtener los historiales de estados: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while getting instrument status histories: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al obtener los historiales de estados: {ex.Message}.", ex);
             }
         }
     }

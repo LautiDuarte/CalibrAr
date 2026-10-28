@@ -30,16 +30,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to get location with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo obtener la ubicación con ID {id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while getting location with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al obtener la ubicación con ID {id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while getting location with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al obtener la ubicación con ID {id}: {ex.Message}.", ex);
             }
 
         }
@@ -59,16 +59,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to get locations. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudieron obtener las ubicaciones. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while getting locations: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al obtener las ubicaciones: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while getting locations: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al obtener las ubicaciones: {ex.Message}.", ex);
             }
         }
 
@@ -82,16 +82,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to create location. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo crear la ubicación. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while creating location: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al crear la ubicación: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while creating location: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al crear la ubicación: {ex.Message}.", ex);
             }
         }
 
@@ -105,16 +105,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to delete location with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo eliminar la ubicación con ID {id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while deleting location with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al eliminar la ubicación con ID {id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while deleting location with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al eliminar la ubicación con ID {id}: {ex.Message}.", ex);
             }
         }
 
@@ -128,16 +128,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to update location with ID {location.Id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo actualizar la ubicación con ID {location.Id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while updating location with ID {location.Id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al actualizar la ubicación con ID {location.Id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while updating location with ID {location.Id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al actualizar la ubicación con ID {location.Id}: {ex.Message}.", ex);
             }
         }
     }

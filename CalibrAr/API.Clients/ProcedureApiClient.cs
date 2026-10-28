@@ -29,16 +29,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to get procedure with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo obtener el procedimiento con ID {id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while getting procedure with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al obtener el procedimiento con ID {id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while getting procedure with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al obtener el procedimiento con ID {id}: {ex.Message}.", ex);
             }
         }
 
@@ -57,16 +57,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to get procedures. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudieron obtener los procedimientos. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while getting procedures: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al obtener los procedimientos: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while getting procedures: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al obtener los procedimientos: {ex.Message}.", ex);
             }
         }
 
@@ -80,16 +80,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to add procedure. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo agregar el procedimiento. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while adding procedure: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al agregar el procedimiento: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while adding procedure: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al agregar el procedimiento: {ex.Message}.", ex);
             }
         }
 
@@ -103,16 +103,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to delete procedure with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo eliminar el procedimiento con ID {id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while deleting procedure with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al eliminar el procedimiento con ID {id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while deleting procedure with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al eliminar el procedimiento con ID {id}: {ex.Message}.", ex);
             }
         }
 
@@ -126,16 +126,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to update procedure with ID {procedure.Id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo actualizar el procedimiento con ID {procedure.Id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while updating procedure with ID {procedure.Id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al actualizar el procedimiento con ID {procedure.Id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while updating procedure with ID {procedure.Id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al actualizar el procedimiento con ID {procedure.Id}: {ex.Message}.", ex);
             }
         }
     }

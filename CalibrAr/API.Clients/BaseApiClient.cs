@@ -94,7 +94,7 @@ namespace API.Clients
         {
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
-                throw new UnauthorizedAccessException("Your session has expired.");
+                throw new UnauthorizedAccessException("La sesión expiró.");
             }
         }
     }

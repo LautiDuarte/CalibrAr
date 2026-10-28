@@ -30,16 +30,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to get instrument type with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo obtener el tipo de instrumento con ID {id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while getting instrument type with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al obtener el tipo de instrumento con ID {id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while getting instrument type with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al obtener el tipo de instrumento con ID {id}: {ex.Message}.", ex);
             }
         }
 
@@ -58,16 +58,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to get instrument types. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudieron obtener los tipos de instrumento. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while getting instrument types: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al obtener los tipos de instrumento: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while getting instrument types: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al obtener los tipos de instrumento: {ex.Message}.", ex);
             }
         }
 
@@ -81,16 +81,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to add instrument type. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo agregar el tipo de instrumento. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while adding instrument type: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al agregar el tipo de instrumento: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while adding instrument type: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al agregar el tipo de instrumento: {ex.Message}.", ex);
             }
         }
 
@@ -104,16 +104,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to delete instrument type with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo eliminar el tipo de instrumento con ID {id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while deleting instrument type with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al eliminar el tipo de instrumento con ID {id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while deleting instrument type with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al eliminar el tipo de instrumento con ID {id}: {ex.Message}.", ex);
             }
         }
 
@@ -127,16 +127,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to update instrument type with ID {instrumentType.Id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo actualizar el tipo de instrumento con ID {instrumentType.Id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while updating instrument type with ID {instrumentType.Id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al actualizar el tipo de instrumento con ID {instrumentType.Id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while updating instrument type with ID {instrumentType.Id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al actualizar el tipo de instrumento con ID {instrumentType.Id}: {ex.Message}.", ex);
             }
         }
     }

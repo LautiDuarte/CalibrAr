@@ -29,16 +29,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to get calibration with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo obtener la calibración con ID {id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while getting calibration with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al obtener la calibración con ID {id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while getting calibration with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al obtener la calibración con ID {id}: {ex.Message}.", ex);
             }
         }
 
@@ -68,16 +68,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to search calibrations. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudieron buscar las calibraciones. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while searching calibrations: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al buscar las calibraciones: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while searching calibrations: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al buscar las calibraciones: {ex.Message}.", ex);
             }
         }
 
@@ -96,16 +96,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to get calibrations. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudieron obtener las calibraciones. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while getting calibrations: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al obtener las calibraciones: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while getting calibrations: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al obtener las calibraciones: {ex.Message}.", ex);
             }
         }
 
@@ -119,16 +119,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to add calibration. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo agregar la calibración. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while adding calibration: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al agregar la calibración: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while adding calibration: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al agregar la calibración: {ex.Message}.", ex);
             }
         }
 
@@ -142,16 +142,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to delete calibration with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo eliminar la calibración con ID {id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while deleting calibration with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al eliminar la calibración con ID {id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while deleting calibration with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al eliminar la calibración con ID {id}: {ex.Message}.", ex);
             }
         }
 
@@ -165,16 +165,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to update calibration with ID {calibration.Id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo actualizar la calibración con ID {calibration.Id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while updating calibration with ID {calibration.Id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al actualizar la calibración con ID {calibration.Id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while updating calibration with ID {calibration.Id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al actualizar la calibración con ID {calibration.Id}: {ex.Message}.", ex);
             }
         }
 
@@ -189,16 +189,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to approve calibration with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo aprobar la calibración con ID {id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while approving calibration with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al aprobar la calibración con ID {id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while approving calibration with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al aprobar la calibración con ID {id}: {ex.Message}.", ex);
             }
         }
     }

@@ -53,17 +53,17 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to get report. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo obtener el reporte. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
                 return response;
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while getting report: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al obtener el reporte: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while getting report: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al obtener el reporte: {ex.Message}.", ex);
             }
         }
     }
