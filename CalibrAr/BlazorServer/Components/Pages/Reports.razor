@@ -9,10 +9,7 @@
 
 <PageHeader Title="Reportes" />
 
-@if (errorMessage != null)
-{
-    <div class="alert alert-danger">@errorMessage</div>
-}
+<ErrorBanner @bind-Message="errorMessage" />
 
 <h2 class="h5">Calibraciones próximas y vencidas</h2>
 

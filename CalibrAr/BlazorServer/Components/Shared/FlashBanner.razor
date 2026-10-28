@@ -3,36 +3,80 @@
 
 @if (message != null)
 {
-    <div class="alert alert-success d-flex justify-content-between align-items-center">
+    <div class="alert alert-success app-toast d-flex justify-content-between align-items-center">
         <span>@message</span>
         <button type="button" class="btn-close" aria-label="Cerrar" @onclick="Close"></button>
     </div>
 }
 
 @code {
+    private const int SecondsVisible = 5;
+
     private string? message;
+    private CancellationTokenSource? timer;
 
     protected override void OnInitialized()
     {
         // Mensaje que dejó la pantalla anterior (por ejemplo, después de guardar).
-        message = Flash.Take();
+        Show(Flash.Take());
         Flash.Changed += OnChanged;
     }
 
     // Mensaje que llega con la pantalla ya abierta (por ejemplo, después de eliminar).
     private void OnChanged()
     {
-        message = Flash.Take();
-        InvokeAsync(StateHasChanged);
+        InvokeAsync(() =>
+        {
+            Show(Flash.Take());
+            StateHasChanged();
+        });
+    }
+
+    private void Show(string? text)
+    {
+        message = text;
+        StopTimer();
+        if (text == null)
+            return;
+
+        timer = new CancellationTokenSource();
+        _ = ExpireAsync(timer.Token);
+    }
+
+    private async Task ExpireAsync(CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(SecondsVisible), token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        await InvokeAsync(() =>
+        {
+            message = null;
+            StateHasChanged();
+        });
     }
 
     private void Close()
     {
+        StopTimer();
         message = null;
+    }
+
+    private void StopTimer()
+    {
+        timer?.Cancel();
+        timer?.Dispose();
+        timer = null;
     }
 
     public void Dispose()
     {
+        StopTimer();
         Flash.Changed -= OnChanged;
     }
 }

@@ -17,10 +17,7 @@
 
 <FlashBanner />
 
-@if (errorMessage != null)
-{
-    <div class="alert alert-danger">@errorMessage</div>
-}
+<ErrorBanner @bind-Message="errorMessage" />
 
 @if (instruments == null)
 {
