@@ -29,16 +29,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to get non conformity with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo obtener la no conformidad con ID {id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while getting non conformity with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al obtener la no conformidad con ID {id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while getting non conformity with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al obtener la no conformidad con ID {id}: {ex.Message}.", ex);
             }
         }
 
@@ -57,16 +57,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to get non conformities. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudieron obtener las no conformidades. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while getting non conformities: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al obtener las no conformidades: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while getting non conformities: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al obtener las no conformidades: {ex.Message}.", ex);
             }
         }
 
@@ -80,16 +80,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to add non conformity. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo agregar la no conformidad. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while adding non conformity: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al agregar la no conformidad: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while adding non conformity: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al agregar la no conformidad: {ex.Message}.", ex);
             }
         }
 
@@ -103,16 +103,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to delete non conformity with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo eliminar la no conformidad con ID {id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while deleting non conformity with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al eliminar la no conformidad con ID {id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while deleting non conformity with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al eliminar la no conformidad con ID {id}: {ex.Message}.", ex);
             }
         }
 
@@ -126,16 +126,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to update non conformity with ID {nonConformity.Id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo actualizar la no conformidad con ID {nonConformity.Id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while updating non conformity with ID {nonConformity.Id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al actualizar la no conformidad con ID {nonConformity.Id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while updating non conformity with ID {nonConformity.Id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al actualizar la no conformidad con ID {nonConformity.Id}: {ex.Message}.", ex);
             }
         }
 
@@ -150,16 +150,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to close non conformity with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo cerrar la no conformidad con ID {id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while closing non conformity with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al cerrar la no conformidad con ID {id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while closing non conformity with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al cerrar la no conformidad con ID {id}: {ex.Message}.", ex);
             }
         }
     }

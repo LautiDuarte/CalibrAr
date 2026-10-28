@@ -103,7 +103,7 @@ namespace Application.Services
             var previousStatus = existing.Status;
 
             if (dto.InstrumentTypeId != existing.InstrumentTypeId)
-                throw new InvalidOperationException("The instrument type cannot be changed after creation.");
+                throw new InvalidOperationException("El tipo de instrumento no se puede cambiar después de crearlo.");
 
             await EnsureCodeIsUniqueAsync(dto.Code, dto.Id);
             await EnsureInstrumentTypeExistsAsync(dto.InstrumentTypeId);
@@ -220,29 +220,35 @@ namespace Application.Services
 
         private async Task EnsureInstrumentTypeExistsAsync(int instrumentTypeId)
         {
+            if (instrumentTypeId <= 0)
+                throw new ArgumentException("Debe seleccionar un tipo de instrumento.");
+
             var instrumentType = await instrumentTypeRepository.GetAsync(instrumentTypeId);
             if (instrumentType == null)
-                throw new KeyNotFoundException($"There is no instrument type with id {instrumentTypeId}.");
+                throw new KeyNotFoundException($"No existe un tipo de instrumento con id {instrumentTypeId}.");
         }
 
         private async Task EnsureAreaExistsAsync(int areaId)
         {
+            if (areaId <= 0)
+                throw new ArgumentException("Debe seleccionar un área.");
+
             var area = await areaRepository.GetAsync(areaId);
             if (area == null)
-                throw new KeyNotFoundException($"There is no area with id {areaId}.");
+                throw new KeyNotFoundException($"No existe un área con id {areaId}.");
         }
 
         private async Task EnsureCodeIsUniqueAsync(string code, int? excludeId = null)
         {
             var normalized = code?.Trim() ?? string.Empty;
             if (await instrumentRepository.ExistsByCodeAsync(normalized, excludeId))
-                throw new InvalidOperationException($"There is already an instrument with code '{normalized}'.");
+                throw new InvalidOperationException($"Ya existe un instrumento con el código '{normalized}'.");
         }
 
         private static InstrumentStatus ParseStatus(string status)
         {
             if (!Enum.TryParse<InstrumentStatus>(status, out var parsed))
-                throw new ArgumentException($"The status '{status}' is not valid.", nameof(status));
+                throw new ArgumentException($"El estado '{status}' no es válido.");
             return parsed;
         }
 

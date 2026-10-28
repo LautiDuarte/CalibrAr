@@ -41,36 +41,36 @@ namespace Domain.Model
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("Id must be greater than 0.", nameof(id));
+                throw new ArgumentException("El id debe ser mayor que 0.");
             Id = id;
         }
         public void SetFullName(string fullname)
         {
             if (string.IsNullOrWhiteSpace(fullname))
-                throw new ArgumentException("The name cannot be null or empty.", nameof(fullname));
+                throw new ArgumentException("El nombre no puede estar vacío.");
             if (fullname.Length > 100)
-                throw new ArgumentException("The name cannot exceed 100 characters.", nameof(fullname));
+                throw new ArgumentException("El nombre no puede superar los 100 caracteres.");
             FullName = fullname.Trim();
         }
 
         public void SetEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
-                throw new ArgumentException("The email cannot be null or empty.", nameof(email));
+                throw new ArgumentException("El email no puede estar vacío.");
             email = email.Trim();
             if (email.Length > 100)
-                throw new ArgumentException("The email cannot exceed 100 characters.", nameof(email));
+                throw new ArgumentException("El email no puede superar los 100 caracteres.");
             if (!MailAddress.TryCreate(email, out var address) || address.Address != email || !address.Host.Contains('.'))
-                throw new ArgumentException("The email format is not valid.", nameof(email));
+                throw new ArgumentException("El formato del email no es válido.");
             Email = email;
         }
 
         public void SetPasswordHash(string passwordHash)
         {
             if (string.IsNullOrWhiteSpace(passwordHash))
-                throw new ArgumentException("The password hash cannot be null or empty.", nameof(passwordHash));
+                throw new ArgumentException("La contraseña no puede estar vacía.");
             if (passwordHash.Length > 30)
-                throw new ArgumentException("The password cannot exceed 30 characters.", nameof(passwordHash));
+                throw new ArgumentException("La contraseña no puede superar los 30 caracteres.");
             Salt = GenerateSalt();
             PasswordHash = HashPassword(passwordHash, Salt);
         }
@@ -78,7 +78,7 @@ namespace Domain.Model
         public void SetRole(UserRole role)
         {
             if (!Enum.IsDefined(typeof(UserRole), role))
-                throw new ArgumentException("The role is not valid.", nameof(role));
+                throw new ArgumentException("El rol no es válido.");
             Role = role;
         }
 
@@ -99,7 +99,7 @@ namespace Domain.Model
         public void SetCreatedAt(DateTime createdAt)
         {
             if (createdAt == default)
-                throw new ArgumentException("The creation date cannot be null.", nameof(createdAt));
+                throw new ArgumentException("La fecha de creación no puede estar vacía.");
             CreatedAt = createdAt;
         }
 

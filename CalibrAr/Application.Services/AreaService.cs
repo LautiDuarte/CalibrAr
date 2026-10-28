@@ -41,7 +41,7 @@ namespace Application.Services
         {
             var instruments = await instrumentRepository.GetAllAsync();
             if (instruments.Any(i => i.AreaId == id))
-                throw new InvalidOperationException($"Cannot delete area with id {id} because it is being used");
+                throw new InvalidOperationException($"No se puede eliminar el área con id {id} porque está en uso.");
             return await areaRepository.DeleteAsync(id);
         }
 
@@ -93,9 +93,12 @@ namespace Application.Services
 
         private async Task EnsureLocationExistsAsync(int locationId)
         {
+            if (locationId <= 0)
+                throw new ArgumentException("Debe seleccionar una ubicación.");
+
             var location = await locationRepository.GetAsync(locationId);
             if (location == null)
-                throw new KeyNotFoundException($"There is no location with id {locationId}.");
+                throw new KeyNotFoundException($"No existe una ubicación con id {locationId}.");
         }
     }
 }

@@ -17,10 +17,7 @@
 
 <FlashBanner />
 
-@if (errorMessage != null)
-{
-    <div class="alert alert-danger">@errorMessage</div>
-}
+<ErrorBanner @bind-Message="errorMessage" />
 
 @if (instruments == null)
 {
@@ -192,7 +189,7 @@ else
 
             areas = instruments
                 .Where(i => !string.IsNullOrEmpty(i.AreaName))
-                .Select(i => (i.AreaId, i.AreaName))
+                .Select(i => (AreaId: i.AreaId, AreaName: i.AreaName!))
                 .Distinct()
                 .OrderBy(a => a.AreaName)
                 .ToList();

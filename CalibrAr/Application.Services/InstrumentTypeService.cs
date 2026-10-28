@@ -41,7 +41,7 @@ namespace Application.Services
         {
             var instruments = await instrumentRepository.GetAllAsync();
             if (instruments.Any(i => i.InstrumentTypeId == id))
-                throw new InvalidOperationException($"Cannot delete instrument type with id {id} because it is being used");
+                throw new InvalidOperationException($"No se puede eliminar el tipo de instrumento con id {id} porque está en uso.");
 
             return await instrumentTypeRepository.DeleteAsync(id);
         }

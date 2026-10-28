@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
     <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="app.css?v=@CssVersion" />
     <link rel="stylesheet" href="BlazorServer.styles.css" />
     <HeadOutlet @rendermode="RenderModeForPage" />
 </head>
@@ -34,6 +34,10 @@
     // cuando se decide el modo de renderizado.
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
+
+    // El servidor no manda Cache-Control: sin esto el navegador puede seguir usando un app.css viejo.
+    private static readonly string CssVersion =
+        File.GetLastWriteTimeUtc(typeof(App).Assembly.Location).Ticks.ToString();
 
     // /login se renderiza estático (sin circuito) porque emitir la cookie requiere una
     // respuesta HTTP normal; el resto de la app es interactiva.

@@ -15,10 +15,7 @@
     </Actions>
 </PageHeader>
 
-@if (errorMessage != null)
-{
-    <div class="alert alert-danger form-narrow">@errorMessage</div>
-}
+<ErrorBanner @bind-Message="errorMessage" Persistent="@(instruments == null || calibrations == null)" />
 
 @if (instruments == null || calibrations == null)
 {

@@ -34,7 +34,7 @@ namespace Application.Services
         {
             var areas = await areaRepository.GetAllAsync();
             if (areas.Any(a => a.LocationId == id))
-                throw new InvalidOperationException($"Cannot delete location with id {id} because it is being used");
+                throw new InvalidOperationException($"No se puede eliminar la ubicación con id {id} porque está en uso.");
 
             return await locationRepository.DeleteAsync(id);
         }

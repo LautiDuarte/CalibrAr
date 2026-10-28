@@ -32,13 +32,13 @@ namespace Domain.Model
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("Id must be greater than 0.", nameof(id));
+                throw new ArgumentException("El id debe ser mayor que 0.");
             Id = id;
         }
         public void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("The name cannot be null or empty.", nameof(name));
+                throw new ArgumentException("El nombre no puede estar vacío.");
             Name = name;
         }
 
@@ -50,7 +50,7 @@ namespace Domain.Model
         public void SetMeasurementUnit(string measurementUnit)
         {
             if (string.IsNullOrWhiteSpace(measurementUnit))
-                throw new ArgumentException("The measurement unit cannot be null or empty.", nameof(measurementUnit));
+                throw new ArgumentException("La unidad de medida no puede estar vacía.");
             MeasurementUnit = measurementUnit;
         }
 
@@ -58,7 +58,7 @@ namespace Domain.Model
         {
             if (maxAllowedError <= 0)
             {
-                throw new ArgumentException("Max allowed error must be greater than 0.", nameof(maxAllowedError));
+                throw new ArgumentException("El error máximo permitido debe ser mayor que 0.");
             }
             MaxAllowedError = maxAllowedError;
         }
@@ -67,7 +67,7 @@ namespace Domain.Model
         {
             if (calibrationFrequencyMonths <= 0)
             {
-                throw new ArgumentException("The calibration frequency must be greater than 0.", nameof(calibrationFrequencyMonths));
+                throw new ArgumentException("La frecuencia de calibración debe ser mayor que 0.");
             }
             CalibrationFrequencyMonths = calibrationFrequencyMonths;
         }
@@ -78,7 +78,7 @@ namespace Domain.Model
         public void SetCreatedAt(DateTime createdAt)
         {
             if (createdAt == default)
-                throw new ArgumentException("The creation date cannot be null.", nameof(createdAt));
+                throw new ArgumentException("La fecha de creación no puede estar vacía.");
             CreatedAt = createdAt;
         }
 

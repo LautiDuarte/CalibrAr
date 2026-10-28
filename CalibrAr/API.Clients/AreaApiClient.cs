@@ -29,16 +29,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to get area with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo obtener el área con ID {id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while getting area with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al obtener el área con ID {id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while getting area with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al obtener el área con ID {id}: {ex.Message}.", ex);
             }
         }
 
@@ -57,16 +57,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to get areas. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudieron obtener las áreas. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while getting areas: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al obtener las áreas: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while getting areas: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al obtener las áreas: {ex.Message}.", ex);
             }
         }
 
@@ -80,16 +80,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to add area. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo agregar el área. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while adding area: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al agregar el área: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while adding area: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al agregar el área: {ex.Message}.", ex);
             }
         }
 
@@ -103,16 +103,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to delete area with ID {id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo eliminar el área con ID {id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while deleting area with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al eliminar el área con ID {id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while deleting area with ID {id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al eliminar el área con ID {id}: {ex.Message}.", ex);
             }
         }
 
@@ -126,16 +126,16 @@ namespace API.Clients
                 {
                     ThrowIfUnauthorized(response);
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to update area with ID {area.Id}. Status code: {response.StatusCode}, Error: {errorContent}");
+                    throw new Exception($"No se pudo actualizar el área con ID {area.Id}. Código de estado: {response.StatusCode}, Error: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"An error occurred while updating area with ID {area.Id}: {ex.Message}.", ex);
+                throw new Exception($"Ocurrió un error al actualizar el área con ID {area.Id}: {ex.Message}.", ex);
             }
             catch (TaskCanceledException ex)
             {
-                throw new Exception($"Request timed out while updating area with ID {area.Id}: {ex.Message}.", ex);
+                throw new Exception($"Se agotó el tiempo de espera al actualizar el área con ID {area.Id}: {ex.Message}.", ex);
             }
         }
     }

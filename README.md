@@ -70,6 +70,8 @@ La base se siembra con 4 usuarios, uno por rol, cada uno con un conjunto de perm
 
 ## Autenticación (JWT)
 
+La clave con la que se firman los tokens **no está en el repositorio**. La WebAPI la busca en `JwtSettings:SecretKey`, que se puede definir con la variable de entorno `JwtSettings__SecretKey` o con user-secrets (`dotnet user-secrets set JwtSettings:SecretKey "<clave de al menos 32 caracteres>" --project CalibrAr/WebAPI`). Si no está definida y se corre en Development (lo normal al ejecutar desde Visual Studio), la API genera una clave al azar al arrancar, así que el proyecto corre sin configurar nada; la consecuencia es que al reiniciar la API los tokens anteriores dejan de valer y hay que volver a iniciar sesión. Fuera de Development, sin clave la API no arranca.
+
 `POST /auth/login` devuelve un token JWT con los permisos del usuario codificados como claims (`"permission": ["Areas.read", "Areas.create", ...]`). Todos los demás endpoints exigen ese token en el header `Authorization: Bearer <token>`, salvo el propio login.
 
 - **Desde WindowsForms**: el token se maneja solo, no hay nada que hacer a mano. Se guarda en memoria mientras la app está abierta (nunca en disco).
@@ -121,9 +123,7 @@ Para poder probar y mostrar la aplicación, cuando la base está vacía la WebAP
 ## Pendiente conocido
 
 - En `WindowsForms`, si el token vence con una lista abierta, se muestra un error genérico en vez de mandarte directo al login (la excepción de sesión vencida se la "traga" cada pantalla). Hay que hacer logout desde el menú y volver a entrar.
-- Hay unos 20 warnings de nulabilidad (CS86xx) en el código de `WindowsForms` y los servicios. No rompen nada pero hay que limpiarlos.
-- Los mensajes que vienen del dominio (por ejemplo "Cannot delete location...") están en inglés y se muestran así en las dos interfaces.
-- El dominio mezcla español e inglés (nombres de clases y algunos mensajes de validación en inglés, `UserRole` y otros mensajes en español) — es una decisión de idioma pendiente de unificar.
+- Los nombres de clases y propiedades del dominio están en inglés y los mensajes y textos de las pantallas en español; es una decisión de idioma que queda así.
 
 ## Mejoras futuras
 
@@ -133,4 +133,3 @@ Cosas que charlamos y no llegamos a hacer:
 - Que la API también exija el procedimiento en las calibraciones internas (hoy lo controla solo la web).
 - Sacar el "tipo de intervención" de la calibración: el mantenimiento no encaja con las mediciones y el resultado.
 - Que cada usuario pueda cambiar su propia contraseña.
-- Que las reglas de autoprotección de usuarios (no borrarse ni cambiarse el rol) y el usuario que registra un cambio de estado salgan del token y no de un dato que manda el cliente.

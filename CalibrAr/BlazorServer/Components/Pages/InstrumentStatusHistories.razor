@@ -7,10 +7,7 @@
 
 <PageHeader Title="Historial de estados" Count="histories?.Count" Subtitle="@FilterSubtitle" />
 
-@if (errorMessage != null)
-{
-    <div class="alert alert-danger">@errorMessage</div>
-}
+<ErrorBanner @bind-Message="errorMessage" />
 
 @if (histories == null)
 {

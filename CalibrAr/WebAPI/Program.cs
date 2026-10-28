@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using System.Text;
 using Application.Services;
 using Data;
@@ -69,9 +70,19 @@ builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddSingleton<ReportPdfGenerator>();
 builder.Services.AddScoped<AuthService>();
 
+// La clave de firma de los tokens no está en el repositorio: se configura con la variable de entorno
+// JwtSettings__SecretKey o con "dotnet user-secrets set JwtSettings:SecretKey <clave>".
+// Solo en Development, si falta, se genera una al azar (los tokens dejan de valer al reiniciar la API).
+if (string.IsNullOrWhiteSpace(builder.Configuration["JwtSettings:SecretKey"]))
+{
+    if (!builder.Environment.IsDevelopment())
+        throw new InvalidOperationException("Falta configurar JwtSettings:SecretKey (variable de entorno JwtSettings__SecretKey).");
+
+    builder.Configuration["JwtSettings:SecretKey"] = Convert.ToBase64String(RandomNumberGenerator.GetBytes(48));
+}
+
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var jwtSecretKey = jwtSettings["SecretKey"]
-    ?? throw new InvalidOperationException("Falta configurar JwtSettings:SecretKey en appsettings.json.");
+var jwtSecretKey = jwtSettings["SecretKey"]!;
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

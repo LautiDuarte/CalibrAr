@@ -114,9 +114,12 @@ namespace Application.Services
 
         private async Task EnsureInstrumentTypeExistsAsync(int instrumentTypeId)
         {
+            if (instrumentTypeId <= 0)
+                throw new ArgumentException("Debe seleccionar un tipo de instrumento.");
+
             var instrumentType = await instrumentTypeRepository.GetAsync(instrumentTypeId);
             if (instrumentType == null)
-                throw new KeyNotFoundException($"There is no instrument type with id {instrumentTypeId}.");
+                throw new KeyNotFoundException($"No existe un tipo de instrumento con id {instrumentTypeId}.");
         }
     }
 }

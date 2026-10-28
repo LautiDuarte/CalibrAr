@@ -5,10 +5,7 @@
 @inject ReferenceStandardApiClient ReferenceStandardApiClient
 @inject NavigationManager NavigationManager
 
-@if (errorMessage != null)
-{
-    <div class="alert alert-danger form-narrow">@errorMessage</div>
-}
+<ErrorBanner @bind-Message="errorMessage" />
 
 @if (editContext == null)
 {
