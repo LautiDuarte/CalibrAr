@@ -109,16 +109,9 @@ namespace WindowsForms
             if (nonConformitiesDataGridView.Rows[e.RowIndex].DataBoundItem is not NonConformityDTO nonConformity) return;
             if (!CanClose(nonConformity)) return;
 
-            int? closerId = AuthServiceProvider.Instance.GetUserId();
-            if (closerId == null)
-            {
-                MessageBox.Show("No se encontró el usuario actual. Revisá tu sesión.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
             var result = MessageBox.Show(
                 $"¿Cerrar la no conformidad {nonConformity.Code}?",
-                "Confirm close", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+                "Confirmar cierre", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
             if (result != DialogResult.OK) return;
 
             try
@@ -221,7 +214,7 @@ namespace WindowsForms
                 MessageBox.Show("Primero seleccione una no conformidad.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
             }
-            return (NonConformityDTO)nonConformitiesDataGridView.SelectedRows[0].DataBoundItem;
+            return nonConformitiesDataGridView.SelectedRows[0].DataBoundItem as NonConformityDTO;
         }
 
         private void DisableControls()

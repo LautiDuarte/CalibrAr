@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -68,7 +69,7 @@ namespace WindowsForms
 
         private async void saveButton_Click(object sender, EventArgs e)
         {
-            if (this.ValidateInstrumentType())
+            if (this.ValidateInstrumentType(out decimal maxAllowedError, out int calibrationFrequencyMonths))
             {
                 try
                 {
@@ -77,8 +78,8 @@ namespace WindowsForms
                     this.InstrumentType.Name = nameTextBox.Text;
                     this.InstrumentType.Description = descriptionTextBox.Text;
                     this.InstrumentType.MeasurementUnit = measurementUnitTextBox.Text;
-                    this.InstrumentType.MaxAllowedError = decimal.Parse(maxAllowedErrorTextBox.Text);
-                    this.InstrumentType.CalibrationFrequencyMonths = int.Parse(calibrationFrequencyMonthsTextBox.Text);
+                    this.InstrumentType.MaxAllowedError = maxAllowedError;
+                    this.InstrumentType.CalibrationFrequencyMonths = calibrationFrequencyMonths;
                     if (this.Mode == FormMode.Update)
                     {
                         await instrumentTypeApiClient.UpdateAsync(this.InstrumentType);
@@ -115,9 +116,11 @@ namespace WindowsForms
             this.calibrationFrequencyMonthsTextBox.Text = this.InstrumentType.CalibrationFrequencyMonths.ToString();
         }
 
-        private bool ValidateInstrumentType()
+        private bool ValidateInstrumentType(out decimal maxAllowedError, out int calibrationFrequencyMonths)
         {
             bool isValid = true;
+            maxAllowedError = 0;
+            calibrationFrequencyMonths = 0;
             errorProvider.SetError(nameTextBox, string.Empty);
             errorProvider.SetError(measurementUnitTextBox, string.Empty);
             errorProvider.SetError(maxAllowedErrorTextBox, string.Empty);
@@ -135,15 +138,25 @@ namespace WindowsForms
                 isValid = false;
             }
 
-            if (this.maxAllowedErrorTextBox.Text == string.Empty)
+            if (string.IsNullOrWhiteSpace(this.maxAllowedErrorTextBox.Text))
             {
                 errorProvider.SetError(maxAllowedErrorTextBox, "El error máximo es obligatorio.");
                 isValid = false;
             }
+            else if (!DecimalParser.TryParse(this.maxAllowedErrorTextBox.Text, out maxAllowedError))
+            {
+                errorProvider.SetError(maxAllowedErrorTextBox, "El error máximo debe ser un número.");
+                isValid = false;
+            }
 
-            if (this.calibrationFrequencyMonthsTextBox.Text == string.Empty)
+            if (string.IsNullOrWhiteSpace(this.calibrationFrequencyMonthsTextBox.Text))
             {
                 errorProvider.SetError(calibrationFrequencyMonthsTextBox, "La frecuencia (meses) es obligatoria.");
+                isValid = false;
+            }
+            else if (!int.TryParse(this.calibrationFrequencyMonthsTextBox.Text.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out calibrationFrequencyMonths))
+            {
+                errorProvider.SetError(calibrationFrequencyMonthsTextBox, "La frecuencia (meses) debe ser un número entero.");
                 isValid = false;
             }
 

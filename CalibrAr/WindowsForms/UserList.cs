@@ -157,7 +157,7 @@ namespace WindowsForms
                 MessageBox.Show("Primero seleccione un usuario.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
             }
-            return (UserDTO)usersDataGridView.SelectedRows[0].DataBoundItem;
+            return usersDataGridView.SelectedRows[0].DataBoundItem as UserDTO;
         }
 
         private void DisableControls()

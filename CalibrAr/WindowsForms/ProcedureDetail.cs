@@ -1,5 +1,4 @@
 ﻿using System;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -19,7 +18,7 @@ namespace WindowsForms
         private readonly InstrumentTypeApiClient instrumentTypeApiClient = new(AuthServiceProvider.Instance);
         private readonly ProcedureApiClient procedureApiClient = new(AuthServiceProvider.Instance);
 
-        private ProcedureDTO procedure;
+        private ProcedureDTO procedure = new();
         private FormMode mode;
 
         public ProcedureDTO Procedure
@@ -93,7 +92,8 @@ namespace WindowsForms
                     this.Procedure.Name = nameTextBox.Text;
                     this.Procedure.VersionNumber = versionNumberTextBox.Text;
                     this.Procedure.ApprovedAt = approvedAtDateTimePicker.Value;
-                    this.Procedure.InstrumentTypeId = (int)instrumentTypeComboBox.SelectedValue;
+                    if (instrumentTypeComboBox.SelectedValue is not int instrumentTypeId) return;
+                    this.Procedure.InstrumentTypeId = instrumentTypeId;
                     this.Procedure.DocumentUrl = string.IsNullOrWhiteSpace(documentUrlTextBox.Text) ? null : documentUrlTextBox.Text.Trim();
                     if (this.Mode == FormMode.Update)
                     {

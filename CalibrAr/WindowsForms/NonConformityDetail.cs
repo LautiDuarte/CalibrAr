@@ -21,9 +21,6 @@ namespace WindowsForms
         private readonly CalibrationApiClient calibrationApiClient = new(AuthServiceProvider.Instance);
         private readonly UserApiClient userApiClient = new(AuthServiceProvider.Instance);
 
-        private static readonly string[] rolesThatCanDetect = { "Administrador", "Responsable", "Operador" };
-        private static readonly string[] rolesThatCanClose = { "Administrador", "Responsable" };
-
         private NonConformityDTO nonConformity = new();
         private FormMode mode;
         private List<CalibrationDTO> allCalibrations = new();
@@ -173,8 +170,8 @@ namespace WindowsForms
             isClosed = NonConformity.ClosedByUserId.HasValue;
             openedAtDateTimePicker.Value = NonConformity.OpenedAt;
 
-            // Abierta: el estado no puede ser Closed (se cierra con el botón Close o desde ClosedBy).
-            // Cerrada: se muestra Closed deshabilitado; al reabrir con "(None)" el back lo pasa a Open.
+            // Abierta: el estado no puede ser Closed (se cierra solo con el botón "Cerrar" de la lista).
+            // Cerrada: se muestra Closed deshabilitado; no se puede reabrir desde acá.
             if (!isClosed)
             {
                 statusComboBox.DataSource = Enum.GetValues<NonConformityStatusDTO>()
@@ -182,8 +179,9 @@ namespace WindowsForms
             }
             statusComboBox.SelectedItem = Enum.Parse<NonConformityStatusDTO>(NonConformity.Status);
 
+            // Solo lectura: se muestra quién la detectó, sin posibilidad de cambiarlo
             detectedByUserComboBox.DataSource = allUsers
-                .Where(u => rolesThatCanDetect.Contains(u.Role.ToString()) || u.Id == NonConformity.DetectedByUserId)
+                .Where(u => u.Id == NonConformity.DetectedByUserId)
                 .ToList();
             detectedByUserComboBox.DisplayMember = "FullName";
             detectedByUserComboBox.ValueMember = "Id";
@@ -196,15 +194,12 @@ namespace WindowsForms
 
             if (isClosed)
             {
-                var closers = allUsers
-                    .Where(u => rolesThatCanClose.Contains(u.Role.ToString()) || u.Id == NonConformity.ClosedByUserId)
+                // Solo lectura: quién cerró y cuándo
+                closedByUserComboBox.DataSource = allUsers
+                    .Where(u => u.Id == NonConformity.ClosedByUserId)
                     .ToList();
-                closers.Insert(0, new UserDTO { Id = 0, FullName = "(Ninguno)" });
-
-                closedByUserComboBox.DataSource = closers;
                 closedByUserComboBox.DisplayMember = "FullName";
                 closedByUserComboBox.ValueMember = "Id";
-                closedByUserComboBox.SelectedValue = NonConformity.ClosedByUserId ?? 0;
                 closedAtDateTimePicker.Value = NonConformity.ClosedAt ?? DateTime.Now;
             }
 
@@ -235,47 +230,37 @@ namespace WindowsForms
         {
             if (!ValidateNonConformity()) return;
 
-            int? sessionUserId = AuthServiceProvider.Instance.GetUserId();
-            if (this.Mode == FormMode.Create && sessionUserId == null)
-            {
-                MessageBox.Show("No se encontró el usuario actual. Revisá tu sesión.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
             try
             {
                 DisableControls();
 
                 // Vacío al crear: la API genera el código. Al editar se conserva el que ya tenía.
                 NonConformity.Code = this.Mode == FormMode.Create ? string.Empty : codeTextBox.Text.Trim();
-                NonConformity.InstrumentId = (int)instrumentComboBox.SelectedValue;
+                if (instrumentComboBox.SelectedValue is not int instrumentId) return;
+                NonConformity.InstrumentId = instrumentId;
                 NonConformity.CalibrationId = calibrationComboBox.SelectedValue is int calibrationId && calibrationId != 0
                     ? calibrationId
                     : null;
                 NonConformity.Description = descriptionTextBox.Text;
-                NonConformity.Origin = originComboBox.SelectedItem!.ToString()!;
+                if (originComboBox.SelectedItem is not OriginDTO origin) return;
+                NonConformity.Origin = origin.ToString();
                 NonConformity.CorrectiveAction = correctiveActionTextBox.Text;
 
                 if (this.Mode == FormMode.Create)
                 {
-                    NonConformity.DetectedByUserId = sessionUserId!.Value;
+                    // El detector lo toma la API del token
                     NonConformity.Status = NonConformityStatusDTO.Open.ToString();
                 }
                 else
                 {
                     NonConformity.OpenedAt = openedAtDateTimePicker.Value;
-                    NonConformity.DetectedByUserId = (int)detectedByUserComboBox.SelectedValue;
 
-                    if (isClosed)
+                    // Detector y cierre no se mandan desde acá: la API los toma del token
+                    // y el cierre se hace solo con el botón "Cerrar" de la lista.
+                    if (!isClosed)
                     {
-                        // "(None)" = 0 => reabrir. El back limpia ClosedAt y pasa el estado a Open
-                        int closedById = (int)closedByUserComboBox.SelectedValue;
-                        NonConformity.ClosedByUserId = closedById == 0 ? null : closedById;
-                        NonConformity.ClosedAt = closedById == 0 ? null : closedAtDateTimePicker.Value;
-                    }
-                    else
-                    {
-                        NonConformity.Status = statusComboBox.SelectedItem!.ToString()!;
+                        if (statusComboBox.SelectedItem is not NonConformityStatusDTO status) return;
+                        NonConformity.Status = status.ToString();
                     }
                 }
 
@@ -349,18 +334,6 @@ namespace WindowsForms
                     errorProvider.SetError(statusComboBox, "El estado es obligatorio");
                 }
 
-                if (detectedByUserComboBox.SelectedValue == null)
-                {
-                    isValid = false;
-                    errorProvider.SetError(detectedByUserComboBox, "Indique quién detectó la no conformidad");
-                }
-
-                if (isClosed && closedByUserComboBox.SelectedValue is int closedById && closedById != 0
-                    && closedAtDateTimePicker.Value < openedAtDateTimePicker.Value)
-                {
-                    isValid = false;
-                    errorProvider.SetError(closedAtDateTimePicker, "La fecha de cierre no puede ser anterior a la de apertura");
-                }
             }
 
             return isValid;
@@ -391,9 +364,9 @@ namespace WindowsForms
             correctiveActionTextBox.Enabled = true;
             statusComboBox.Enabled = !isClosed;
             openedAtDateTimePicker.Enabled = true;
-            detectedByUserComboBox.Enabled = true;
-            closedAtDateTimePicker.Enabled = true;
-            closedByUserComboBox.Enabled = true;
+            detectedByUserComboBox.Enabled = false; // solo lectura
+            closedAtDateTimePicker.Enabled = false; // solo lectura
+            closedByUserComboBox.Enabled = false;   // solo lectura
         }
     }
 }
