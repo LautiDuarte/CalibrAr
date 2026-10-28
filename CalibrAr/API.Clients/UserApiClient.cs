@@ -22,7 +22,8 @@ namespace API.Clients
                 HttpResponseMessage response = await client.GetAsync($"users/{id}");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<UserDTO>();
+                    var user = await response.Content.ReadFromJsonAsync<UserDTO>();
+                    return user ?? throw new Exception($"La respuesta del servidor para el usuario con ID {id} vino vacia.");
                 }
                 else
                 {
@@ -49,7 +50,8 @@ namespace API.Clients
                 HttpResponseMessage response = await client.GetAsync("users");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<List<UserDTO>>();
+                    var users = await response.Content.ReadFromJsonAsync<List<UserDTO>>();
+                    return users ?? throw new Exception("La respuesta del servidor para la lista de usuarios vino vacia.");
                 }
                 else
                 {

@@ -189,7 +189,7 @@ else
 
             areas = instruments
                 .Where(i => !string.IsNullOrEmpty(i.AreaName))
-                .Select(i => (i.AreaId, i.AreaName))
+                .Select(i => (AreaId: i.AreaId, AreaName: i.AreaName!))
                 .Distinct()
                 .OrderBy(a => a.AreaName)
                 .ToList();

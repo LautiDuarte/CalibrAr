@@ -36,7 +36,7 @@ namespace Application.Services
                 {
                     InstrumentCode = i.Code,
                     InstrumentName = i.Name,
-                    AreaName = i.AreaName,
+                    AreaName = i.AreaName ?? string.Empty,
                     LastCalibrationDate = i.LastCalibrationDate,
                     NextCalibrationDate = i.NextCalibrationDate!.Value,
                     DaysRemaining = (i.NextCalibrationDate!.Value.Date - today).Days
