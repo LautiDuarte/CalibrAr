@@ -10,9 +10,10 @@ namespace Application.Services
     public interface IUserService
     {
         Task<UserDTO> AddAsync(UserDTO dto);
-        Task<bool> DeleteAsync(int id);
+        Task<bool> DeleteAsync(int id, int requesterUserId);
         Task<UserDTO?> GetAsync(int id);
         Task<IEnumerable<UserDTO>> GetAllAsync();
-        Task<bool> UpdateAsync(UserDTO dto);
+        Task<bool> UpdateAsync(UserDTO dto, int requesterUserId);
+
     }
 }

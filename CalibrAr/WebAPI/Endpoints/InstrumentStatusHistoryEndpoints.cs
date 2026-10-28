@@ -21,7 +21,8 @@ namespace WebAPI
             .WithName("GetInstrumentStatusHistory")
             .Produces<InstrumentStatusHistoryDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentStatusHistoryRead");
 
             app.MapGet("/instrumentstatushistories", async (IInstrumentStatusHistoryService instrumentStatusHistoryService) =>
             {
@@ -31,74 +32,8 @@ namespace WebAPI
             })
             .WithName("GetAllInstrumentStatusHistories")
             .Produces<IEnumerable<InstrumentStatusHistoryDTO>>(StatusCodes.Status200OK)
-            .WithOpenApi();
-
-            app.MapPost("/instrumentstatushistories", async (InstrumentStatusHistoryDTO dto, IInstrumentStatusHistoryService instrumentStatusHistoryService) =>
-            {
-                try
-                {
-                    InstrumentStatusHistoryDTO created = await instrumentStatusHistoryService.AddAsync(dto);
-
-                    return Results.Created($"/instrumentstatushistories/{created.Id}", created);
-                }
-                catch (ArgumentException ex)
-                {
-                    return Results.BadRequest(new { error = ex.Message });
-                }
-                catch (KeyNotFoundException ex)
-                {
-                    return Results.NotFound(new { error = ex.Message });
-                }
-            })
-            .WithName("AddInstrumentStatusHistory")
-            .Produces<InstrumentStatusHistoryDTO>(StatusCodes.Status201Created)
-            .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
-
-            app.MapPut("/instrumentstatushistories/{id}", async (int id, InstrumentStatusHistoryDTO dto, IInstrumentStatusHistoryService instrumentStatusHistoryService) =>
-            {
-                dto.Id = id;
-                try
-                {
-                    var updated = await instrumentStatusHistoryService.UpdateAsync(dto);
-
-                    if (!updated)
-                    {
-                        return Results.NotFound();
-                    }
-
-                    return Results.NoContent();
-                }
-                catch (ArgumentException ex)
-                {
-                    return Results.BadRequest(new { error = ex.Message });
-                }
-                catch (KeyNotFoundException ex)
-                {
-                    return Results.NotFound(new { error = ex.Message });
-                }
-            })
-            .WithName("UpdateInstrumentStatusHistory")
-            .Produces(StatusCodes.Status204NoContent)
-            .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
-
-            app.MapDelete("/instrumentstatushistories/{id}", async (int id, IInstrumentStatusHistoryService instrumentStatusHistoryService) =>
-            {
-                var deleted = await instrumentStatusHistoryService.DeleteAsync(id);
-
-                if (!deleted)
-                {
-                    return Results.NotFound();
-                }
-
-                return Results.NoContent();
-            })
-            .WithName("DeleteInstrumentStatusHistory")
-            .Produces(StatusCodes.Status204NoContent)
-            .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentStatusHistoryRead");
         }
     }
 }

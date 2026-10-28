@@ -1,0 +1,236 @@
+@page "/non-conformities"
+@attribute [Authorize(Policy = "NonConformitiesRead")]
+@inject NonConformityApiClient NonConformityApiClient
+@inject CurrentUser CurrentUser
+@inject NavigationManager NavigationManager
+@inject FlashService Flash
+@inject IJSRuntime JS
+
+<PageTitle>No conformidades - CalibrAr</PageTitle>
+
+<PageHeader Title="No conformidades" Count="nonConformities?.Count" Subtitle="@FilterSubtitle">
+    <Actions>
+        <AuthorizeView Policy="NonConformitiesCreate">
+            <a href="non-conformities/new" class="btn btn-primary">Nueva no conformidad</a>
+        </AuthorizeView>
+    </Actions>
+</PageHeader>
+
+<FlashBanner />
+
+<ErrorBanner @bind-Message="errorMessage" />
+
+@if (nonConformities == null)
+{
+    <p class="text-secondary">Cargando...</p>
+}
+else if (nonConformities.Count == 0)
+{
+    <p class="text-secondary">No hay no conformidades cargadas.</p>
+}
+else
+{
+    var filtered = FilteredNonConformities;
+
+    <div class="row g-2 mb-3">
+        <div class="col-md-4">
+            <input type="search" class="form-control" placeholder="Buscar por código, descripción o instrumento"
+                   @bind="searchText" @bind:event="oninput" />
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" @bind="statusFilter">
+                <option value="">Todos los estados</option>
+                @foreach (var status in new[] { "Open", "UnderAnalysis", "WithCorrectiveActions", "Closed" })
+                {
+                    <option value="@status">@NonConformityForm.StatusText(status)</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" @bind="originFilter">
+                <option value="">Todos los orígenes</option>
+                @foreach (var origin in NonConformityForm.Origins)
+                {
+                    <option value="@origin">@NonConformityForm.OriginText(origin)</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2 d-grid">
+            @if (HasFilters)
+            {
+                <button class="btn btn-outline-secondary" @onclick="ClearFilters">Limpiar</button>
+            }
+        </div>
+    </div>
+
+    @if (filtered.Count == 0)
+    {
+        <p class="text-secondary">Ninguna no conformidad coincide con los filtros.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Instrumento</th>
+                        <th>Origen</th>
+                        <th>Estado</th>
+                        <th>Descripción</th>
+                        <th>Apertura</th>
+                        <th>Cierre</th>
+                        <th>Detectada por</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var nonConformity in filtered)
+                    {
+                        <tr>
+                            <td class="font-monospace">@nonConformity.Code</td>
+                            <td><a href="instruments/@nonConformity.InstrumentId" class="font-monospace">@nonConformity.InstrumentCode</a></td>
+                            <td>@NonConformityForm.OriginText(nonConformity.Origin)</td>
+                            <td>
+                                <StatusBadge Text="@NonConformityForm.StatusText(nonConformity.Status)" Kind="@NonConformityForm.StatusKind(nonConformity.Status)" />
+                            </td>
+                            <td title="@nonConformity.Description">@Shorten(nonConformity.Description, 60)</td>
+                            <td>@nonConformity.OpenedAt.ToString("dd/MM/yyyy")</td>
+                            <td>@(nonConformity.ClosedAt?.ToString("dd/MM/yyyy") ?? "-")</td>
+                            <td>@nonConformity.DetectedByUserName</td>
+                            <td class="text-end text-nowrap">
+                                <AuthorizeView Policy="NonConformitiesUpdate">
+                                    @if (nonConformity.ClosedByUserId.HasValue)
+                                    {
+                                        <a href="non-conformities/@nonConformity.Id/edit" class="btn btn-sm btn-outline-secondary">Ver</a>
+                                    }
+                                    else
+                                    {
+                                        <a href="non-conformities/@nonConformity.Id/edit" class="btn btn-sm btn-outline-primary">Editar</a>
+                                        <button class="btn btn-sm btn-outline-success" @onclick="() => CloseAsync(nonConformity)">Cerrar</button>
+                                    }
+                                </AuthorizeView>
+                                <AuthorizeView Policy="NonConformitiesDelete">
+                                    <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteAsync(nonConformity)">Eliminar</button>
+                                </AuthorizeView>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+}
+
+@code {
+    private List<NonConformityDTO>? nonConformities;
+    private string? errorMessage;
+
+    private string searchText = string.Empty;
+    private string statusFilter = string.Empty;
+    private string originFilter = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadNonConformities();
+    }
+
+    private bool HasFilters =>
+        !string.IsNullOrWhiteSpace(searchText) || statusFilter != string.Empty || originFilter != string.Empty;
+
+    // Los filtros se aplican en memoria sobre la lista ya cargada.
+    private List<NonConformityDTO> FilteredNonConformities => nonConformities!
+        .Where(n => (string.IsNullOrWhiteSpace(searchText) || Matches(n, searchText.Trim()))
+                    && (statusFilter == string.Empty || n.Status == statusFilter)
+                    && (originFilter == string.Empty || n.Origin == originFilter))
+        .ToList();
+
+    private string? FilterSubtitle =>
+        nonConformities != null && HasFilters ? $"{FilteredNonConformities.Count} de {nonConformities.Count} no conformidades" : null;
+
+    private static bool Matches(NonConformityDTO n, string text) =>
+        Contains(n.Code, text) || Contains(n.Description, text) || Contains(n.InstrumentCode, text);
+
+    private static bool Contains(string? value, string text) =>
+        value != null && value.Contains(text, StringComparison.OrdinalIgnoreCase);
+
+    private static string Shorten(string text, int max) => text.Length <= max ? text : text[..max].TrimEnd() + "...";
+
+    private void ClearFilters()
+    {
+        searchText = string.Empty;
+        statusFilter = string.Empty;
+        originFilter = string.Empty;
+    }
+
+    private async Task LoadNonConformities()
+    {
+        try
+        {
+            nonConformities = await NonConformityApiClient.GetAllAsync();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+            nonConformities = new List<NonConformityDTO>();
+        }
+    }
+
+    private async Task CloseAsync(NonConformityDTO nonConformity)
+    {
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"¿Cerrar la no conformidad \"{nonConformity.Code}\"?");
+        if (!confirmed)
+            return;
+
+        int? userId = await CurrentUser.GetIdAsync();
+        if (userId == null)
+        {
+            errorMessage = "No se pudo identificar al usuario de la sesión. Volvé a iniciar sesión.";
+            return;
+        }
+
+        try
+        {
+            // Quién la cierra y la fecha de cierre los pone la API.
+            await NonConformityApiClient.CloseAsync(nonConformity.Id);
+            errorMessage = null;
+            await LoadNonConformities();
+            Flash.Success($"No conformidad \"{nonConformity.Code}\" cerrada.");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+
+    private async Task DeleteAsync(NonConformityDTO nonConformity)
+    {
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"¿Eliminar la no conformidad \"{nonConformity.Code}\"?");
+        if (!confirmed)
+            return;
+
+        try
+        {
+            await NonConformityApiClient.DeleteAsync(nonConformity.Id);
+            errorMessage = null;
+            await LoadNonConformities();
+            Flash.Success($"No conformidad \"{nonConformity.Code}\" eliminada.");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+}

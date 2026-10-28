@@ -1,0 +1,184 @@
+@page "/calibrations/{Id:int}/edit"
+@attribute [Authorize(Policy = "CalibrationsUpdate")]
+@inject CalibrationApiClient CalibrationApiClient
+@inject ReferenceStandardApiClient ReferenceStandardApiClient
+@inject NavigationManager NavigationManager
+@inject FlashService Flash
+@inject IJSRuntime JS
+
+<PageTitle>Calibración - CalibrAr</PageTitle>
+
+<PageHeader Title="@(calibration == null ? "Calibración" : $"Calibración de {calibration.InstrumentCode}")">
+    <Actions>
+        <a href="calibrations" class="btn btn-sm btn-outline-secondary">← Volver</a>
+    </Actions>
+</PageHeader>
+
+<FlashBanner />
+
+<ErrorBanner @bind-Message="errorMessage" Persistent="@(calibration == null)" />
+
+@if (calibration == null)
+{
+    @if (errorMessage == null)
+    {
+        <p class="text-secondary">Cargando...</p>
+    }
+}
+else if (calibration.ApprovedByUserId.HasValue)
+{
+    @* Aprobada: solo lectura. Para modificarla hay que quitar la aprobación. *@
+    <div class="alert alert-secondary">
+        Aprobada por @calibration.ApprovedByUserName. Para modificarla hay que quitar primero la aprobación.
+    </div>
+
+    <dl class="row">
+        <dt class="col-sm-3">Instrumento</dt>
+        <dd class="col-sm-9">@calibration.InstrumentCode</dd>
+
+        <dt class="col-sm-3">Fecha</dt>
+        <dd class="col-sm-9">@calibration.CalibrationDate.ToString("dd/MM/yyyy")</dd>
+
+        <dt class="col-sm-3">Tipo de intervención</dt>
+        <dd class="col-sm-9">@CalibrationText.InterventionText(calibration.InterventionType)</dd>
+
+        <dt class="col-sm-3">Procedimiento</dt>
+        <dd class="col-sm-9">@(calibration.ProcedureName ?? "-")</dd>
+
+        <dt class="col-sm-3">Origen</dt>
+        <dd class="col-sm-9">@(calibration.IsExternal ? $"Externa - {calibration.ExternalLab}" : "Interna")</dd>
+
+        <dt class="col-sm-3">Certificado</dt>
+        <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(calibration.CertificateNumber) ? "-" : calibration.CertificateNumber)</dd>
+
+        <dt class="col-sm-3">Resultado</dt>
+        <dd class="col-sm-9">
+            <StatusBadge Text="@CalibrationText.ResultText(calibration.Result)" Kind="@CalibrationText.ResultKind(calibration.Result)" />
+            @if (!string.IsNullOrWhiteSpace(calibration.RestrictionDetail))
+            {
+                <span class="ms-2">@calibration.RestrictionDetail</span>
+            }
+        </dd>
+
+        <dt class="col-sm-3">Notas</dt>
+        <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(calibration.Notes) ? "-" : calibration.Notes)</dd>
+
+        <dt class="col-sm-3">Realizada por</dt>
+        <dd class="col-sm-9">@(calibration.PerformedByUserName ?? "-")</dd>
+
+        <dt class="col-sm-3">Patrones usados</dt>
+        <dd class="col-sm-9">@UsedStandards()</dd>
+    </dl>
+
+    <MeasurementsEditor Measurements="calibration.Measurements" ReadOnly="true" />
+
+    <div class="mt-4">
+        <button class="btn btn-outline-primary" @onclick="RemoveApprovalAsync" disabled="@saving">Quitar aprobación</button>
+    </div>
+}
+else
+{
+    <CalibrationEditor Calibration="calibration" IsEdit="true" OnSave="SaveAsync" Saving="saving" />
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private CalibrationDTO? calibration;
+    private List<ReferenceStandardDTO> standards = new();
+    private string? errorMessage;
+    private bool saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        try
+        {
+            calibration = await CalibrationApiClient.GetAsync(Id);
+
+            // Solo hace falta para mostrar los nombres de los patrones en la vista de solo lectura.
+            if (calibration.ApprovedByUserId.HasValue)
+                standards = await ReferenceStandardApiClient.GetAllAsync();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+
+    private string UsedStandards()
+    {
+        if (calibration!.IsExternal || calibration.ReferenceStandardIds.Count == 0)
+            return "-";
+
+        return string.Join(", ", standards
+            .Where(s => calibration.ReferenceStandardIds.Contains(s.Id))
+            .Select(s => s.Description));
+    }
+
+    private async Task SaveAsync(CalibrationDTO updated)
+    {
+        errorMessage = null;
+        saving = true;
+        try
+        {
+            await CalibrationApiClient.UpdateAsync(updated);
+            Flash.Success("Calibración actualizada.");
+            NavigationManager.NavigateTo("calibrations");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private async Task RemoveApprovalAsync()
+    {
+        bool confirmed = await JS.InvokeAsync<bool>("confirm",
+            $"¿Quitar la aprobación de la calibración de {calibration!.InstrumentCode}? Va a quedar pendiente de aprobar.");
+        if (!confirmed)
+            return;
+
+        errorMessage = null;
+        saving = true;
+        try
+        {
+            // Sin "aprobada por", la API la considera pendiente. Se manda lo mismo que ya tenía (mediciones incluidas).
+            calibration.ApprovedByUserId = null;
+            await CalibrationApiClient.UpdateAsync(calibration);
+
+            // Se vuelve a leer para que la pantalla pase a ser editable sin salir de ella.
+            await LoadAsync();
+            Flash.Success("Se quitó la aprobación: la calibración quedó pendiente.");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

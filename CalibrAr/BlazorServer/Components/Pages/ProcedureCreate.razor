@@ -1,0 +1,83 @@
+@page "/procedures/new"
+@attribute [Authorize(Policy = "ProceduresCreate")]
+@inject ProcedureApiClient ProcedureApiClient
+@inject InstrumentTypeApiClient InstrumentTypeApiClient
+@inject NavigationManager NavigationManager
+@inject FlashService Flash
+
+<PageTitle>Nuevo procedimiento - CalibrAr</PageTitle>
+
+<PageHeader Title="Nuevo procedimiento">
+    <Actions>
+        <a href="procedures" class="btn btn-sm btn-outline-secondary">← Volver</a>
+    </Actions>
+</PageHeader>
+
+<ErrorBanner @bind-Message="errorMessage" Persistent="@(instrumentTypes == null)" />
+
+@if (instrumentTypes == null)
+{
+    @if (errorMessage == null)
+    {
+        <p class="text-secondary">Cargando...</p>
+    }
+}
+else
+{
+    <ProcedureForm Model="model" InstrumentTypes="instrumentTypes" OnValidSubmit="SaveAsync" Saving="saving" />
+}
+
+@code {
+    private ProcedureForm.ProcedureFormModel model = new();
+    private List<InstrumentTypeDTO>? instrumentTypes;
+    private string? errorMessage;
+    private bool saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            instrumentTypes = (await InstrumentTypeApiClient.GetAllAsync()).Where(t => t.IsActive).ToList();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        saving = true;
+        try
+        {
+            await ProcedureApiClient.AddAsync(new ProcedureDTO
+            {
+                Code = model.Code.Trim(),
+                Name = model.Name.Trim(),
+                VersionNumber = model.VersionNumber.Trim(),
+                DocumentUrl = string.IsNullOrWhiteSpace(model.DocumentUrl) ? null : model.DocumentUrl.Trim(),
+                ApprovedAt = model.ApprovedAt.Date,
+                InstrumentTypeId = model.InstrumentTypeId,
+                InstrumentTypeName = string.Empty
+            });
+            Flash.Success("Procedimiento creado.");
+            NavigationManager.NavigateTo("procedures");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

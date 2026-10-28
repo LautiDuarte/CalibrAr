@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,14 +11,14 @@ namespace Domain.Model
     public class User
     {
         public int Id { get; private set; }
-        public string FullName { get; private set; }
-        public string Email { get; private set; }
-        public string PasswordHash { get; private set; }
+        public string FullName { get; private set; } = String.Empty;
+        public string Email { get; private set; } = String.Empty;
+        public string PasswordHash { get; private set; } = String.Empty;
         public UserRole Role { get; private set; }
         public DateTime? LastLoginAt { get; private set; }
         public bool IsActive { get; private set; }
         public DateTime CreatedAt { get; private set; }
-        public string Salt { get; private set; }
+        public string Salt { get; private set; } = String.Empty;
 
         public int? PermissionGroupId { get; private set; }
         public virtual PermissionGroup? Group { get; private set; }
@@ -40,29 +41,36 @@ namespace Domain.Model
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("El Id debe ser mayor que 0.", nameof(id));
+                throw new ArgumentException("El id debe ser mayor que 0.");
             Id = id;
         }
         public void SetFullName(string fullname)
         {
             if (string.IsNullOrWhiteSpace(fullname))
-                throw new ArgumentException("El nombre no puede ser nulo o vacío.", nameof(fullname));
-            FullName = fullname;
+                throw new ArgumentException("El nombre no puede estar vacío.");
+            if (fullname.Length > 100)
+                throw new ArgumentException("El nombre no puede superar los 100 caracteres.");
+            FullName = fullname.Trim();
         }
 
         public void SetEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
-                throw new ArgumentException("El email no puede ser nulo o vacío.", nameof(email));
-            if (!email.Contains('@'))
-                throw new ArgumentException("El email no tiene un formato válido.", nameof(email));
+                throw new ArgumentException("El email no puede estar vacío.");
+            email = email.Trim();
+            if (email.Length > 100)
+                throw new ArgumentException("El email no puede superar los 100 caracteres.");
+            if (!MailAddress.TryCreate(email, out var address) || address.Address != email || !address.Host.Contains('.'))
+                throw new ArgumentException("El formato del email no es válido.");
             Email = email;
         }
 
         public void SetPasswordHash(string passwordHash)
         {
             if (string.IsNullOrWhiteSpace(passwordHash))
-                throw new ArgumentException("El hash de contraseña no puede ser nulo o vacío.", nameof(passwordHash));
+                throw new ArgumentException("La contraseña no puede estar vacía.");
+            if (passwordHash.Length > 30)
+                throw new ArgumentException("La contraseña no puede superar los 30 caracteres.");
             Salt = GenerateSalt();
             PasswordHash = HashPassword(passwordHash, Salt);
         }
@@ -70,7 +78,7 @@ namespace Domain.Model
         public void SetRole(UserRole role)
         {
             if (!Enum.IsDefined(typeof(UserRole), role))
-                throw new ArgumentException("El rol especificado no es válido.", nameof(role));
+                throw new ArgumentException("El rol no es válido.");
             Role = role;
         }
 
@@ -79,10 +87,19 @@ namespace Domain.Model
             IsActive = isActive;
         }
 
+        public bool ValidatePassword(string password)
+        {
+            if (string.IsNullOrWhiteSpace(password))
+                return false;
+
+            string hashedInput = HashPassword(password, Salt);
+            return PasswordHash == hashedInput;
+        }
+
         public void SetCreatedAt(DateTime createdAt)
         {
             if (createdAt == default)
-                throw new ArgumentException("La fecha de alta no puede ser nula.", nameof(createdAt));
+                throw new ArgumentException("La fecha de creación no puede estar vacía.");
             CreatedAt = createdAt;
         }
 

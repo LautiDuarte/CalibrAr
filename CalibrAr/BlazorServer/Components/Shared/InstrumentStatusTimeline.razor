@@ -1,0 +1,109 @@
+@inject InstrumentStatusHistoryApiClient InstrumentStatusHistoryApiClient
+
+<h2 class="h5 mt-4 mb-3">Historial de estados</h2>
+
+<ErrorBanner @bind-Message="errorMessage" Persistent="@(periods == null)" />
+
+@if (periods == null)
+{
+    @if (errorMessage == null)
+    {
+        <p class="text-secondary">Cargando...</p>
+    }
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Estado</th>
+                    <th>Desde</th>
+                    <th>Hasta</th>
+                    <th>Duración</th>
+                    <th>Cambiado por</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var period in periods)
+                {
+                    <tr>
+                        <td>
+                            <StatusBadge Text="@InstrumentForm.StatusText(period.Status)" Kind="@InstrumentForm.StatusKind(period.Status)" />
+                        </td>
+                        <td>@period.From.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                            @if (period.To.HasValue)
+                            {
+                                @period.To.Value.ToString("dd/MM/yyyy HH:mm")
+                            }
+                            else
+                            {
+                                <span class="fw-semibold">Actual</span>
+                            }
+                        </td>
+                        <td>@Duration(period)</td>
+                        <td>@period.ChangedBy</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public int InstrumentId { get; set; }
+
+    [Parameter, EditorRequired]
+    public DateTime CreatedAt { get; set; }
+
+    [Parameter, EditorRequired]
+    public string CurrentStatus { get; set; } = string.Empty;
+
+    private record Period(string Status, DateTime From, DateTime? To, string ChangedBy);
+
+    private List<Period>? periods;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var all = await InstrumentStatusHistoryApiClient.GetAllAsync();
+            var changes = all.Where(h => h.InstrumentId == InstrumentId).OrderBy(h => h.ChangedAt).ToList();
+
+            // El historial solo guarda los cambios, así que el primer estado sale de la fecha de alta:
+            // es el "estado anterior" del primer cambio, o el actual si nunca cambió.
+            var built = new List<Period>
+            {
+                new(changes.Count > 0 ? changes[0].PreviousStatus : CurrentStatus,
+                    CreatedAt,
+                    changes.Count > 0 ? changes[0].ChangedAt : null,
+                    "Alta del instrumento")
+            };
+
+            for (int i = 0; i < changes.Count; i++)
+            {
+                built.Add(new Period(
+                    changes[i].NewStatus,
+                    changes[i].ChangedAt,
+                    i + 1 < changes.Count ? changes[i + 1].ChangedAt : null,
+                    changes[i].ChangedByUserName ?? "Sistema"));
+            }
+
+            periods = built;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+
+    private static string Duration(Period period)
+    {
+        int days = (int)((period.To ?? DateTime.Now) - period.From).TotalDays;
+        string text = days == 0 ? "menos de 1 día" : days == 1 ? "1 día" : $"{days} días";
+        return period.To.HasValue ? text : $"{text} hasta hoy";
+    }
+}

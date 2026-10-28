@@ -14,5 +14,6 @@ namespace Data
         Task<ReferenceStandard?> GetAsync(int id);
         Task<IEnumerable<ReferenceStandard>> GetAllAsync();
         Task<bool> UpdateAsync(ReferenceStandard referenceStandard);
+        Task<bool> IsUsedAsync(int id);
     }
 }

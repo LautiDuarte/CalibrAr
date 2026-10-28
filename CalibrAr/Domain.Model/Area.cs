@@ -1,10 +1,11 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 namespace Domain.Model
 {
     public class Area
     {
         public int Id { get; private set; }
-        public string Name { get; private set; }
+        public string Name { get; private set; } = String.Empty;
         public string? Responsible { get; private set; }
         public bool IsActive { get; private set; }
         public DateTime CreatedAt { get; private set; }
@@ -41,14 +42,14 @@ namespace Domain.Model
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("El Id debe ser mayor que 0.", nameof(id));
+                throw new ArgumentException("El id debe ser mayor que 0.");
             Id = id;
         }
 
         public void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("El nombre no puede ser nulo o vacío.", nameof(name));
+                throw new ArgumentException("El nombre no puede estar vacío.");
             Name = name;
         }
 
@@ -65,14 +66,14 @@ namespace Domain.Model
         public void SetCreatedAt(DateTime createdAt)
         {
             if (createdAt == default)
-                throw new ArgumentException("La fecha de alta no puede ser nula.", nameof(createdAt));
+                throw new ArgumentException("La fecha de creación no puede estar vacía.");
             CreatedAt = createdAt;
         }
 
         public void SetLocationId(int locationId)
         {
             if (locationId <= 0)
-                throw new ArgumentException("El LocationId debe ser mayor que 0.", nameof(locationId));
+                throw new ArgumentException("El id de la ubicación debe ser mayor que 0.");
 
             // Si el objeto cargado ya no corresponde al nuevo id, se invalida
             if (_location != null && _location.Id != locationId)

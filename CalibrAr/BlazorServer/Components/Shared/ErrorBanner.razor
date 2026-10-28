@@ -1,0 +1,88 @@
+@implements IDisposable
+
+@if (!string.IsNullOrEmpty(Message))
+{
+    @if (Persistent)
+    {
+        @* Error de carga: la pantalla no tiene datos, así que el mensaje se queda. *@
+        <div class="alert alert-danger">@Message</div>
+    }
+    else
+    {
+        <div class="alert alert-danger app-toast" role="alert">
+            <span>@Message</span>
+            <button type="button" class="btn-close" aria-label="Cerrar" @onclick="DismissAsync"></button>
+        </div>
+    }
+}
+
+@code {
+    private const int SecondsVisible = 8;
+
+    [Parameter]
+    public string? Message { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> MessageChanged { get; set; }
+
+    // Un error de carga no se cierra solo: si desapareciera, la pantalla quedaría vacía.
+    [Parameter]
+    public bool Persistent { get; set; }
+
+    private string? timedMessage;
+    private CancellationTokenSource? timer;
+
+    protected override void OnParametersSet()
+    {
+        if (Persistent || string.IsNullOrEmpty(Message))
+        {
+            StopTimer();
+            timedMessage = null;
+            return;
+        }
+
+        if (Message == timedMessage)
+            return;
+
+        // Mensaje nuevo: arranca la cuenta de nuevo.
+        timedMessage = Message;
+        StopTimer();
+        timer = new CancellationTokenSource();
+        _ = ExpireAsync(timer.Token);
+    }
+
+    private async Task ExpireAsync(CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(SecondsVisible), token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        await InvokeAsync(DismissAsync);
+    }
+
+    // Avisa a la pantalla para que borre el mensaje; así, si el mismo error vuelve a ocurrir, se muestra otra vez.
+    private async Task DismissAsync()
+    {
+        StopTimer();
+        timedMessage = null;
+        Message = null;
+        await MessageChanged.InvokeAsync(null);
+    }
+
+    private void StopTimer()
+    {
+        timer?.Cancel();
+        timer?.Dispose();
+        timer = null;
+    }
+
+    public void Dispose()
+    {
+        StopTimer();
+    }
+}

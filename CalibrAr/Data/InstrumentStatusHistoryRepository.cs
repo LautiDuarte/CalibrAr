@@ -61,7 +61,6 @@ namespace Data
             {
                 existing.SetPreviousStatus(instrumentStatusHistory.PreviousStatus);
                 existing.SetNewStatus(instrumentStatusHistory.NewStatus);
-                existing.SetReason(instrumentStatusHistory.Reason);
                 existing.SetChangedAt(instrumentStatusHistory.ChangedAt);
                 existing.SetInstrumentId(instrumentStatusHistory.InstrumentId);
                 existing.SetChangedByUserId(instrumentStatusHistory.ChangedByUserId);

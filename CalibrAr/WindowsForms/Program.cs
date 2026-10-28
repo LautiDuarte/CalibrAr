@@ -1,0 +1,84 @@
+﻿using API.Clients;
+using API.Auth.WindowsForms;
+
+namespace WindowsForms
+{
+    internal static class Program
+    {
+
+        /// <summary>
+        ///  The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
+        {
+            // To customize application configuration such as set high DPI settings or default font,
+            // see https://aka.ms/applicationconfiguration.
+            ApplicationConfiguration.Initialize();
+
+            // Handler para excepciones de UI no manejadas
+            Application.ThreadException += Application_ThreadException;
+            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+
+            RunApplication();
+        }
+
+        static void RunApplication()
+        {
+            // Registrar AuthService en singleton
+            var authService = new WindowsFormsAuthService();
+            AuthServiceProvider.Register(authService);
+
+            // Loop principal de autenticación
+            while (true)
+            {
+
+                if (!authService.IsAuthenticated())
+                {
+                    var loginForm = new LoginForm();
+                    if (loginForm.ShowDialog() != DialogResult.OK)
+                    {
+                        // Usuario canceló login, cerrar aplicación
+                        return;
+                    }
+                }
+
+                try
+                {
+                    Application.Run(new Home());
+                    if (authService.IsAuthenticated())
+                    {
+                        break; // Cerró la ventana estando logueado -> salir de la app
+                    }
+                    // Si no: hizo logout -> el while sigue y vuelve a mostrar el LoginForm
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    // Sesión expirada, mostrar mensaje y volver al login
+                    MessageBox.Show(ex.Message, "Sesión vencida",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    // El loop continuará y volverá a mostrar login
+                }
+            }
+        }
+
+        private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
+        {
+            if (e.Exception is UnauthorizedAccessException)
+            {
+                // Sesión expirada
+                MessageBox.Show("La sesión venció. Volvé a iniciar sesión.", "Sesión vencida",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                // Reiniciar la aplicación para volver al login
+                Application.Restart();
+            }
+            else
+            {
+                // Otras excepciones, mostrar error genérico
+                MessageBox.Show($"Error inesperado: {e.Exception.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+    }
+}

@@ -1,0 +1,48 @@
+@inherits LayoutComponentBase
+@using System.Security.Claims
+
+<div class="app-shell">
+    <AuthorizeView>
+        <Authorized>
+            <aside class="app-sidebar">
+                <a class="app-brand" href="">CalibrAr</a>
+
+                <NavMenu />
+
+                <div class="app-user">
+                    <div class="fw-semibold">@context.User.Identity?.Name</div>
+                    <div class="small text-secondary">@RoleText(context.User)</div>
+
+                    @* Form HTML común (sin @onsubmit): el navegador hace un POST real a /logout,
+                       no pasa por el circuito, porque borrar la cookie requiere una respuesta HTTP. *@
+                    <form action="logout" method="post" class="mt-2">
+                        <AntiforgeryToken />
+                        <button type="submit" class="btn btn-sm btn-outline-secondary w-100">Cerrar sesión</button>
+                    </form>
+                </div>
+            </aside>
+        </Authorized>
+    </AuthorizeView>
+
+    <main class="app-content container-fluid p-4">
+        @Body
+    </main>
+</div>
+
+<div id="blazor-error-ui">
+    Ocurrió un error inesperado.
+    <a href="" class="reload">Recargar</a>
+    <a class="dismiss">🗙</a>
+</div>
+
+@code {
+    // El claim "group" trae el nombre del grupo de permisos tal cual está en la base.
+    private static string RoleText(ClaimsPrincipal user) => user.FindFirst("group")?.Value switch
+    {
+        "Administrator" => "Administrador",
+        "Responsible" => "Responsable",
+        "Operator" => "Operador",
+        "Auditor" => "Auditor",
+        _ => string.Empty
+    };
+}

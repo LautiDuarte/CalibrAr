@@ -1,0 +1,18 @@
+<Router AppAssembly="typeof(Program).Assembly">
+    <Found Context="routeData">
+        @* Igual que RouteView, pero antes de mostrar la página revisa su [Authorize]. *@
+        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
+            <NotAuthorized>
+                @if (context.User.Identity?.IsAuthenticated != true)
+                {
+                    <RedirectToLogin />
+                }
+                else
+                {
+                    <AccessDeniedMessage />
+                }
+            </NotAuthorized>
+        </AuthorizeRouteView>
+        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+    </Found>
+</Router>

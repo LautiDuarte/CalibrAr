@@ -9,10 +9,11 @@ namespace Application.Services
 {
     public interface INonConformityService
     {
-        Task<NonConformityDTO> AddAsync(NonConformityDTO dto);
+        Task<NonConformityDTO> AddAsync(NonConformityDTO dto, int userId);
         Task<bool> DeleteAsync(int id);
         Task<NonConformityDTO?> GetAsync(int id);
         Task<IEnumerable<NonConformityDTO>> GetAllAsync();
         Task<bool> UpdateAsync(NonConformityDTO dto);
+        Task<bool> CloseAsync(int id, int closerUserId);
     }
 }

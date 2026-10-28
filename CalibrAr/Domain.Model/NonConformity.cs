@@ -1,4 +1,4 @@
-﻿using System;
+﻿    using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,8 +9,8 @@ namespace Domain.Model
     public class NonConformity
     {
         public int Id { get; private set; }
-        public string Code { get; private set; }
-        public string Description { get; private set; }
+        public string Code { get; private set; } = string.Empty;
+        public string Description { get; private set; } = string.Empty;
         public Origin Origin { get; private set; }
         public NonConformityStatus Status { get; private set; }
         public string? CorrectiveAction { get; private set; }
@@ -18,9 +18,9 @@ namespace Domain.Model
         public DateTime? ClosedAt { get; private set; }
         public DateTime CreatedAt { get; private set; }
         private int _instrumentId;
-        private int _calibrationId;
+        private int? _calibrationId;
         private int _detectedByUserId;
-        private int _closedByUserId;
+        private int? _closedByUserId;
         private Instrument? _instrument;
         private Calibration? _calibration;
         private User? _detectedByUser;
@@ -31,7 +31,7 @@ namespace Domain.Model
             get => _instrument?.Id ?? _instrumentId;
             private set => _instrumentId = value;
         }
-        public int CalibrationId
+        public int? CalibrationId
         {
             get => _calibration?.Id ?? _calibrationId;
             private set => _calibrationId = value;
@@ -41,7 +41,7 @@ namespace Domain.Model
             get => _detectedByUser?.Id ?? _detectedByUserId;
             private set => _detectedByUserId = value;
         }
-        public int ClosedByUserId
+        public int? ClosedByUserId
         {
             get => _closedByUser?.Id ?? _closedByUserId;
             private set => _closedByUserId = value;
@@ -83,7 +83,7 @@ namespace Domain.Model
             }
         }
 
-        public NonConformity(int id, string code, string description, Origin origin, NonConformityStatus status, string? correctiveAction, DateTime openedAt, DateTime? closedAt, DateTime createdAt, int instrumentId, int calibrationId, int detectedByUserId, int closedByUserId)
+        public NonConformity(int id, string code, string description, Origin origin, NonConformityStatus status, string? correctiveAction, DateTime openedAt, DateTime? closedAt, DateTime createdAt, int instrumentId, int? calibrationId, int detectedByUserId, int? closedByUserId)
         {
             SetId(id);
             SetCode(code);
@@ -103,21 +103,21 @@ namespace Domain.Model
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("El Id debe ser mayor que 0.", nameof(id));
+                throw new ArgumentException("El id debe ser mayor que 0.");
             Id = id;
         }
 
         public void SetCode(string code)
         {
             if (string.IsNullOrWhiteSpace(code))
-                throw new ArgumentException("El código no puede estar vacío.", nameof(code));
+                throw new ArgumentException("El código no puede estar vacío.");
             Code = code;
         }
 
         public void SetDescription(string description)
         {
             if (string.IsNullOrWhiteSpace(description))
-                throw new ArgumentException("La descripción no puede estar vacía.", nameof(description));
+                throw new ArgumentException("La descripción no puede estar vacía.");
             Description = description;
         }
 
@@ -139,35 +139,37 @@ namespace Domain.Model
         public void SetOpenedAt(DateTime openedAt)
         {
             if (openedAt == default)
-                throw new ArgumentException("La fecha de apertura no puede ser nula.", nameof(openedAt));
+                throw new ArgumentException("La fecha de apertura no puede estar vacía.");
             OpenedAt = openedAt;
         }
 
         public void SetClosedAt(DateTime? closedAt)
         {
+            if (closedAt.HasValue && closedAt.Value < OpenedAt)
+                throw new ArgumentException("La fecha de cierre no puede ser anterior a la de apertura.");
             ClosedAt = closedAt;
         }
 
         public void SetCreatedAt(DateTime createdAt)
         {
             if (createdAt == default)
-                throw new ArgumentException("La fecha de creación no puede ser nula.", nameof(createdAt));
+                throw new ArgumentException("La fecha de creación no puede estar vacía.");
             CreatedAt = createdAt;
         }
 
         public void SetInstrumentId(int instrumentId)
         {
             if (instrumentId <= 0)
-                throw new ArgumentException("El Id del instrumento debe ser mayor que 0.", nameof(instrumentId));
+                throw new ArgumentException("El id del instrumento debe ser mayor que 0.");
             if (_instrument != null && _instrument.Id != instrumentId)
                 Instrument = null;
             InstrumentId = instrumentId;
         }
 
-        public void SetCalibrationId(int calibrationId)
+        public void SetCalibrationId(int? calibrationId)
         {
-            if (calibrationId <= 0)
-                throw new ArgumentException("El Id de la calibración debe ser mayor que 0.", nameof(calibrationId));
+            if (calibrationId.HasValue && calibrationId <= 0)
+                throw new ArgumentException("El id de la calibración debe ser mayor que 0.");
             if (_calibration != null && _calibration.Id != calibrationId)
                 Calibration = null;
             CalibrationId = calibrationId;
@@ -176,16 +178,16 @@ namespace Domain.Model
         public void SetDetectedByUserId(int detectedByUserId)
         {
             if (detectedByUserId <= 0)
-                throw new ArgumentException("El Id del usuario que detectó la no conformidad debe ser mayor que 0.", nameof(detectedByUserId));
+                throw new ArgumentException("El id del usuario que detectó la no conformidad debe ser mayor que 0.");
             if (_detectedByUser != null && _detectedByUser.Id != detectedByUserId)
                 DetectedByUser = null;
             DetectedByUserId = detectedByUserId;
         }
 
-        public void SetClosedByUserId(int closedByUserId)
+        public void SetClosedByUserId(int? closedByUserId)
         {
-            if (closedByUserId <= 0)
-                throw new ArgumentException("El Id del usuario que cerró la no conformidad debe ser mayor que 0.", nameof(closedByUserId));
+            if (closedByUserId.HasValue && closedByUserId <= 0)
+                throw new ArgumentException("El id del usuario que cerró la no conformidad debe ser mayor que 0.");
             if (_closedByUser != null && _closedByUser.Id != closedByUserId)
                 ClosedByUser = null;
             ClosedByUserId = closedByUserId;

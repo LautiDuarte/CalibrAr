@@ -9,9 +9,9 @@ namespace Domain.Model
     public class Permission
     {
         public int Id { get; private set; }
-        public string Name { get; private set; }
-        public string Description { get; private set; }
-        public string Category { get; private set; }
+        public string Name { get; private set; } = string.Empty;
+        public string Description { get; private set; } = string.Empty;
+        public string Category { get; private set; } = string.Empty;
         public bool IsActive { get; private set; }
 
         // Navigation properties
@@ -32,17 +32,17 @@ namespace Domain.Model
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("El Id debe ser mayor o igual a 0.", nameof(id));
+                throw new ArgumentException("El id debe ser mayor que 0.");
             Id = id;
         }
 
         public void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("El nombre no puede ser nulo o vacío.", nameof(name));
+                throw new ArgumentException("El nombre no puede estar vacío.");
 
             if (name.Length > 50)
-                throw new ArgumentException("El nombre no puede exceder 50 caracteres.", nameof(name));
+                throw new ArgumentException("El nombre no puede superar los 50 caracteres.");
 
             Name = name;
         }
@@ -50,20 +50,20 @@ namespace Domain.Model
         public void SetDescription(string description)
         {
             if (string.IsNullOrWhiteSpace(description))
-                throw new ArgumentException("La descripción no puede ser nula o vacía.", nameof(description));
+                throw new ArgumentException("La descripción no puede estar vacía.");
 
             if (description.Length > 200)
-                throw new ArgumentException("La descripción no puede exceder 200 caracteres.", nameof(description));
+                throw new ArgumentException("La descripción no puede superar los 200 caracteres.");
             Description = description;
         }
 
         public void SetCategory(string category)
         {
             if (string.IsNullOrWhiteSpace(category))
-                throw new ArgumentException("La categoría no puede ser nula o vacía.", nameof(category));
+                throw new ArgumentException("La categoría no puede estar vacía.");
 
             if (category.Length > 30)
-                throw new ArgumentException("La categoría no puede exceder 30 caracteres.", nameof(category));
+                throw new ArgumentException("La categoría no puede superar los 30 caracteres.");
 
             Category = category;
         }

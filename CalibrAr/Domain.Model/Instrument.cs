@@ -9,8 +9,8 @@ namespace Domain.Model
     public class Instrument
     {
         public int Id { get; private set; }
-        public string Code { get; private set; }
-        public string Name { get; private set; }
+        public string Code { get; private set; } = string.Empty;
+        public string Name { get; private set; } = string.Empty;
         public string? SerialNumber { get; private set; }
         public string? Brand { get; private set; }
         public string? Model { get; private set; }
@@ -79,21 +79,21 @@ namespace Domain.Model
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("El Id debe ser mayor que 0.", nameof(id));
+                throw new ArgumentException("El id debe ser mayor que 0.");
             Id = id;
         }
 
         public void SetCode(string code)
         {
             if (string.IsNullOrWhiteSpace(code))
-                throw new ArgumentException("El código no puede ser nulo o vacío.", nameof(code));
-            Code = code;
+                throw new ArgumentException("El código no puede estar vacío.");
+            Code = code.Trim();
         }
 
         public void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("El nombre no puede ser nulo o vacío.", nameof(name));
+                throw new ArgumentException("El nombre no puede estar vacío.");
             Name = name;
         }
 
@@ -120,14 +120,14 @@ namespace Domain.Model
         public void SetMaxAllowedError(decimal? maxAllowedError)
         {
             if (maxAllowedError < 0)
-                throw new ArgumentException("El error máximo permitido no puede ser negativo.", nameof(maxAllowedError));
+                throw new ArgumentException("El error máximo permitido no puede ser negativo.");
             MaxAllowedError = maxAllowedError;
         }
 
         public void SetCalibrationFrequencyMonths(int? calibrationFrequencyMonths)
         {
             if (calibrationFrequencyMonths < 0)
-                throw new ArgumentException("La frecuencia de calibración no puede ser negativa.", nameof(calibrationFrequencyMonths));
+                throw new ArgumentException("La frecuencia de calibración debe ser mayor que 0.");
             CalibrationFrequencyMonths = calibrationFrequencyMonths;
         }
 
@@ -149,7 +149,7 @@ namespace Domain.Model
         public void SetCreatedAt(DateTime createdAt)
         {
             if (createdAt == default)
-                throw new ArgumentException("La fecha de creación no puede ser nula.", nameof(createdAt));
+                throw new ArgumentException("La fecha de creación no puede estar vacía.");
             CreatedAt = createdAt;
         }
 
@@ -158,10 +158,10 @@ namespace Domain.Model
             UpdatedAt = updatedAt;
         }
 
-        public void SetInstrumentTypeId( int instrumentTypeId)
+        public void SetInstrumentTypeId(int instrumentTypeId)
         {
             if (instrumentTypeId <= 0)
-                throw new ArgumentException("El Id del tipo de instrumento debe ser mayor que 0.", nameof(instrumentTypeId));
+                throw new ArgumentException("El id del tipo de instrumento debe ser mayor que 0.");
             if (_instrumentType != null && _instrumentType.Id != instrumentTypeId)
                 InstrumentType = null;
             InstrumentTypeId = instrumentTypeId;
@@ -170,7 +170,7 @@ namespace Domain.Model
         public void SetAreaId(int areaId)
         {
             if (areaId <= 0)
-                throw new ArgumentException("El Id del área debe ser mayor que 0.", nameof(areaId));
+                throw new ArgumentException("El id del área debe ser mayor que 0.");
             if (_area != null && _area.Id != areaId)
                 Area = null;
             AreaId = areaId;
@@ -186,6 +186,13 @@ namespace Domain.Model
         {
             ArgumentNullException.ThrowIfNull(area);
             Area = area;
+        }
+
+        public static DateTime? CalculateNextCalibrationDate(DateTime? lastCalibrationDate, int? frequencyMonths)
+        {
+            return lastCalibrationDate.HasValue && frequencyMonths.HasValue
+                ? lastCalibrationDate.Value.AddMonths(frequencyMonths.Value)
+                : null;
         }
     }
 }

@@ -1,0 +1,222 @@
+@page "/reports"
+@attribute [Authorize(Policy = "ReportsRead")]
+@using DTOs.Reports
+@inject ReportApiClient ReportApiClient
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+<PageTitle>Reportes - CalibrAr</PageTitle>
+
+<PageHeader Title="Reportes" />
+
+<ErrorBanner @bind-Message="errorMessage" />
+
+<h2 class="h5">Calibraciones próximas y vencidas</h2>
+
+<div class="row g-2 mb-3 align-items-end">
+    <div class="col-md-3">
+        <label class="form-label" for="days">Período</label>
+        <select id="days" class="form-select" @bind="days" @bind:after="LoadUpcomingAsync">
+            <option value="30">Próximos 30 días</option>
+            <option value="60">Próximos 60 días</option>
+            <option value="90">Próximos 90 días</option>
+        </select>
+    </div>
+    <div class="col-md-3 d-grid">
+        <button class="btn btn-outline-secondary" @onclick="DownloadUpcomingPdfAsync" disabled="@(downloading || upcoming == null)">Descargar PDF</button>
+    </div>
+</div>
+
+@if (upcoming == null)
+{
+    <p class="text-secondary">Cargando...</p>
+}
+else if (upcoming.Rows.Count == 0)
+{
+    <p class="text-secondary">No hay calibraciones en este período.</p>
+}
+else
+{
+    <p class="text-secondary small">Vencidas: @upcoming.OverdueCount · Próximas: @upcoming.UpcomingCount</p>
+
+    <div class="table-responsive mb-5">
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Instrumento</th>
+                    <th>Área</th>
+                    <th>Última calibración</th>
+                    <th>Próxima calibración</th>
+                    <th>Días</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in upcoming.Rows)
+                {
+                    <tr>
+                        <td class="font-monospace">@row.InstrumentCode</td>
+                        <td>@row.InstrumentName</td>
+                        <td>@row.AreaName</td>
+                        <td>@(row.LastCalibrationDate?.ToString("dd/MM/yyyy") ?? "-")</td>
+                        <td>@row.NextCalibrationDate.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            @if (row.DaysRemaining < 0)
+                            {
+                                <StatusBadge Text="@($"Vencida ({-row.DaysRemaining})")" Kind="danger" />
+                            }
+                            else
+                            {
+                                @row.DaysRemaining
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<h2 class="h5">Resultados de calibraciones</h2>
+
+<div class="row g-2 mb-3 align-items-end">
+    <div class="col-md-3">
+        <label class="form-label" for="from">Desde</label>
+        <input id="from" type="date" class="form-control" @bind="from" />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label" for="to">Hasta</label>
+        <input id="to" type="date" class="form-control" @bind="to" />
+    </div>
+    <div class="col-md-3 d-grid">
+        <button class="btn btn-primary" @onclick="LoadResultsAsync">Ver reporte</button>
+    </div>
+    <div class="col-md-3 d-grid">
+        <button class="btn btn-outline-secondary" @onclick="DownloadResultsPdfAsync" disabled="@(downloading || results == null)">Descargar PDF</button>
+    </div>
+</div>
+
+@if (results == null)
+{
+    <p class="text-secondary">Cargando...</p>
+}
+else if (results.Total == 0)
+{
+    <p class="text-secondary">No hay calibraciones en este período.</p>
+}
+else
+{
+    <p class="text-secondary small">Total de calibraciones: @results.Total</p>
+
+    @* Barras con el ancho proporcional a la cantidad; mismos colores que el PDF. *@
+    <div class="mb-4">
+        @for (int i = 0; i < results.Totals.Count; i++)
+        {
+            var item = results.Totals[i];
+            int max = results.Totals.Max(t => t.Count);
+            int percent = max == 0 ? 0 : item.Count * 100 / max;
+
+            <div class="d-flex align-items-center mb-2">
+                <div style="width: 220px;">@item.Label</div>
+                <div class="flex-grow-1">
+                    <div class="@($"bg-{BarKinds[i % BarKinds.Length]}")" style="@($"height: 20px; width: {percent}%;")"></div>
+                </div>
+                <div class="text-end" style="width: 40px;">@item.Count</div>
+            </div>
+        }
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Instrumento</th>
+                    <th>Resultado</th>
+                    <th>Tipo</th>
+                    <th>Certificado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in results.Rows)
+                {
+                    <tr>
+                        <td>@row.CalibrationDate.ToString("dd/MM/yyyy")</td>
+                        <td class="font-monospace">@row.InstrumentCode</td>
+                        <td>@row.Result</td>
+                        <td>@(row.IsExternal ? "Externa" : "Interna")</td>
+                        <td>@(row.CertificateNumber ?? "-")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private static readonly string[] BarKinds = ["success", "warning", "danger"];
+
+    private UpcomingCalibrationsReportDTO? upcoming;
+    private CalibrationResultsReportDTO? results;
+    private int days = 30;
+    private DateTime from = DateTime.Today.AddMonths(-12);
+    private DateTime to = DateTime.Today;
+    private bool downloading;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUpcomingAsync();
+        await LoadResultsAsync();
+    }
+
+    private async Task LoadUpcomingAsync()
+    {
+        await RunAsync(async () => upcoming = await ReportApiClient.GetUpcomingCalibrationsAsync(days));
+    }
+
+    private async Task LoadResultsAsync()
+    {
+        await RunAsync(async () => results = await ReportApiClient.GetCalibrationResultsAsync(from, to));
+    }
+
+    private async Task DownloadUpcomingPdfAsync()
+    {
+        await DownloadAsync(() => ReportApiClient.GetUpcomingCalibrationsPdfAsync(days), $"calibraciones-proximas-{DateTime.Now:yyyyMMdd}.pdf");
+    }
+
+    private async Task DownloadResultsPdfAsync()
+    {
+        await DownloadAsync(() => ReportApiClient.GetCalibrationResultsPdfAsync(from, to), $"resultados-calibraciones-{DateTime.Now:yyyyMMdd}.pdf");
+    }
+
+    private async Task DownloadAsync(Func<Task<byte[]>> getPdf, string fileName)
+    {
+        downloading = true;
+        await RunAsync(async () =>
+        {
+            byte[] pdf = await getPdf();
+            using var stream = new MemoryStream(pdf);
+            using var reference = new DotNetStreamReference(stream);
+            await JS.InvokeVoidAsync("downloadFileFromStream", fileName, reference);
+        });
+        downloading = false;
+    }
+
+    private async Task RunAsync(Func<Task> action)
+    {
+        errorMessage = null;
+        try
+        {
+            await action();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+}

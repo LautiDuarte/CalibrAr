@@ -17,6 +17,10 @@ namespace Data
             this.context = context;
         }
 
+        //public UserRepository()
+        //{
+        //}
+
         public async Task AddAsync(User user)
         {
             context.Users.Add(user);
@@ -62,10 +66,44 @@ namespace Data
                 existing.SetEmail(user.Email);
                 existing.SetRole(user.Role);
                 existing.SetIsActive(user.IsActive);
+                existing.SetGroup(user.Group);
                 await context.SaveChangesAsync();
                 return true;
             }
             return false;
+        }
+
+        public async Task<bool> ExistsByEmailAsync(string email, int? excludeId = null)
+        {
+            return await context.Users.AnyAsync(u => u.Email == email && (excludeId == null || u.Id != excludeId));
+        }
+
+        public async Task<int> CountOtherActiveAdministratorsAsync(int userId)
+        {
+            return await context.Users.CountAsync(u => u.Role == UserRole.Administrador && u.IsActive && u.Id != userId);
+        }
+
+        // Usuario referenciado por calibraciones, no conformidades o historial de estados
+        public async Task<bool> IsReferencedAsync(int id)
+        {
+            return await context.Calibrations.AnyAsync(c => c.PerformedByUserId == id || c.ApprovedByUserId == id)
+                || await context.NonConformities.AnyAsync(n => n.DetectedByUserId == id || n.ClosedByUserId == id)
+                || await context.InstrumentStatusHistories.AnyAsync(h => h.ChangedByUserId == id);
+        }
+
+        public async Task<PermissionGroup?> GetGroupByNameAsync(string name)
+        {
+            return await context.PermissionGroups.FirstOrDefaultAsync(g => g.Name == name);
+        }
+
+        public async Task UpdateLastLoginAsync(int userId, DateTime lastLoginAt)
+        {
+            var existing = await context.Users.FindAsync(userId);
+            if (existing != null)
+            {
+                existing.SetLastLoginAt(lastLoginAt);
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

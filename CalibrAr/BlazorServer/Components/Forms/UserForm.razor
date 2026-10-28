@@ -1,0 +1,109 @@
+@using System.ComponentModel.DataAnnotations
+@using System.Net.Mail
+
+<EditForm Model="Model" OnValidSubmit="OnValidSubmit" class="form-narrow">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label for="fullName" class="form-label">Nombre completo</label>
+        <InputText id="fullName" class="form-control" @bind-Value="Model.FullName" />
+        <ValidationMessage For="() => Model.FullName" />
+    </div>
+
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <InputText id="email" class="form-control" @bind-Value="Model.Email" autocomplete="off" />
+        <ValidationMessage For="() => Model.Email" />
+    </div>
+
+    <div class="mb-3">
+        <label for="role" class="form-label">Rol</label>
+        <InputSelect id="role" class="form-select" @bind-Value="Model.Role" disabled="@IsSelf">
+            <option value="">Seleccione un rol</option>
+            @foreach (var role in Enum.GetNames<UserRoleDTO>())
+            {
+                <option value="@role">@role</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="() => Model.Role" />
+    </div>
+
+    @if (Model.IsNew)
+    {
+        <div class="mb-3">
+            <label for="password" class="form-label">Contraseña</label>
+            <InputText id="password" type="password" class="form-control" @bind-Value="Model.Password" autocomplete="new-password" />
+            <div class="form-text">Entre 8 y 30 caracteres.</div>
+            <ValidationMessage For="() => Model.Password" />
+        </div>
+    }
+    else
+    {
+        <div class="form-check mb-3">
+            <InputCheckbox id="isActive" class="form-check-input" @bind-Value="Model.IsActive" disabled="@IsSelf" />
+            <label for="isActive" class="form-check-label">Activo</label>
+            <div class="form-text">Un usuario inactivo no puede iniciar sesión, pero se conserva su historial.</div>
+        </div>
+    }
+
+    @if (IsSelf)
+    {
+        <div class="form-text mb-3">Es tu propio usuario: no podés cambiarte el rol ni desactivarte.</div>
+    }
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary" disabled="@Saving">Guardar</button>
+        <a href="users" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter, EditorRequired]
+    public UserFormModel Model { get; set; } = default!;
+
+    // El usuario que se está editando es el de la sesión.
+    [Parameter]
+    public bool IsSelf { get; set; }
+
+    [Parameter]
+    public EventCallback OnValidSubmit { get; set; }
+
+    [Parameter]
+    public bool Saving { get; set; }
+
+    public class UserFormModel : IValidatableObject
+    {
+        // Alta: se pide contraseña. Edición: no se muestra (la API no permite cambiarla).
+        public bool IsNew { get; set; }
+
+        [Required(ErrorMessage = "El nombre es obligatorio.")]
+        [StringLength(100, ErrorMessage = "El nombre no puede superar los 100 caracteres.")]
+        public string FullName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El email es obligatorio.")]
+        [StringLength(100, ErrorMessage = "El email no puede superar los 100 caracteres.")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Seleccione un rol.")]
+        public string Role { get; set; } = string.Empty;
+
+        public string? Password { get; set; }
+
+        public bool IsActive { get; set; } = true;
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            // Misma regla que el dominio, para avisar antes de enviar.
+            var email = Email.Trim();
+            if (!MailAddress.TryCreate(email, out var address) || address.Address != email || !address.Host.Contains('.'))
+                yield return new ValidationResult("El email no tiene un formato válido.", new[] { nameof(Email) });
+
+            if (IsNew && string.IsNullOrWhiteSpace(Password))
+                yield return new ValidationResult("La contraseña es obligatoria.", new[] { nameof(Password) });
+            else if (IsNew && Password != null && Password.Length < 8)
+                yield return new ValidationResult("La contraseña debe tener al menos 8 caracteres.", new[] { nameof(Password) });
+            else if (Password != null && Password.Length > 30)
+                yield return new ValidationResult("La contraseña no puede superar los 30 caracteres.", new[] { nameof(Password) });
+        }
+    }
+}

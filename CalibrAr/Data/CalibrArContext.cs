@@ -29,14 +29,10 @@ namespace Data
 
         public CalibrArContext(DbContextOptions<CalibrArContext> options) : base(options)
         {
-            this.Database.EnsureCreated();
-            SeedInitialData();
         }
 
         internal CalibrArContext()
         {
-            this.Database.EnsureCreated();
-            SeedInitialData();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -47,7 +43,8 @@ namespace Data
                     .SetBasePath(Directory.GetCurrentDirectory())
                     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                     .Build();
-                string connectionString = configuration.GetConnectionString("DefaultConnection");
+                string connectionString = configuration.GetConnectionString("DefaultConnection")
+                    ?? throw new InvalidOperationException("Falta configurar ConnectionStrings:DefaultConnection en appsettings.json.");
                 optionsBuilder.UseSqlServer(connectionString);
             }
         }
@@ -94,7 +91,7 @@ namespace Data
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.Description).HasMaxLength(200);
                 entity.Property(e => e.MeasurementUnit).IsRequired().HasMaxLength(50);
-                entity.Property(e => e.MaxAllowedError).IsRequired();
+                entity.Property(e => e.MaxAllowedError).IsRequired().HasPrecision(18, 4);
                 entity.Property(e => e.CalibrationFrequencyMonths).IsRequired();
                 entity.Property(e => e.IsActive).IsRequired();
                 entity.Property(e => e.CreatedAt).IsRequired();
@@ -111,12 +108,13 @@ namespace Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
                 entity.Property(e => e.Code).IsRequired().HasMaxLength(50);
+                entity.HasIndex(e => e.Code).IsUnique();
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.SerialNumber).HasMaxLength(100);
                 entity.Property(e => e.Brand).HasMaxLength(100);
                 entity.Property(e => e.Model).HasMaxLength(100);
                 entity.Property(e => e.Status).IsRequired();
-                entity.Property(e => e.MaxAllowedError);
+                entity.Property(e => e.MaxAllowedError).HasPrecision(18, 4);
                 entity.Property(e => e.CalibrationFrequencyMonths);
                 entity.Property(e => e.LastCalibrationDate);
                 entity.Property(e => e.NextCalibrationDate);
@@ -144,9 +142,8 @@ namespace Data
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
                 entity.Property(e => e.InstrumentId).IsRequired().HasField("_instrumentId");
                 entity.Navigation(e => e.Instrument).HasField("_instrument");
-                entity.Property(e => e.ChangedByUserId).IsRequired().HasField("_changedByUserId");
+                entity.Property(e => e.ChangedByUserId).HasField("_changedByUserId");
                 entity.Navigation(e => e.ChangedByUser).HasField("_changedByUser");
-                entity.Property(e => e.Reason).HasMaxLength(200);
                 entity.Property(e => e.ChangedAt).IsRequired();
                 entity.Property(e => e.PreviousStatus).IsRequired();
                 entity.Property(e => e.NewStatus).IsRequired();
@@ -157,7 +154,7 @@ namespace Data
                 entity.HasOne(e => e.Instrument)
                       .WithMany()
                       .HasForeignKey(e => e.InstrumentId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<User>(entity =>
@@ -175,8 +172,8 @@ namespace Data
                 entity.Property(e => e.CreatedAt).IsRequired();
 
                 var adminUser = new User(1, "Admin", "admin@calibrar.com", "admin123", UserRole.Administrador, true, DateTime.Now);
-                var responsableUser = new User(2, "Responsable", "responsable@calibrar.com", "responsable123", UserRole.Responsable, true, DateTime.Now);
-                var operadorUser = new User(3, "Operador", "operador@calibrar.com", "operador123", UserRole.Operador, true, DateTime.Now);
+                var responsibleUser = new User(2, "Responsible", "responsible@calibrar.com", "responsible123", UserRole.Responsable, true, DateTime.Now);
+                var operatorUser = new User(3, "Operator", "operator@calibrar.com", "operator123", UserRole.Operador, true, DateTime.Now);
                 var auditorUser = new User(4, "Auditor", "auditor@calibrar.com", "auditor123", UserRole.Auditor, true, DateTime.Now);
 
                 entity.HasData
@@ -194,25 +191,25 @@ namespace Data
                     },
                     new
                     {
-                        Id = responsableUser.Id,
-                        FullName = responsableUser.FullName,
-                        Email = responsableUser.Email,
-                        PasswordHash = responsableUser.PasswordHash,
-                        Salt = responsableUser.Salt,
-                        Role = responsableUser.Role,
-                        IsActive = responsableUser.IsActive,
-                        CreatedAt = responsableUser.CreatedAt
+                        Id = responsibleUser.Id,
+                        FullName = responsibleUser.FullName,
+                        Email = responsibleUser.Email,
+                        PasswordHash = responsibleUser.PasswordHash,
+                        Salt = responsibleUser.Salt,
+                        Role = responsibleUser.Role,
+                        IsActive = responsibleUser.IsActive,
+                        CreatedAt = responsibleUser.CreatedAt
                     },
                     new
                     {
-                        Id = operadorUser.Id,
-                        FullName = operadorUser.FullName,
-                        Email = operadorUser.Email,
-                        PasswordHash = operadorUser.PasswordHash,
-                        Salt = operadorUser.Salt,
-                        Role = operadorUser.Role,
-                        IsActive = operadorUser.IsActive,
-                        CreatedAt = operadorUser.CreatedAt
+                        Id = operatorUser.Id,
+                        FullName = operatorUser.FullName,
+                        Email = operatorUser.Email,
+                        PasswordHash = operatorUser.PasswordHash,
+                        Salt = operatorUser.Salt,
+                        Role = operatorUser.Role,
+                        IsActive = operatorUser.IsActive,
+                        CreatedAt = operatorUser.CreatedAt
                     },
                     new
                     {
@@ -248,6 +245,7 @@ namespace Data
                 entity.Property(e => e.Code).IsRequired().HasMaxLength(50);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.VersionNumber).IsRequired().HasMaxLength(20);
+                entity.Property(e => e.DocumentUrl).HasMaxLength(500);
                 entity.Property(e => e.ApprovedAt).IsRequired();
                 entity.Property(e => e.IsActive).IsRequired();
                 entity.Property(e => e.CreatedAt).IsRequired();
@@ -266,7 +264,6 @@ namespace Data
                 entity.Property(e => e.CertificateNumber).HasMaxLength(100);
                 entity.Property(e => e.Result).IsRequired();
                 entity.Property(e => e.RestrictionDetail).HasMaxLength(200);
-                entity.Property(e => e.NextCalibrationDate).IsRequired();
                 entity.Property(e => e.Notes).HasMaxLength(500);
                 entity.Property(e => e.CreatedAt).IsRequired();
                 entity.Property(e => e.InstrumentId).IsRequired().HasField("_instrumentId");
@@ -280,7 +277,7 @@ namespace Data
                 entity.HasOne(e => e.Instrument)
                       .WithMany()
                       .HasForeignKey(e => e.InstrumentId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.Cascade);
                 entity.HasOne(e => e.Procedure)
                       .WithMany()
                       .HasForeignKey(e => e.ProcedureId)
@@ -288,11 +285,11 @@ namespace Data
                 entity.HasOne(e => e.PerformedByUser)
                       .WithMany()
                       .HasForeignKey(e => e.PerformedByUserId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.NoAction);
                 entity.HasOne(e => e.ApprovedByUser)
                       .WithMany()
                       .HasForeignKey(e => e.ApprovedByUserId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<CalibrationMeasurement>(entity =>
@@ -301,15 +298,16 @@ namespace Data
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
                 entity.Property(e => e.CalibrationId).IsRequired().HasField("_calibrationId");
                 entity.Navigation(e => e.Calibration).HasField("_calibration");
-                entity.Property(e => e.NominalValue).IsRequired();
+                // Sin precisión explícita EF usa decimal(18,2) y redondea a 0 valores como 0.004.
+                entity.Property(e => e.NominalValue).IsRequired().HasPrecision(18, 4);
                 entity.Property(e => e.Notes).HasMaxLength(500);
-                entity.Property(e => e.MeasuredValue).IsRequired();
-                entity.Property(e => e.Error).IsRequired();
+                entity.Property(e => e.MeasuredValue).IsRequired().HasPrecision(18, 4);
+                entity.Property(e => e.Error).IsRequired().HasPrecision(18, 4);
                 entity.Property(e => e.IsWithinTolerance).IsRequired();
                 entity.HasOne(e => e.Calibration)
-                      .WithMany()
+                      .WithMany(c => c.Measurements)
                       .HasForeignKey(e => e.CalibrationId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<NonConformity>(entity =>
@@ -395,82 +393,84 @@ namespace Data
 
             modelBuilder.Entity<Permission>().HasData(
                 // Permisos para Locations
-                new { Id = 1, Name = "read", Description = "Leer locations", Category = "Locations", IsActive = true },
-                new { Id = 2, Name = "create", Description = "Agregar locations", Category = "Locations", IsActive = true },
-                new { Id = 3, Name = "update", Description = "Actualizar locations", Category = "Locations", IsActive = true },
-                new { Id = 4, Name = "delete", Description = "Eliminar locations", Category = "Locations", IsActive = true },
+                new { Id = 1, Name = "read", Description = "Read locations", Category = "Locations", IsActive = true },
+                new { Id = 2, Name = "create", Description = "Create locations", Category = "Locations", IsActive = true },
+                new { Id = 3, Name = "update", Description = "Update locations", Category = "Locations", IsActive = true },
+                new { Id = 4, Name = "delete", Description = "Delete locations", Category = "Locations", IsActive = true },
 
                 // Permisos para Areas
-                new { Id = 5, Name = "read", Description = "Leer areas", Category = "Areas", IsActive = true },
-                new { Id = 6, Name = "create", Description = "Agregar areas", Category = "Areas", IsActive = true },
-                new { Id = 7, Name = "update", Description = "Actualizar areas", Category = "Areas", IsActive = true },
-                new { Id = 8, Name = "delete", Description = "Eliminar areas", Category = "Areas", IsActive = true },
+                new { Id = 5, Name = "read", Description = "Read areas", Category = "Areas", IsActive = true },
+                new { Id = 6, Name = "create", Description = "Create areas", Category = "Areas", IsActive = true },
+                new { Id = 7, Name = "update", Description = "Update areas", Category = "Areas", IsActive = true },
+                new { Id = 8, Name = "delete", Description = "Delete areas", Category = "Areas", IsActive = true },
 
                 // Permisos para Instruments
-                new { Id = 9, Name = "read", Description = "Leer instrumentos", Category = "Instruments", IsActive = true },
-                new { Id = 10, Name = "create", Description = "Agregar instrumentos", Category = "Instruments", IsActive = true },
-                new { Id = 11, Name = "update", Description = "Actualizar instrumentos", Category = "Instruments", IsActive = true },
-                new { Id = 12, Name = "delete", Description = "Eliminar instrumentos", Category = "Instruments", IsActive = true },
+                new { Id = 9, Name = "read", Description = "Read instruments", Category = "Instruments", IsActive = true },
+                new { Id = 10, Name = "create", Description = "Create instruments", Category = "Instruments", IsActive = true },
+                new { Id = 11, Name = "update", Description = "Update instruments", Category = "Instruments", IsActive = true },
+                new { Id = 12, Name = "delete", Description = "Delete instruments", Category = "Instruments", IsActive = true },
 
                 // Permisos para Calibrations
-                new { Id = 13, Name = "read", Description = "Leer calibraciones", Category = "Calibrations", IsActive = true },
-                new { Id = 14, Name = "create", Description = "Agregar calibraciones", Category = "Calibrations", IsActive = true },
-                new { Id = 15, Name = "update", Description = "Actualizar calibraciones", Category = "Calibrations", IsActive = true },
-                new { Id = 16, Name = "delete", Description = "Eliminar calibraciones", Category = "Calibrations", IsActive = true },
-                new { Id = 17, Name = "approve", Description = "Aprobar calibraciones", Category = "Calibrations", IsActive = true },
+                new { Id = 13, Name = "read", Description = "Read calibrations", Category = "Calibrations", IsActive = true },
+                new { Id = 14, Name = "create", Description = "Create calibrations", Category = "Calibrations", IsActive = true },
+                new { Id = 15, Name = "update", Description = "Update calibrations", Category = "Calibrations", IsActive = true },
+                new { Id = 16, Name = "delete", Description = "Delete calibrations", Category = "Calibrations", IsActive = true },
 
                 // Permisos para Users
-                new { Id = 18, Name = "read", Description = "Leer usuarios", Category = "Users", IsActive = true },
-                new { Id = 19, Name = "create", Description = "Agregar usuarios", Category = "Users", IsActive = true },
-                new { Id = 20, Name = "update", Description = "Actualizar usuarios", Category = "Users", IsActive = true },
-                new { Id = 21, Name = "delete", Description = "Eliminar usuarios", Category = "Users", IsActive = true },
+                new { Id = 17, Name = "read", Description = "Read users", Category = "Users", IsActive = true },
+                new { Id = 18, Name = "create", Description = "Create users", Category = "Users", IsActive = true },
+                new { Id = 19, Name = "update", Description = "Update users", Category = "Users", IsActive = true },
+                new { Id = 20, Name = "delete", Description = "Delete users", Category = "Users", IsActive = true },
 
                 // Permisos para InstrumentTypes
-                new { Id = 22, Name = "read", Description = "Leer tipos de instrumentos", Category = "InstrumentTypes", IsActive = true },
-                new { Id = 23, Name = "create", Description = "Agregar tipos de instrumentos", Category = "InstrumentTypes", IsActive = true },
-                new { Id = 24, Name = "update", Description = "Actualizar tipos de instrumentos", Category = "InstrumentTypes", IsActive = true },
-                new { Id = 25, Name = "delete", Description = "Eliminar tipos de instrumentos", Category = "InstrumentTypes", IsActive = true },
+                new { Id = 21, Name = "read", Description = "Read instrument types", Category = "InstrumentTypes", IsActive = true },
+                new { Id = 22, Name = "create", Description = "Create instrument types", Category = "InstrumentTypes", IsActive = true },
+                new { Id = 23, Name = "update", Description = "Update instrument types", Category = "InstrumentTypes", IsActive = true },
+                new { Id = 24, Name = "delete", Description = "Delete instrument types", Category = "InstrumentTypes", IsActive = true },
 
                 // Permisos para Procedures
-                new { Id = 26, Name = "read", Description = "Leer procedimientos", Category = "Procedures", IsActive = true },
-                new { Id = 27, Name = "create", Description = "Agregar procedimientos", Category = "Procedures", IsActive = true },
-                new { Id = 28, Name = "update", Description = "Actualizar procedimientos", Category = "Procedures", IsActive = true },
-                new { Id = 29, Name = "delete", Description = "Eliminar procedimientos", Category = "Procedures", IsActive = true },
+                new { Id = 25, Name = "read", Description = "Read procedures", Category = "Procedures", IsActive = true },
+                new { Id = 26, Name = "create", Description = "Create procedures", Category = "Procedures", IsActive = true },
+                new { Id = 27, Name = "update", Description = "Update procedures", Category = "Procedures", IsActive = true },
+                new { Id = 28, Name = "delete", Description = "Delete procedures", Category = "Procedures", IsActive = true },
 
                 //Permisos para Nonconformities
-                new { Id = 30, Name = "read", Description = "Leer no conformidades", Category = "NonConformities", IsActive = true },
-                new { Id = 31, Name = "create", Description = "Agregar no conformidades", Category = "NonConformities", IsActive = true },
-                new { Id = 32, Name = "update", Description = "Actualizar no conformidades", Category = "NonConformities", IsActive = true },
-                new { Id = 33, Name = "delete", Description = "Eliminar no conformidades", Category = "NonConformities", IsActive = true },
+                new { Id = 29, Name = "read", Description = "Read nonconformities", Category = "NonConformities", IsActive = true },
+                new { Id = 30, Name = "create", Description = "Create nonconformities", Category = "NonConformities", IsActive = true },
+                new { Id = 31, Name = "update", Description = "Update nonconformities", Category = "NonConformities", IsActive = true },
+                new { Id = 32, Name = "delete", Description = "Delete nonconformities", Category = "NonConformities", IsActive = true },
 
                 //Permisos para Reference standards
-                new { Id = 34, Name = "read", Description = "Leer patrones de referencia", Category = "ReferenceStandards", IsActive = true },
-                new { Id = 35, Name = "create", Description = "Agregar patrones de referencia", Category = "ReferenceStandards", IsActive = true },
-                new { Id = 36, Name = "update", Description = "Actualizar patrones de referencia", Category = "ReferenceStandards", IsActive = true },
-                new { Id = 37, Name = "delete", Description = "Eliminar patrones de referencia", Category = "ReferenceStandards", IsActive = true },
+                new { Id = 33, Name = "read", Description = "Read reference standards", Category = "ReferenceStandards", IsActive = true },
+                new { Id = 34, Name = "create", Description = "Create reference standards", Category = "ReferenceStandards", IsActive = true },
+                new { Id = 35, Name = "update", Description = "Update reference standards", Category = "ReferenceStandards", IsActive = true },
+                new { Id = 36, Name = "delete", Description = "Delete reference standards", Category = "ReferenceStandards", IsActive = true },
 
                 //Permisos para Instrument status history
-                new { Id = 38, Name = "read", Description = "Leer historial de estado de instrumentos", Category = "InstrumentStatusHistory", IsActive = true },
-                new { Id = 39, Name = "create", Description = "Agregar historial de estado de instrumentos", Category = "InstrumentStatusHistory", IsActive = true },
-                new { Id = 40, Name = "update", Description = "Actualizar historial de estado de instrumentos", Category = "InstrumentStatusHistory", IsActive = true },
-                new { Id = 41, Name = "delete", Description = "Eliminar historial de estado de instrumentos", Category = "InstrumentStatusHistory", IsActive = true },
+                new { Id = 37, Name = "read", Description = "Read instrument status history", Category = "InstrumentStatusHistory", IsActive = true },
+                new { Id = 38, Name = "create", Description = "Create instrument status history", Category = "InstrumentStatusHistory", IsActive = true },
+                new { Id = 39, Name = "update", Description = "Update instrument status history", Category = "InstrumentStatusHistory", IsActive = true },
+                new { Id = 40, Name = "delete", Description = "Delete instrument status history", Category = "InstrumentStatusHistory", IsActive = true },
 
                 //Permisos para Calibration Measurements
-                new { Id = 42, Name = "read", Description = "Leer mediciones de calibración", Category = "CalibrationMeasurements", IsActive = true },
-                new { Id = 43, Name = "create", Description = "Agregar mediciones de calibración", Category = "CalibrationMeasurements", IsActive = true },
-                new { Id = 44, Name = "update", Description = "Actualizar mediciones de calibración", Category = "CalibrationMeasurements", IsActive = true },
-                new { Id = 45, Name = "delete", Description = "Eliminar mediciones de calibración", Category = "CalibrationMeasurements", IsActive = true }
+                new { Id = 41, Name = "read", Description = "Read calibration measurements", Category = "CalibrationMeasurements", IsActive = true },
+                new { Id = 42, Name = "create", Description = "Create calibration measurements", Category = "CalibrationMeasurements", IsActive = true },
+                new { Id = 43, Name = "update", Description = "Update calibration measurements", Category = "CalibrationMeasurements", IsActive = true },
+                new { Id = 44, Name = "delete", Description = "Delete calibration measurements", Category = "CalibrationMeasurements", IsActive = true },
+
+                //Permisos para Reports
+                new { Id = 45, Name = "read", Description = "Read reports", Category = "Reports", IsActive = true }
                 );
 
             modelBuilder.Entity<PermissionGroup>().HasData(
-                new { Id = 1, Name = "Administrador", Description = "Grupo de administradores", IsActive = true, CreatedAt = DateTime.Now },
-                new { Id = 2, Name = "Responsable", Description = "Grupo de responsables", IsActive = true, CreatedAt = DateTime.Now },
-                new { Id = 3, Name = "Operador", Description = "Grupo de operadores", IsActive = true, CreatedAt = DateTime.Now },
-                new { Id = 4, Name = "Auditor", Description = "Grupo de auditores", IsActive = true, CreatedAt = DateTime.Now }
+                new { Id = 1, Name = "Administrator", Description = "Group of administrators", IsActive = true, CreatedAt = DateTime.Now },
+                new { Id = 2, Name = "Responsible", Description = "Group of responsibles", IsActive = true, CreatedAt = DateTime.Now },
+                new { Id = 3, Name = "Operator", Description = "Group of operators", IsActive = true, CreatedAt = DateTime.Now },
+                new { Id = 4, Name = "Auditor", Description = "Group of auditors", IsActive = true, CreatedAt = DateTime.Now }
                 );
         }
 
-        private void SeedInitialData()
+        public void SeedInitialData()
         {
             try
             {
@@ -480,18 +480,18 @@ namespace Data
                     Permissions.Any())
                 {
                     var adminUser = Users.Include(u => u.Group).FirstOrDefault(u => u.Email == "admin@calibrar.com");
-                    var responsableUser = Users.Include(u => u.Group).FirstOrDefault(u => u.Email == "responsable@calibrar.com");
-                    var operadorUser = Users.Include(u => u.Group).FirstOrDefault(u => u.Email == "operador@calibrar.com");
+                    var responsibleUser = Users.Include(u => u.Group).FirstOrDefault(u => u.Email == "responsible@calibrar.com");
+                    var operatorUser = Users.Include(u => u.Group).FirstOrDefault(u => u.Email == "operator@calibrar.com");
                     var auditorUser = Users.Include(u => u.Group).FirstOrDefault(u => u.Email == "auditor@calibrar.com");
-                    var adminGroup = PermissionGroups.Include(g => g.Permissions).FirstOrDefault(g => g.Name == "Administrador");
-                    var responsableGroup = PermissionGroups.Include(g => g.Permissions).FirstOrDefault(g => g.Name == "Responsable");
-                    var operadorGroup = PermissionGroups.Include(g => g.Permissions).FirstOrDefault(g => g.Name == "Operador");
+                    var adminGroup = PermissionGroups.Include(g => g.Permissions).FirstOrDefault(g => g.Name == "Administrator");
+                    var responsibleGroup = PermissionGroups.Include(g => g.Permissions).FirstOrDefault(g => g.Name == "Responsible");
+                    var operatorGroup = PermissionGroups.Include(g => g.Permissions).FirstOrDefault(g => g.Name == "Operator");
                     var auditorGroup = PermissionGroups.Include(g => g.Permissions).FirstOrDefault(g => g.Name == "Auditor");
                     var allPermissions = Permissions.ToList();
 
                     if (adminGroup != null && 
-                        responsableGroup != null &&
-                        operadorGroup != null &&
+                        responsibleGroup != null &&
+                        operatorGroup != null &&
                         auditorGroup != null &&
                         allPermissions.Any())
                     {
@@ -503,43 +503,52 @@ namespace Data
                             }
                         }
 
-                        var responsablePermissions = allPermissions.Where(
+                        var responsiblePermissions = allPermissions.Where(
                             
-                            p => (p.Category == "Locations") || 
+                            p => (p.Category == "Locations") ||
+                                 (p.Category == "Procedures" && p.Name == "read") ||
+                                 (p.Category == "Users" && p.Name == "read") ||
                                  (p.Category == "Areas") || 
                                  (p.Category == "InstrumentTypes") || 
                                  (p.Category == "Instruments") || 
                                  (p.Category == "Calibrations") ||
                                  (p.Category == "CalibrationMeasurements") ||
                                  (p.Category == "NonConformities") ||
+                                 (p.Category == "InstrumentStatusHistory" && p.Name == "read") ||
+                                 (p.Category == "Reports") ||
                                  (p.Category == "ReferenceStandards")
                         ).ToList();
 
-                        foreach (var permission in responsablePermissions)
+                        foreach (var permission in responsiblePermissions)
                         {
-                            if (!responsableGroup.Permissions.Contains(permission))
+                            if (!responsibleGroup.Permissions.Contains(permission))
                             {
-                                responsableGroup.Permissions.Add(permission);
+                                responsibleGroup.Permissions.Add(permission);
                             }
                         }
 
-                        var operadorPermissions = allPermissions.Where(
+                        var operatorPermissions = allPermissions.Where(
                             p => (p.Category == "Instruments") || 
-                                 (p.Category == "Calibrations" && (p.Name == "read" || p.Name == "create" || p.Name == "update" || p.Name == "delete")) ||
+                                 (p.Category == "Procedures" && p.Name == "read") ||
+                                 (p.Category == "ReferenceStandards" && p.Name == "read") ||
+                                 (p.Category == "Calibrations" && (p.Name == "read" || p.Name == "create")) ||
+                                 (p.Category == "InstrumentTypes" && p.Name == "read") ||
+                                 (p.Category == "Areas" && p.Name == "read") ||
                                  (p.Category == "CalibrationMeasurements") ||
-                                 (p.Category == "NonConformities")
+                                 (p.Category == "NonConformities" && (p.Name == "read" || p.Name == "create"))
                         ).ToList();
 
-                        foreach (var permission in operadorPermissions)
+                        foreach (var permission in operatorPermissions)
                         {
-                            if (!operadorGroup.Permissions.Contains(permission))
+                            if (!operatorGroup.Permissions.Contains(permission))
                             {
-                                operadorGroup.Permissions.Add(permission);
+                                operatorGroup.Permissions.Add(permission);
                             }
                         }
 
                         var auditorPermissions = allPermissions.Where(
-                            p => (p.Category == "Instruments" && p.Name == "read")
+                            p => (p.Category == "Instruments" && p.Name == "read") ||
+                                 (p.Category == "Reports")
                         ).ToList();
 
                         foreach(var permission in auditorPermissions)
@@ -555,14 +564,14 @@ namespace Data
                             adminUser.SetGroup(adminGroup);
                         }
 
-                        if (responsableUser != null)
+                        if (responsibleUser != null)
                         {
-                            responsableUser.SetGroup(responsableGroup);
+                            responsibleUser.SetGroup(responsibleGroup);
                         }
 
-                        if (operadorUser != null)
+                        if (operatorUser != null)
                         {
-                            operadorUser.SetGroup(operadorGroup);
+                            operatorUser.SetGroup(operatorGroup);
                         }
 
                         if (auditorUser != null)

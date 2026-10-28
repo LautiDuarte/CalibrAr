@@ -1,0 +1,99 @@
+@using System.ComponentModel.DataAnnotations
+
+<EditForm Model="Model" OnValidSubmit="OnValidSubmit" class="form-narrow">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label for="description" class="form-label">Descripción</label>
+        <InputText id="description" class="form-control" @bind-Value="Model.Description" />
+        <ValidationMessage For="() => Model.Description" />
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-sm-7">
+            <label for="certifyingBody" class="form-label">Organismo certificante</label>
+            <InputText id="certifyingBody" class="form-control" @bind-Value="Model.CertifyingBody" />
+            <ValidationMessage For="() => Model.CertifyingBody" />
+        </div>
+        <div class="col-sm-5">
+            <label for="certificateNumber" class="form-label">N° de certificado</label>
+            <InputText id="certificateNumber" class="form-control" @bind-Value="Model.CertificateNumber" />
+            <ValidationMessage For="() => Model.CertificateNumber" />
+        </div>
+    </div>
+
+    <div class="@(IsEdit ? "row g-3 mb-3" : "row g-3 mb-4")">
+        <div class="col-sm-6">
+            <label for="issuedAt" class="form-label">Fecha de emisión</label>
+            <InputDate id="issuedAt" class="form-control" @bind-Value="Model.CertificateIssuedAt" ParsingErrorMessage="La fecha de emisión no es válida." />
+            <ValidationMessage For="() => Model.CertificateIssuedAt" />
+        </div>
+        <div class="col-sm-6">
+            <label for="expiresAt" class="form-label">Fecha de vencimiento</label>
+            <InputDate id="expiresAt" class="form-control" @bind-Value="Model.CertificateExpiresAt" ParsingErrorMessage="La fecha de vencimiento no es válida." />
+            <div class="form-text">Pasada esa fecha el patrón no debe usarse para calibrar.</div>
+            <ValidationMessage For="() => Model.CertificateExpiresAt" />
+        </div>
+    </div>
+
+    @if (IsEdit)
+    {
+        <div class="form-check mb-4">
+            <InputCheckbox id="isActive" class="form-check-input" @bind-Value="Model.IsActive" />
+            <label for="isActive" class="form-check-label">Activo</label>
+            <div class="form-text">Desmarcalo cuando llegue un certificado nuevo o el patrón se retire. Las calibraciones anteriores lo conservan.</div>
+        </div>
+    }
+
+    <button type="submit" class="btn btn-primary" disabled="@Saving">Guardar</button>
+    <a href="reference-standards" class="btn btn-outline-secondary">Cancelar</a>
+</EditForm>
+
+@code {
+    [Parameter, EditorRequired]
+    public ReferenceStandardFormModel Model { get; set; } = default!;
+
+    // El estado "activo" solo se elige al editar (al crear queda activo).
+    [Parameter]
+    public bool IsEdit { get; set; }
+
+    [Parameter]
+    public EventCallback OnValidSubmit { get; set; }
+
+    [Parameter]
+    public bool Saving { get; set; }
+
+    public class ReferenceStandardFormModel : IValidatableObject
+    {
+        [Required(ErrorMessage = "La descripción es obligatoria.")]
+        [StringLength(200, ErrorMessage = "La descripción no puede superar los 200 caracteres.")]
+        public string Description { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El organismo certificante es obligatorio.")]
+        [StringLength(100, ErrorMessage = "El organismo certificante no puede superar los 100 caracteres.")]
+        public string CertifyingBody { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El número de certificado es obligatorio.")]
+        [StringLength(100, ErrorMessage = "El número de certificado no puede superar los 100 caracteres.")]
+        public string CertificateNumber { get; set; } = string.Empty;
+
+        // Por defecto un año de vigencia, porque el vencimiento tiene que ser posterior a la emisión.
+        public DateTime CertificateIssuedAt { get; set; } = DateTime.Today;
+
+        public DateTime CertificateExpiresAt { get; set; } = DateTime.Today.AddYears(1);
+
+        public bool IsActive { get; set; } = true;
+
+        // Reglas entre campos: el servidor y el dominio las exigen igual, pero así se ven antes de enviar.
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (CertificateIssuedAt == default)
+                yield return new ValidationResult("La fecha de emisión es obligatoria.", new[] { nameof(CertificateIssuedAt) });
+
+            if (CertificateExpiresAt == default)
+                yield return new ValidationResult("La fecha de vencimiento es obligatoria.", new[] { nameof(CertificateExpiresAt) });
+            else if (CertificateIssuedAt != default && CertificateExpiresAt.Date <= CertificateIssuedAt.Date)
+                yield return new ValidationResult("La fecha de vencimiento debe ser posterior a la de emisión.", new[] { nameof(CertificateExpiresAt) });
+        }
+    }
+}

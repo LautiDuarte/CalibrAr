@@ -1,0 +1,53 @@
+@page "/reference-standards/new"
+@attribute [Authorize(Policy = "ReferenceStandardsCreate")]
+@inject ReferenceStandardApiClient ReferenceStandardApiClient
+@inject NavigationManager NavigationManager
+@inject FlashService Flash
+
+<PageTitle>Nuevo patrón de referencia - CalibrAr</PageTitle>
+
+<PageHeader Title="Nuevo patrón de referencia">
+    <Actions>
+        <a href="reference-standards" class="btn btn-sm btn-outline-secondary">← Volver</a>
+    </Actions>
+</PageHeader>
+
+<ErrorBanner @bind-Message="errorMessage" />
+
+<ReferenceStandardForm Model="model" OnValidSubmit="SaveAsync" Saving="saving" />
+
+@code {
+    private ReferenceStandardForm.ReferenceStandardFormModel model = new();
+    private string? errorMessage;
+    private bool saving;
+
+    private async Task SaveAsync()
+    {
+        saving = true;
+        try
+        {
+            await ReferenceStandardApiClient.AddAsync(new ReferenceStandardDTO
+            {
+                Description = model.Description.Trim(),
+                CertifyingBody = model.CertifyingBody.Trim(),
+                CertificateNumber = model.CertificateNumber.Trim(),
+                CertificateIssuedAt = model.CertificateIssuedAt.Date,
+                CertificateExpiresAt = model.CertificateExpiresAt.Date
+            });
+            Flash.Success("Patrón de referencia creado.");
+            NavigationManager.NavigateTo("reference-standards");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

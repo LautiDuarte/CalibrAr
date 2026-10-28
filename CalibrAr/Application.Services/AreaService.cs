@@ -13,29 +13,35 @@ namespace Application.Services
     {
         private readonly IAreaRepository areaRepository;
         private readonly ILocationRepository locationRepository;
+        private readonly IInstrumentRepository instrumentRepository;
 
-        public AreaService(IAreaRepository areaRepository, ILocationRepository locationRepository)
+        public AreaService(IAreaRepository areaRepository, ILocationRepository locationRepository, IInstrumentRepository instrumentRepository)
         {
             this.areaRepository = areaRepository;
             this.locationRepository = locationRepository;
+            this.instrumentRepository = instrumentRepository;
         }
 
         public async Task<AreaDTO> AddAsync(AreaDTO dto)
         {
             await EnsureLocationExistsAsync(dto.LocationId);
-
+            var isActive = true;
             var createdAt = DateTime.Now;
-            var area = new Area(0, dto.Name, dto.Responsible, dto.IsActive, createdAt, dto.LocationId);
+            var area = new Area(0, dto.Name, dto.Responsible, isActive, createdAt, dto.LocationId);
             await areaRepository.AddAsync(area);
             dto.Id = area.Id;
             dto.CreatedAt = area.CreatedAt;
             dto.LocationName = area.Location?.Name;
             dto.LocationAddress = area.Location?.Address;
+            dto.IsActive = isActive;
             return dto;
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
+            var instruments = await instrumentRepository.GetAllAsync();
+            if (instruments.Any(i => i.AreaId == id))
+                throw new InvalidOperationException($"No se puede eliminar el área con id {id} porque está en uso.");
             return await areaRepository.DeleteAsync(id);
         }
 
@@ -87,9 +93,12 @@ namespace Application.Services
 
         private async Task EnsureLocationExistsAsync(int locationId)
         {
+            if (locationId <= 0)
+                throw new ArgumentException("Debe seleccionar una ubicación.");
+
             var location = await locationRepository.GetAsync(locationId);
             if (location == null)
-                throw new KeyNotFoundException($"No existe una Location con Id {locationId}.");
+                throw new KeyNotFoundException($"No existe una ubicación con id {locationId}.");
         }
     }
 }

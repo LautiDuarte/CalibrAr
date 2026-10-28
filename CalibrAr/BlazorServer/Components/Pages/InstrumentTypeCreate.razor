@@ -1,0 +1,54 @@
+@page "/instrument-types/new"
+@attribute [Authorize(Policy = "InstrumentTypesCreate")]
+@inject InstrumentTypeApiClient InstrumentTypeApiClient
+@inject NavigationManager NavigationManager
+@inject FlashService Flash
+
+<PageTitle>Nuevo tipo de instrumento - CalibrAr</PageTitle>
+
+<PageHeader Title="Nuevo tipo de instrumento">
+    <Actions>
+        <a href="instrument-types" class="btn btn-sm btn-outline-secondary">← Volver</a>
+    </Actions>
+</PageHeader>
+
+<ErrorBanner @bind-Message="errorMessage" />
+
+<InstrumentTypeForm Model="model" OnValidSubmit="SaveAsync" Saving="saving" />
+
+@code {
+    private InstrumentTypeForm.InstrumentTypeFormModel model = new();
+    private string? errorMessage;
+    private bool saving;
+
+    private async Task SaveAsync()
+    {
+        saving = true;
+        try
+        {
+            await InstrumentTypeApiClient.AddAsync(new InstrumentTypeDTO
+            {
+                Name = model.Name,
+                Description = model.Description,
+                MeasurementUnit = model.MeasurementUnit,
+                MaxAllowedError = model.MaxAllowedError,
+                CalibrationFrequencyMonths = model.CalibrationFrequencyMonths,
+                IsActive = model.IsActive
+            });
+            Flash.Success("Tipo de instrumento creado.");
+            NavigationManager.NavigateTo("instrument-types");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

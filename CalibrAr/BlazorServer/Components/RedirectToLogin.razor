@@ -1,0 +1,13 @@
+@inject NavigationManager NavigationManager
+
+@code {
+    protected override void OnInitialized()
+    {
+        // Guarda la página actual para volver a ella después del login.
+        var returnUrl = "/" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+
+        // forceLoad: /login es estático, así que hace falta un request HTTP completo
+        // (no una navegación interna del circuito).
+        NavigationManager.NavigateTo($"login?ReturnUrl={Uri.EscapeDataString(returnUrl)}", forceLoad: true);
+    }
+}

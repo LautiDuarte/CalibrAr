@@ -16,7 +16,6 @@ namespace Domain.Model
         public string? CertificateNumber { get; private set; }
         public Result Result { get; private set; }
         public string? RestrictionDetail { get; private set; }
-        public DateTime NextCalibrationDate { get; private set; }
         public string? Notes { get; private set; }
         public DateTime CreatedAt { get; private set; }
         private int _instrumentId;
@@ -87,7 +86,9 @@ namespace Domain.Model
 
         public virtual ICollection<ReferenceStandard> ReferenceStandards { get; private set; } = new List<ReferenceStandard>();
 
-        public Calibration(int id, DateTime calibrationDate, InterventionType interventionType, bool isExternal, string? externalLab, string? certificateNumber, Result result, string? restrictionDetail, DateTime nextCalibrationDate, string? notes, DateTime createdAt, int instrumentId, int? procedureId, int? performedByUserId, int? approvedByUserId)
+        public virtual ICollection<CalibrationMeasurement> Measurements { get; private set; } = new List<CalibrationMeasurement>();
+
+        public Calibration(int id, DateTime calibrationDate, InterventionType interventionType, bool isExternal, string? externalLab, string? certificateNumber, Result result, string? restrictionDetail, string? notes, DateTime createdAt, int instrumentId, int? procedureId, int? performedByUserId, int? approvedByUserId)
         {
             SetId(id);
             SetCalibrationDate(calibrationDate);
@@ -97,7 +98,6 @@ namespace Domain.Model
             SetCertificateNumber(certificateNumber);
             SetResult(result);
             SetRestrictionDetail(restrictionDetail);
-            SetNextCalibrationDate(nextCalibrationDate);
             SetNotes(notes);
             SetCreatedAt(createdAt);
             SetInstrumentId(instrumentId);
@@ -109,16 +109,16 @@ namespace Domain.Model
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("El Id debe ser mayor que 0.", nameof(id));
+                throw new ArgumentException("El id debe ser mayor que 0.");
             Id = id;
         }
 
         public void SetCalibrationDate(DateTime calibrationDate)
         {
             if (calibrationDate > DateTime.Now)
-                throw new ArgumentException("La fecha de calibración no puede ser mayor a la fecha actual.", nameof(calibrationDate));
+                throw new ArgumentException("La fecha de calibración no puede ser futura.");
             if (calibrationDate == default)
-                throw new ArgumentException("La fecha de calibración no puede ser nula.", nameof(calibrationDate));
+                throw new ArgumentException("La fecha de calibración no puede estar vacía.");
             CalibrationDate = calibrationDate;
         }
 
@@ -152,13 +152,6 @@ namespace Domain.Model
             RestrictionDetail = restrictionDetail;
         }
 
-        public void SetNextCalibrationDate(DateTime nextCalibrationDate)
-        {
-            if (nextCalibrationDate == default)
-                throw new ArgumentException("La fecha de próxima calibración no puede ser nula.", nameof(nextCalibrationDate));
-            NextCalibrationDate = nextCalibrationDate;
-        }
-
         public void SetNotes(string? notes)
         {
             Notes = notes;
@@ -167,14 +160,14 @@ namespace Domain.Model
         public void SetCreatedAt(DateTime createdAt)
         {
             if (createdAt == default)
-                throw new ArgumentException("La fecha de creación no puede ser nula.", nameof(createdAt));
+                throw new ArgumentException("La fecha de creación no puede estar vacía.");
             CreatedAt = createdAt;
         }
 
         public void SetInstrumentId(int instrumentId)
         {
             if (instrumentId <= 0)
-                throw new ArgumentException("El Id del instrumento debe ser mayor que 0.", nameof(instrumentId));
+                throw new ArgumentException("El id del instrumento debe ser mayor que 0.");
             if (_instrument != null && _instrument.Id != instrumentId)
                 Instrument = null;
             InstrumentId = instrumentId;
@@ -183,7 +176,7 @@ namespace Domain.Model
         public void SetProcedureId(int? procedureId)
         {
             if (procedureId.HasValue && procedureId <= 0)
-                throw new ArgumentException("El Id del procedimiento debe ser mayor que 0.", nameof(procedureId));
+                throw new ArgumentException("El id del procedimiento debe ser mayor que 0.");
             if (_procedure != null && _procedure.Id != procedureId)
                 Procedure = null;
             ProcedureId = procedureId;
@@ -192,7 +185,7 @@ namespace Domain.Model
         public void SetPerformedByUserId(int? performedByUserId)
         {
             if (performedByUserId.HasValue && performedByUserId <= 0)
-                throw new ArgumentException("El Id del usuario que realizó la calibración debe ser mayor que 0.", nameof(performedByUserId));
+                throw new ArgumentException("El id del usuario que realizó la calibración debe ser mayor que 0.");
             if (_performedByUser != null && _performedByUser.Id != performedByUserId)
                 PerformedByUser = null;
             PerformedByUserId = performedByUserId;
@@ -201,7 +194,7 @@ namespace Domain.Model
         public void SetApprovedByUserId(int? approvedByUserId)
         {
             if (approvedByUserId.HasValue && approvedByUserId <= 0)
-                throw new ArgumentException("El Id del usuario que aprobó la calibración debe ser mayor que 0.", nameof(approvedByUserId));
+                throw new ArgumentException("El id del usuario que aprobó la calibración debe ser mayor que 0.");
             if (_approvedByUser != null && _approvedByUser.Id != approvedByUserId)
                 ApprovedByUser = null;
             ApprovedByUserId = approvedByUserId;
@@ -229,6 +222,18 @@ namespace Domain.Model
         {
             ArgumentNullException.ThrowIfNull(approvedByUser);
             ApprovedByUser = approvedByUser;
+        }
+
+        public void SetMeasurements(IEnumerable<CalibrationMeasurement> measurements)
+        {
+            ArgumentNullException.ThrowIfNull(measurements);
+            Measurements = measurements.ToList();
+        }
+
+        public void SetReferenceStandards(IEnumerable<ReferenceStandard> referenceStandards)
+        {
+            ArgumentNullException.ThrowIfNull(referenceStandards);
+            ReferenceStandards = referenceStandards.ToList();
         }
     }
 }

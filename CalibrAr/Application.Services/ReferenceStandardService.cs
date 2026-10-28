@@ -21,18 +21,23 @@ namespace Application.Services
         public async Task<ReferenceStandardDTO> AddAsync(ReferenceStandardDTO dto)
         {
             var createdAt = DateTime.Now;
-            ReferenceStandard referenceStandard = new ReferenceStandard(0, dto.Description, dto.CertifyingBody, dto.CertificateNumber, dto.CertificateIssuedAt, dto.CertificateExpiresAt, dto.IsActive, createdAt);
+            var isActive = true;
+            ReferenceStandard referenceStandard = new ReferenceStandard(0, dto.Description, dto.CertifyingBody, dto.CertificateNumber, dto.CertificateIssuedAt, dto.CertificateExpiresAt, isActive, createdAt);
 
             await referenceStandardRepository.AddAsync(referenceStandard);
 
             dto.Id = referenceStandard.Id;
             dto.CreatedAt = referenceStandard.CreatedAt;
+            dto.IsActive = isActive;
 
             return dto;
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
+            if (await referenceStandardRepository.IsUsedAsync(id))
+                throw new InvalidOperationException("El patrón de referencia se usa en una o más calibraciones y no se puede eliminar.");
+
             return await referenceStandardRepository.DeleteAsync(id);
         }
 

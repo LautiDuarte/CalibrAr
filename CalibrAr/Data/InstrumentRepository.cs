@@ -54,6 +54,18 @@ namespace Data
                 .ToListAsync();
         }
 
+        // Devuelve las entidades en el mismo orden en que vienen los ids
+        public async Task<IEnumerable<Instrument>> GetByIdsAsync(IReadOnlyList<int> ids)
+        {
+            var found = await context.Instruments
+                .Include(i => i.InstrumentType)
+                .Include(i => i.Area)
+                .Where(i => ids.Contains(i.Id))
+                .ToDictionaryAsync(i => i.Id);
+
+            return ids.Where(found.ContainsKey).Select(id => found[id]).ToList();
+        }
+
         public async Task<bool> UpdateAsync(Instrument instrument)
         {
             var existing = await context.Instruments.FindAsync(instrument.Id);
@@ -78,6 +90,12 @@ namespace Data
                 return true;
             }
             return false;
+        }
+
+        public async Task<bool> ExistsByCodeAsync(string code, int? excludeId = null)
+        {
+            return await context.Instruments
+                .AnyAsync(i => i.Code == code && (excludeId == null || i.Id != excludeId));
         }
     }
 }

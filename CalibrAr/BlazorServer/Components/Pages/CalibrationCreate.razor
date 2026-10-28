@@ -1,0 +1,60 @@
+@page "/calibrations/new"
+@attribute [Authorize(Policy = "CalibrationsCreate")]
+@inject CalibrationApiClient CalibrationApiClient
+@inject CurrentUser CurrentUser
+@inject NavigationManager NavigationManager
+@inject FlashService Flash
+
+<PageTitle>Nueva calibración - CalibrAr</PageTitle>
+
+<PageHeader Title="Nueva calibración">
+    <Actions>
+        <a href="calibrations" class="btn btn-sm btn-outline-secondary">← Volver</a>
+    </Actions>
+</PageHeader>
+
+<ErrorBanner @bind-Message="errorMessage" />
+
+<CalibrationEditor OnSave="SaveAsync" Saving="saving" />
+
+@code {
+    private string? errorMessage;
+    private bool saving;
+
+    private async Task SaveAsync(CalibrationDTO calibration)
+    {
+        errorMessage = null;
+
+        int? userId = await CurrentUser.GetIdAsync();
+        if (userId == null)
+        {
+            errorMessage = "No se pudo identificar al usuario de la sesión. Volvé a iniciar sesión.";
+            return;
+        }
+
+        saving = true;
+        try
+        {
+            // El servicio pone la fecha de hoy. Quien la realiza es quien la carga; la aprobación es una acción aparte.
+            calibration.PerformedByUserId = userId;
+            calibration.ApprovedByUserId = null;
+            calibration.CalibrationDate = DateTime.Now;
+
+            await CalibrationApiClient.AddAsync(calibration);
+            Flash.Success("Calibración creada.");
+            NavigationManager.NavigateTo("calibrations");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

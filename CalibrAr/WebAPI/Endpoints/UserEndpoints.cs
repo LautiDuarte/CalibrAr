@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Application.Services;
 using DTOs;
 
@@ -21,7 +22,8 @@ namespace WebAPI
             .WithName("GetUser")
             .Produces<UserDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("UsersRead");
 
             app.MapGet("/users", async (IUserService userService) =>
             {
@@ -31,7 +33,8 @@ namespace WebAPI
             })
             .WithName("GetAllUsers")
             .Produces<IEnumerable<UserDTO>>(StatusCodes.Status200OK)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("UsersRead");
 
             app.MapPost("/users", async (UserDTO dto, IUserService userService) =>
             {
@@ -45,18 +48,34 @@ namespace WebAPI
                 {
                     return Results.BadRequest(new { error = ex.Message });
                 }
+                catch (KeyNotFoundException ex)
+                { 
+                    return Results.NotFound(new { error = ex.Message }); 
+                }
+                catch (InvalidOperationException ex) 
+                { 
+                    return Results.Conflict(new { error = ex.Message }); 
+                }
             })
             .WithName("AddUser")
             .Produces<UserDTO>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status409Conflict)
+            .WithOpenApi()
+            .RequireAuthorization("UsersCreate");
 
-            app.MapPut("/users/{id}", async (int id, UserDTO dto, IUserService userService) =>
+            app.MapPut("/users", async (UserDTO dto, ClaimsPrincipal user, IUserService userService) =>
             {
-                dto.Id = id;
+                int? requesterUserId = user.GetUserId();
+                if (requesterUserId == null)
+                {
+                    return Results.Unauthorized();
+                }
+
                 try
                 {
-                    var updated = await userService.UpdateAsync(dto);
+                    var updated = await userService.UpdateAsync(dto, requesterUserId.Value);
 
                     if (!updated)
                     {
@@ -69,28 +88,46 @@ namespace WebAPI
                 {
                     return Results.BadRequest(new { error = ex.Message });
                 }
+                catch (KeyNotFoundException ex)
+                {
+                    return Results.NotFound(new { error = ex.Message });
+                }
+                catch (InvalidOperationException ex)
+                {
+                    return Results.Conflict(new { error = ex.Message });
+                }
             })
             .WithName("UpdateUser")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .Produces(StatusCodes.Status409Conflict)
+            .WithOpenApi()
+            .RequireAuthorization("UsersUpdate");
 
-            app.MapDelete("/users/{id}", async (int id, IUserService userService) =>
+            app.MapDelete("/users/{id}", async (int id, ClaimsPrincipal user, IUserService userService) =>
             {
-                var deleted = await userService.DeleteAsync(id);
-
-                if (!deleted)
+                int? requesterUserId = user.GetUserId();
+                if (requesterUserId == null)
                 {
-                    return Results.NotFound();
+                    return Results.Unauthorized();
                 }
 
-                return Results.NoContent();
+                try
+                {
+                    var deleted = await userService.DeleteAsync(id, requesterUserId.Value);
+                    return deleted ? Results.NoContent() : Results.NotFound();
+                }
+                catch (ArgumentException ex) { return Results.BadRequest(new { error = ex.Message }); }
+                catch (InvalidOperationException ex) { return Results.Conflict(new { error = ex.Message }); }
             })
             .WithName("DeleteUser")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status409Conflict)
+            .WithOpenApi()
+            .RequireAuthorization("UsersDelete");
         }
     }
 }

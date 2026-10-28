@@ -62,5 +62,10 @@ namespace Data
             }
             return false;
         }
+
+        public async Task<bool> IsUsedAsync(int id)
+        {
+            return await context.Calibrations.AnyAsync(c => c.ReferenceStandards.Any(r => r.Id == id));
+        }
     }
 }

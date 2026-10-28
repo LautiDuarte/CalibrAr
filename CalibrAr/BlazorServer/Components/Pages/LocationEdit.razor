@@ -1,0 +1,90 @@
+@page "/locations/{Id:int}/edit"
+@attribute [Authorize(Policy = "LocationsUpdate")]
+@inject LocationApiClient LocationApiClient
+@inject NavigationManager NavigationManager
+@inject FlashService Flash
+
+<PageTitle>Editar ubicación - CalibrAr</PageTitle>
+
+<PageHeader Title="Editar ubicación">
+    <Actions>
+        <a href="locations" class="btn btn-sm btn-outline-secondary">← Volver</a>
+    </Actions>
+</PageHeader>
+
+<ErrorBanner @bind-Message="errorMessage" Persistent="@(model == null)" />
+
+@if (model == null)
+{
+    @if (errorMessage == null)
+    {
+        <p class="text-secondary">Cargando...</p>
+    }
+}
+else
+{
+    <LocationForm Model="model" OnValidSubmit="SaveAsync" Saving="saving" />
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private LocationForm.LocationFormModel? model;
+    private DateTime createdAt;
+    private string? errorMessage;
+    private bool saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            LocationDTO location = await LocationApiClient.GetAsync(Id);
+            createdAt = location.CreatedAt;
+            model = new LocationForm.LocationFormModel
+            {
+                Name = location.Name,
+                Address = location.Address,
+                IsActive = location.IsActive
+            };
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        saving = true;
+        try
+        {
+            await LocationApiClient.UpdateAsync(new LocationDTO
+            {
+                Id = Id,
+                Name = model!.Name,
+                Address = model.Address,
+                IsActive = model.IsActive,
+                CreatedAt = createdAt
+            });
+            Flash.Success("Ubicación actualizada.");
+            NavigationManager.NavigateTo("locations");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

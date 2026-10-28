@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Application.Services;
 using DTOs;
 
@@ -21,7 +22,8 @@ namespace WebAPI
             .WithName("GetInstrument")
             .Produces<InstrumentDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentsRead");
 
             app.MapGet("/instruments", async (IInstrumentService instrumentService) =>
             {
@@ -31,7 +33,28 @@ namespace WebAPI
             })
             .WithName("GetAllInstruments")
             .Produces<IEnumerable<InstrumentDTO>>(StatusCodes.Status200OK)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentsRead");
+
+            // Búsqueda con filtros combinables: los que no se mandan, no filtran
+            app.MapGet("/instruments/search", async (string? text, string? status, int? areaId, bool? hideDecommissioned, IInstrumentService instrumentService) =>
+            {
+                try
+                {
+                    var dtos = await instrumentService.SearchAsync(text, status, areaId, hideDecommissioned ?? false);
+
+                    return Results.Ok(dtos);
+                }
+                catch (ArgumentException ex)
+                {
+                    return Results.BadRequest(new { error = ex.Message });
+                }
+            })
+            .WithName("SearchInstruments")
+            .Produces<IEnumerable<InstrumentDTO>>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentsRead");
 
             app.MapPost("/instruments", async (InstrumentDTO dto, IInstrumentService instrumentService) =>
             {
@@ -49,18 +72,23 @@ namespace WebAPI
                 {
                     return Results.NotFound(new { error = ex.Message });
                 }
+                catch (InvalidOperationException ex)
+                {
+                    return Results.Conflict(new { error = ex.Message });
+                }
             })
             .WithName("AddInstrument")
             .Produces<InstrumentDTO>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentsCreate");
 
-            app.MapPut("/instruments/{id}", async (int id, InstrumentDTO dto, IInstrumentService instrumentService) =>
+            app.MapPut("/instruments", async (InstrumentDTO dto, ClaimsPrincipal user, IInstrumentService instrumentService) =>
             {
-                dto.Id = id;
                 try
                 {
-                    var updated = await instrumentService.UpdateAsync(dto);
+                    // Quién cambió el estado (para el historial) sale del token
+                    var updated = await instrumentService.UpdateAsync(dto, user.GetUserId());
 
                     if (!updated)
                     {
@@ -77,12 +105,17 @@ namespace WebAPI
                 {
                     return Results.NotFound(new { error = ex.Message });
                 }
+                catch (InvalidOperationException ex)
+                {
+                    return Results.Conflict(new { error = ex.Message });
+                }
             })
             .WithName("UpdateInstrument")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentsUpdate");
 
             app.MapDelete("/instruments/{id}", async (int id, IInstrumentService instrumentService) =>
             {
@@ -98,7 +131,8 @@ namespace WebAPI
             .WithName("DeleteInstrument")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentsDelete");
         }
     }
 }

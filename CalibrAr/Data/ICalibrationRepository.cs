@@ -13,6 +13,8 @@ namespace Data
         Task<bool> DeleteAsync(int id);
         Task<Calibration?> GetAsync(int id);
         Task<IEnumerable<Calibration>> GetAllAsync();
+        Task<IEnumerable<Calibration>> GetByIdsAsync(IReadOnlyList<int> ids);
         Task<bool> UpdateAsync(Calibration calibration);
+        Task<Calibration?> GetLatestByInstrumentAsync(int instrumentId);
     }
 }

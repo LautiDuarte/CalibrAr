@@ -9,10 +9,13 @@ namespace Domain.Model
     public class Procedure
     {
         public int Id { get; private set; }
-        public string Code { get; private set; }
-        public string Name { get; private set; }
-        public string VersionNumber { get; private set; }
+        public string Code { get; private set; } = string.Empty;
+        public string Name { get; private set; } = string.Empty;
+        public string VersionNumber { get; private set; } = string.Empty;
         public DateTime ApprovedAt { get; private set; }
+
+        // Link al PDF del procedimiento (opcional).
+        public string? DocumentUrl { get; private set; }
 
         public bool IsActive { get; private set; }
         public DateTime CreatedAt { get; private set; }
@@ -33,8 +36,9 @@ namespace Domain.Model
             }
         }
 
-        public Procedure(int id, string code, string name, string versionNumber, DateTime approvedAt, bool isActive, DateTime createdAt, int instrumentTypeId)
+        public Procedure(int id, string code, string name, string versionNumber, DateTime approvedAt, bool isActive, DateTime createdAt, int instrumentTypeId, string? documentUrl = null)
         {
+            SetDocumentUrl(documentUrl);
             SetId(id);
             SetCode(code);
             SetName(name);
@@ -48,35 +52,54 @@ namespace Domain.Model
         public void SetId(int id)
         {
             if (id < 0)
-                throw new ArgumentException("El Id debe ser mayor que 0.", nameof(id));
+                throw new ArgumentException("El id debe ser mayor que 0.");
             Id = id;
         }
 
         public void SetCode(string code)
         {
             if (string.IsNullOrWhiteSpace(code))
-                throw new ArgumentException("El código no puede ser nulo o vacío.", nameof(code));
+                throw new ArgumentException("El código no puede estar vacío.");
             Code = code;
         }
 
         public void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("El nombre no puede ser nulo o vacío.", nameof(name));
+                throw new ArgumentException("El nombre no puede estar vacío.");
             Name = name;
         }
 
         public void SetVersionNumber(string versionNumber)
         {
             if (string.IsNullOrWhiteSpace(versionNumber))
-                throw new ArgumentException("El número de versión no puede ser nulo o vacío.", nameof(versionNumber));
+                throw new ArgumentException("El número de versión no puede estar vacío.");
             VersionNumber = versionNumber;
+        }
+
+        public void SetDocumentUrl(string? documentUrl)
+        {
+            if (string.IsNullOrWhiteSpace(documentUrl))
+            {
+                DocumentUrl = null;
+                return;
+            }
+
+            var trimmed = documentUrl.Trim();
+            if (trimmed.Length > 500)
+                throw new ArgumentException("El link al documento no puede superar los 500 caracteres.");
+
+            // Solo http o https, para que no se pueda guardar algo como "javascript:..." que después se muestre como link.
+            if (!Uri.TryCreate(trimmed, UriKind.Absolute, out var uri) || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+                throw new ArgumentException("El link al documento tiene que ser una dirección http o https válida.");
+
+            DocumentUrl = trimmed;
         }
 
         public void SetApprovedAt(DateTime approvedAt)
         {
             if (approvedAt == default)
-                throw new ArgumentException("La fecha de aprobación no puede ser nula.", nameof(approvedAt));
+                throw new ArgumentException("La fecha de aprobación no puede estar vacía.");
             ApprovedAt = approvedAt;
         }
 
@@ -88,14 +111,14 @@ namespace Domain.Model
         public void SetCreatedAt(DateTime createdAt)
         {
             if (createdAt == default)
-                throw new ArgumentException("La fecha de alta no puede ser nula.", nameof(createdAt));
+                throw new ArgumentException("La fecha de creación no puede estar vacía.");
             CreatedAt = createdAt;
         }
 
         public void SetInstrumentTypeId(int instrumentTypeId)
         {
             if (instrumentTypeId <= 0)
-                throw new ArgumentException("El Id del tipo de instrumento debe ser mayor que 0.", nameof(instrumentTypeId));
+                throw new ArgumentException("El id del tipo de instrumento debe ser mayor que 0.");
             if (_instrumentType != null && _instrumentType.Id != instrumentTypeId)
                 InstrumentType = null;
             InstrumentTypeId = instrumentTypeId;

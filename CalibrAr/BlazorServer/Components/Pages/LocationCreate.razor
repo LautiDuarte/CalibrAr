@@ -1,0 +1,51 @@
+@page "/locations/new"
+@attribute [Authorize(Policy = "LocationsCreate")]
+@inject LocationApiClient LocationApiClient
+@inject NavigationManager NavigationManager
+@inject FlashService Flash
+
+<PageTitle>Nueva ubicación - CalibrAr</PageTitle>
+
+<PageHeader Title="Nueva ubicación">
+    <Actions>
+        <a href="locations" class="btn btn-sm btn-outline-secondary">← Volver</a>
+    </Actions>
+</PageHeader>
+
+<ErrorBanner @bind-Message="errorMessage" />
+
+<LocationForm Model="model" OnValidSubmit="SaveAsync" Saving="saving" />
+
+@code {
+    private LocationForm.LocationFormModel model = new();
+    private string? errorMessage;
+    private bool saving;
+
+    private async Task SaveAsync()
+    {
+        saving = true;
+        try
+        {
+            await LocationApiClient.AddAsync(new LocationDTO
+            {
+                Name = model.Name,
+                Address = model.Address,
+                IsActive = model.IsActive
+            });
+            Flash.Success("Ubicación creada.");
+            NavigationManager.NavigateTo("locations");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

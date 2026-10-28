@@ -21,7 +21,8 @@ namespace WebAPI
             .WithName("GetInstrumentType")
             .Produces<InstrumentTypeDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentTypesRead");
 
             app.MapGet("/instrumenttypes", async (IInstrumentTypeService instrumentTypeService) =>
             {
@@ -31,7 +32,8 @@ namespace WebAPI
             })
             .WithName("GetAllInstrumentTypes")
             .Produces<IEnumerable<InstrumentTypeDTO>>(StatusCodes.Status200OK)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentTypesRead");
 
             app.MapPost("/instrumenttypes", async (InstrumentTypeDTO dto, IInstrumentTypeService instrumentTypeService) =>
             {
@@ -49,11 +51,11 @@ namespace WebAPI
             .WithName("AddInstrumentType")
             .Produces<InstrumentTypeDTO>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentTypesCreate");
 
-            app.MapPut("/instrumenttypes/{id}", async (int id, InstrumentTypeDTO dto, IInstrumentTypeService instrumentTypeService) =>
+            app.MapPut("/instrumenttypes", async (InstrumentTypeDTO dto, IInstrumentTypeService instrumentTypeService) =>
             {
-                dto.Id = id;
                 try
                 {
                     var updated = await instrumentTypeService.UpdateAsync(dto);
@@ -74,23 +76,32 @@ namespace WebAPI
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentTypesUpdate");
 
             app.MapDelete("/instrumenttypes/{id}", async (int id, IInstrumentTypeService instrumentTypeService) =>
             {
-                var deleted = await instrumentTypeService.DeleteAsync(id);
-
-                if (!deleted)
+                try
                 {
-                    return Results.NotFound();
-                }
+                    var deleted = await instrumentTypeService.DeleteAsync(id);
 
-                return Results.NoContent();
+                    if (!deleted)
+                    {
+                        return Results.NotFound();
+                    }
+
+                    return Results.NoContent();
+                }
+                catch (InvalidOperationException ex)
+                {
+                    return Results.Conflict(new { error = ex.Message });
+                }
             })
             .WithName("DeleteInstrumentType")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("InstrumentTypesDelete");
         }
     }
 }

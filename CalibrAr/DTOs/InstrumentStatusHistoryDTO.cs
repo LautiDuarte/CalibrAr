@@ -9,13 +9,12 @@ namespace DTOs
     public class InstrumentStatusHistoryDTO
     {
         public int Id { get; set; }
-        public string PreviousStatus { get; set; }
-        public string NewStatus { get; set; }
-        public string? Reason { get; set; }
+        public string PreviousStatus { get; set; } = string.Empty;
+        public string NewStatus { get; set; } = string.Empty;
         public DateTime ChangedAt { get; set; }
         public int InstrumentId { get; set; }
         public string? InstrumentCode { get; set; }
-        public int ChangedByUserId { get; set; }
+        public int? ChangedByUserId { get; set; }
         public string? ChangedByUserName { get; set; }
     }
 }

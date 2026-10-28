@@ -21,7 +21,8 @@ namespace WebAPI
             .WithName("GetProcedure")
             .Produces<ProcedureDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("ProceduresRead");
 
             app.MapGet("/procedures", async (IProcedureService procedureService) =>
             {
@@ -31,7 +32,8 @@ namespace WebAPI
             })
             .WithName("GetAllProcedures")
             .Produces<IEnumerable<ProcedureDTO>>(StatusCodes.Status200OK)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("ProceduresRead");
 
             app.MapPost("/procedures", async (ProcedureDTO dto, IProcedureService procedureService) =>
             {
@@ -49,15 +51,19 @@ namespace WebAPI
                 {
                     return Results.NotFound(new { error = ex.Message });
                 }
+                catch (InvalidOperationException ex)
+                {
+                    return Results.Conflict(new { error = ex.Message });
+                }
             })
             .WithName("AddProcedure")
             .Produces<ProcedureDTO>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("ProceduresCreate");
 
-            app.MapPut("/procedures/{id}", async (int id, ProcedureDTO dto, IProcedureService procedureService) =>
+            app.MapPut("/procedures", async (ProcedureDTO dto, IProcedureService procedureService) =>
             {
-                dto.Id = id;
                 try
                 {
                     var updated = await procedureService.UpdateAsync(dto);
@@ -77,12 +83,17 @@ namespace WebAPI
                 {
                     return Results.NotFound(new { error = ex.Message });
                 }
+                catch (InvalidOperationException ex)
+                {
+                    return Results.Conflict(new { error = ex.Message });
+                }
             })
             .WithName("UpdateProcedure")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("ProceduresUpdate");
 
             app.MapDelete("/procedures/{id}", async (int id, IProcedureService procedureService) =>
             {
@@ -98,7 +109,8 @@ namespace WebAPI
             .WithName("DeleteProcedure")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization("ProceduresDelete");
         }
     }
 }

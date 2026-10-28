@@ -9,10 +9,11 @@ namespace DTOs
     public class ProcedureDTO
     {
         public int Id { get; set; }
-        public string Code { get; set; }
-        public string Name { get; set; }
-        public string VersionNumber { get; set; }
+        public string Code { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string VersionNumber { get; set; } = string.Empty;
         public DateTime ApprovedAt { get; set; }
+        public string? DocumentUrl { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
         public int InstrumentTypeId { get; set; }

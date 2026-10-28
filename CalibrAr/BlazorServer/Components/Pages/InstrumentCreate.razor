@@ -1,0 +1,92 @@
+@page "/instruments/new"
+@attribute [Authorize(Policy = "InstrumentsCreate")]
+@inject InstrumentApiClient InstrumentApiClient
+@inject InstrumentTypeApiClient InstrumentTypeApiClient
+@inject AreaApiClient AreaApiClient
+@inject NavigationManager NavigationManager
+@inject FlashService Flash
+
+<PageTitle>Nuevo instrumento - CalibrAr</PageTitle>
+
+<PageHeader Title="Nuevo instrumento">
+    <Actions>
+        <a href="instruments" class="btn btn-sm btn-outline-secondary">← Volver</a>
+    </Actions>
+</PageHeader>
+
+<ErrorBanner @bind-Message="errorMessage" Persistent="@(instrumentTypes == null || areas == null)" />
+
+@if (instrumentTypes == null || areas == null)
+{
+    @if (errorMessage == null)
+    {
+        <p class="text-secondary">Cargando...</p>
+    }
+}
+else
+{
+    <InstrumentForm Model="model" InstrumentTypes="instrumentTypes" Areas="areas" OnValidSubmit="SaveAsync" Saving="saving" />
+}
+
+@code {
+    private InstrumentForm.InstrumentFormModel model = new();
+    private List<InstrumentTypeDTO>? instrumentTypes;
+    private List<AreaDTO>? areas;
+    private string? errorMessage;
+    private bool saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Los tipos y áreas inactivos no se ofrecen para instrumentos nuevos.
+            instrumentTypes = (await InstrumentTypeApiClient.GetAllAsync()).Where(t => t.IsActive).ToList();
+            areas = (await AreaApiClient.GetAllAsync()).Where(a => a.IsActive).ToList();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        saving = true;
+        try
+        {
+            await InstrumentApiClient.AddAsync(new InstrumentDTO
+            {
+                Code = model.Code.Trim(),
+                Name = model.Name,
+                SerialNumber = model.SerialNumber,
+                Brand = model.Brand,
+                Model = model.Model,
+                Status = model.Status,
+                MaxAllowedError = model.MaxAllowedError,
+                CalibrationFrequencyMonths = model.CalibrationFrequencyMonths,
+                InstrumentTypeId = model.InstrumentTypeId,
+                InstrumentTypeName = string.Empty,
+                AreaId = model.AreaId,
+                AreaName = string.Empty
+            });
+            Flash.Success("Instrumento creado.");
+            NavigationManager.NavigateTo("instruments");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NavigationManager.NavigateTo("login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ApiError.Message(ex);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

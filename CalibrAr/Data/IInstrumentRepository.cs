@@ -13,6 +13,8 @@ namespace Data
         Task<bool> DeleteAsync(int id);
         Task<Instrument?> GetAsync(int id);
         Task<IEnumerable<Instrument>> GetAllAsync();
+        Task<IEnumerable<Instrument>> GetByIdsAsync(IReadOnlyList<int> ids);
         Task<bool> UpdateAsync(Instrument instrument);
+        Task<bool> ExistsByCodeAsync(string code, int? excludeId = null);
     }
 }
